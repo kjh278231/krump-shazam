@@ -13,7 +13,7 @@ const REASON_TEXT = {
   low: '점수가 낮습니다. 조금 더 길게 다시 들어보세요.',
   rival: '다른 곡도 비슷한 점수로 잡혔습니다 (루프·샘플 공유 가능). 들어보고 골라주세요.',
   rhythm_strong: '유력 후보 — 지문 검색으로는 못 찾아서 리듬 패턴으로 찾았습니다 (잔향 큰 현장 녹음). '
-    + '▶ 해당 위치 듣기로 확인해 주세요.',
+    + '▶ 10초 미리듣기로 확인해 주세요.',
   rhythm_weak: '약한 후보 — 리듬 패턴이 조금 더 비슷한 정도라 틀릴 수 있습니다. '
     + '꼭 들어보고 확인하거나, 음악이 잘 들리는 구간에서 다시 시도해 주세요.',
 };
@@ -106,7 +106,8 @@ function renderResult(r, state) {
   }
   $('status').textContent = `${state.tabTitle || ''} · 검색 ${r.elapsed}s`;
 
-  r.songs.forEach((m, i) => {
+  // Only the best song is shown; the rest of the candidate list stays server-side.
+  r.songs.slice(0, 1).forEach((m) => {
     const el = document.createElement('div');
     el.className = 'match';
     const speed = m.time_factor && m.time_factor !== 1 ? ` · 속도 ${(m.time_factor * 100).toFixed(1)}%` : '';
@@ -114,11 +115,11 @@ function renderResult(r, state) {
       <div class="name"></div>
       <div class="meta"></div>
       <div class="actions">
-        <button data-act="play">▶ 해당 위치 듣기</button>
+        <button data-act="play">▶ 10초 미리듣기</button>
         <button data-act="yes">✔ 맞음</button>
         <button data-act="no">✘ 틀림</button>
       </div>`;
-    el.querySelector('.name').textContent = `${i + 1}. ${m.file}`;
+    el.querySelector('.name').textContent = m.file;
     const scoreText = r.method === 'rhythm' ? `리듬 유사도 ${m.score}` : `점수 ${m.score}`;
     el.querySelector('.meta').textContent =
       `${m.folder} · ${scoreText} · 곡의 ${fmt(m.match_start)}–${fmt(m.match_stop)}${speed}`;
@@ -142,7 +143,8 @@ function renderResult(r, state) {
 function play(m) {
   const p = $('player');
   p.hidden = false;
-  p.src = `${SERVER}/track?path=${encodeURIComponent(m.path)}#t=${Math.max(0, m.match_start).toFixed(1)}`;
+  // The server cuts a 10 s excerpt from the matched spot; full files are never sent.
+  p.src = `${SERVER}/preview?path=${encodeURIComponent(m.path)}&start=${Math.max(0, m.match_start).toFixed(1)}`;
   p.play();
 }
 

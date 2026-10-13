@@ -63,8 +63,10 @@ song is not in the library), then `python poc/evaluate.py --manifest your.csv`.
    Pin the extension.
 3. On a tab playing a video, click the extension icon → **현재 탭에서 찾기**. The popup can be
    closed while recording; the badge shows REC → ... → OK / ? / X.
-4. Results list each candidate with its score and position in the library track. **▶ 해당 위치
-   듣기** plays the library file at that spot. **✔ 맞음 / ✘ 틀림** records ground truth.
+4. The result shows the best song only, with its score and position in the library track.
+   **▶ 10초 미리듣기** plays a 10 s MP3 excerpt from that spot, cut by the server's `/preview`.
+   Full library files are never served, because of copyright once this is distributed.
+   **✔ 맞음 / ✘ 틀림** records ground truth.
 
 Candidates are grouped into songs (`poc/grouping.py`):
 - Files containing the same recording (other album copy, a session mix or judge-showcase

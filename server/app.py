@@ -24,7 +24,7 @@ import numpy as np  # noqa: E402
 import uvicorn  # noqa: E402
 from fastapi import FastAPI, HTTPException, Request  # noqa: E402
 from fastapi.middleware.cors import CORSMiddleware  # noqa: E402
-from fastapi.responses import FileResponse  # noqa: E402
+from fastapi.responses import Response  # noqa: E402
 from pydantic import BaseModel  # noqa: E402
 
 from common import FFMPEG, MUSIC_DIR, ROOT, list_audio, load_excluded, panako, parse_query_output  # noqa: E402
@@ -189,13 +189,23 @@ def feedback(fb: Feedback) -> dict:
     raise HTTPException(404, "unknown query id")
 
 
-@app.get("/track")
-def track(path: str) -> FileResponse:
-    """Serve a library file so the popup can play the matched spot for a by-ear check."""
+PREVIEW_SECONDS = 10
+
+
+@app.get("/preview")
+def preview(path: str, start: float = 0.0) -> Response:
+    """A 10 s MP3 excerpt from the matched spot, for a by-ear check. The full library file is
+    never served (copyright, once this is distributed)."""
     p = Path(path).resolve()
     if not p.is_file() or MUSIC_DIR.resolve() not in p.parents:
         raise HTTPException(404, "not a library file")
-    return FileResponse(p)
+    fade = f"afade=t=in:d=0.3,afade=t=out:st={PREVIEW_SECONDS - 0.5}:d=0.5"
+    out = subprocess.run([FFMPEG, "-v", "error", "-ss", f"{max(0.0, start):.2f}", "-t", str(PREVIEW_SECONDS),
+                          "-i", str(p), "-vn", "-af", fade, "-b:a", "128k", "-f", "mp3", "pipe:1"],
+                         capture_output=True)
+    if out.returncode != 0 or not out.stdout:
+        raise HTTPException(500, "could not cut the preview")
+    return Response(out.stdout, media_type="audio/mpeg")
 
 
 if __name__ == "__main__":
