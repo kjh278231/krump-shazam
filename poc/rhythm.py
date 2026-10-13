@@ -120,7 +120,8 @@ class RhythmIndex:
         z = np.full_like(best, np.nan)
         self.last_z_top = None
         if self.cohort is not None:
-            z = (best - self.cohort[0]) / self.cohort[1]
+            with np.errstate(invalid="ignore"):  # tracks shorter than the query stay -inf -> nan
+                z = (best - self.cohort[0]) / self.cohort[1]
             zr = np.where(usable & np.isfinite(z), z, -np.inf)
             self.last_z_top = int(self.ids[int(np.argmax(zr))])
         order = np.argsort(-rank)[:top]

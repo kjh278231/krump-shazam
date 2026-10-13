@@ -6,6 +6,7 @@ import os
 import subprocess
 import sys
 import tempfile
+import threading
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -60,8 +61,7 @@ def list_audio(folder: Path = MUSIC_DIR) -> list[Path]:
     return sorted(p for p in folder.rglob("*") if p.suffix.lower() in AUDIO_EXTS and p.is_file())
 
 
-def panako(command: str, args: list[str], db_dir: Path = DB_DIR, threads: int = 1,
-           map_gb: int = 32, extra_config: dict | None = None) -> subprocess.CompletedProcess:
+def _panako_cmd(command: str, db_dir: Path, threads: int, map_gb: int, extra_config: dict | None) -> list[str]:
     config = {
         "STRATEGY": "PANAKO",
         "DECODER_PIPE_ENVIRONMENT": "cmd.exe",
@@ -71,9 +71,22 @@ def panako(command: str, args: list[str], db_dir: Path = DB_DIR, threads: int = 
         "AVAILABLE_PROCESSORS": str(threads),
         "NUMBER_OF_QUERY_RESULTS": "5",
         # Cached prints are looked up by resource id; never let a query clip reuse them.
-        **({"PANAKO_USE_CACHED_PRINTS": "FALSE"} if command == "query" else {}),
+        **({"PANAKO_USE_CACHED_PRINTS": "FALSE"} if command in ("query", "queryServer") else {}),
         **(extra_config or {}),
     }
+    return [
+        JAVA,
+        f"-Dpanako.lmdb.mapsize.gb={map_gb}",
+        "-Dfile.encoding=UTF-8", "-Dsun.stdout.encoding=UTF-8", "-Dsun.stderr.encoding=UTF-8",
+        "--add-opens", "java.base/java.nio=ALL-UNNAMED",
+        "--add-opens", "java.base/sun.nio.ch=ALL-UNNAMED",
+        "-jar", str(PANAKO_JAR), command,
+        *[f"{k}={v}" for k, v in config.items()],
+    ]
+
+
+def panako(command: str, args: list[str], db_dir: Path = DB_DIR, threads: int = 1,
+           map_gb: int = 32, extra_config: dict | None = None) -> subprocess.CompletedProcess:
     # Java 17 converts command-line arguments through the ANSI code page (cp949), which
     # turns characters like 'ö', '★' or Japanese into '?'. Panako also accepts a .txt file
     # listing one path per line, so pass files that way, read as UTF-8.
@@ -83,22 +96,89 @@ def panako(command: str, args: list[str], db_dir: Path = DB_DIR, threads: int = 
         with os.fdopen(fd, "w", encoding="utf-8") as fh:
             fh.write("\n".join(args))
         args = [list_file]
-    cmd = [
-        JAVA,
-        f"-Dpanako.lmdb.mapsize.gb={map_gb}",
-        "-Dfile.encoding=UTF-8", "-Dsun.stdout.encoding=UTF-8", "-Dsun.stderr.encoding=UTF-8",
-        "--add-opens", "java.base/java.nio=ALL-UNNAMED",
-        "--add-opens", "java.base/sun.nio.ch=ALL-UNNAMED",
-        "-jar", str(PANAKO_JAR), command,
-        *[f"{k}={v}" for k, v in config.items()],
-        *args,
-    ]
+    cmd = [*_panako_cmd(command, db_dir, threads, map_gb, extra_config), *args]
     try:
         return subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8",
                               errors="replace", env=env())
     finally:
         if list_file:
             os.remove(list_file)
+
+
+class PanakoServer:
+    """One long-running Panako JVM (the patched `queryServer` command) shared by all callers.
+
+    Starting a JVM and opening the storage cost most of a one-shot `query` (~2.5 s); the server
+    pays that once. `query()` is thread-safe: requests are tagged with an id, run concurrently on
+    `threads` Java threads, and their result lines are routed back by id. The JVM is restarted if
+    it dies.
+    """
+
+    def __init__(self, db_dir: Path = DB_DIR, threads: int = 4, map_gb: int = 32,
+                 extra_config: dict | None = None, log_path: Path | None = None):
+        self._cmd = _panako_cmd("queryServer", db_dir, threads, map_gb, extra_config)
+        self._log_path = log_path or (ROOT / "panako_server.log")
+        self._lock = threading.Lock()
+        self._pending: dict[str, tuple[list[str], threading.Event]] = {}
+        self._next_id = 0
+        self.proc = None
+        self._start()
+
+    def _start(self) -> None:
+        log = open(self._log_path, "a", encoding="utf-8")
+        self.proc = subprocess.Popen(self._cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=log,
+                                     text=True, encoding="utf-8", errors="replace", env=env(), bufsize=1)
+        for line in self.proc.stdout:  # wait until the storage is open
+            if line.strip() == "READY":
+                break
+        else:
+            raise RuntimeError(f"Panako query server did not start, see {self._log_path}")
+        threading.Thread(target=self._read, args=(self.proc,), daemon=True).start()
+
+    def _read(self, proc) -> None:
+        for line in proc.stdout:
+            head, _, rest = line.partition(";")
+            with self._lock:
+                entry = self._pending.get(head.strip())
+            if entry is None:
+                continue
+            if rest.strip() == "END":
+                entry[1].set()
+            elif rest.strip().startswith("ERROR"):
+                entry[0].append(rest.strip())
+            else:
+                entry[0].append(line)
+        with self._lock:  # the JVM exited: fail everything still waiting
+            for lines, done in self._pending.values():
+                lines.append("ERROR server exited")
+                done.set()
+
+    def query(self, path: str | Path, timeout: float = 120) -> list[Match]:
+        with self._lock:
+            if self.proc.poll() is not None:
+                self._start()
+            rid = str(self._next_id)
+            self._next_id += 1
+            entry = ([], threading.Event())
+            self._pending[rid] = entry
+            self.proc.stdin.write(f"{rid}\t{path}\n")
+            self.proc.stdin.flush()
+        try:
+            if not entry[1].wait(timeout):
+                raise TimeoutError(f"Panako query timed out: {path}")
+        finally:
+            with self._lock:
+                self._pending.pop(rid, None)
+        errors = [l for l in entry[0] if l.startswith("ERROR")]
+        if errors:
+            raise RuntimeError(f"Panako query failed: {errors[0].strip()}")
+        return next(iter(parse_query_output("".join(entry[0])).values()), [])
+
+    def close(self) -> None:
+        if self.proc and self.proc.poll() is None:
+            self.proc.stdin.write("\n")
+            self.proc.stdin.flush()
+            self.proc.wait(10)
 
 
 def _murmur3_x86_32(data: bytes, seed: int = 0) -> int:

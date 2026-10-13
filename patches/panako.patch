@@ -46,11 +46,159 @@ index 7aa5fb4..b6bab6d 100644
  		}
  		
  		@Override
+diff --git a/src/main/java/be/panako/cli/QueryServer.java b/src/main/java/be/panako/cli/QueryServer.java
+new file mode 100644
+index 0000000..c1ce97f
+--- /dev/null
++++ b/src/main/java/be/panako/cli/QueryServer.java
+@@ -0,0 +1,101 @@
++package be.panako.cli;
++
++import java.io.BufferedReader;
++import java.io.FileDescriptor;
++import java.io.FileOutputStream;
++import java.io.InputStreamReader;
++import java.io.PrintStream;
++import java.nio.charset.StandardCharsets;
++import java.util.HashSet;
++import java.util.Locale;
++import java.util.concurrent.ExecutorService;
++import java.util.concurrent.Executors;
++import java.util.logging.Logger;
++
++import be.panako.strategy.QueryResult;
++import be.panako.strategy.QueryResultHandler;
++import be.panako.strategy.Strategy;
++import be.panako.util.Config;
++import be.panako.util.Key;
++
++/**
++ * Long-running query service: keeps the JVM and the storage open so a query costs only the
++ * fingerprinting and lookup, not the JVM start-up and storage opening of the query command.
++ *
++ * Protocol (UTF-8, one request per line on stdin): {@code <request id>\t<audio path>}, where
++ * the id is a non-negative integer. For every request the results are printed on stdout in the
++ * format of the query command, with the request id in the first column, followed by
++ * {@code <request id> ; END}. Requests run concurrently on AVAILABLE_PROCESSORS threads, so
++ * results of different requests may interleave; group them by id. An empty line or EOF stops.
++ */
++class QueryServer extends Application {
++	private final static Logger LOG = Logger.getLogger(QueryServer.class.getName());
++
++	@Override
++	public void run(String... args) {
++		final PrintStream out = new PrintStream(new FileOutputStream(FileDescriptor.out), true, StandardCharsets.UTF_8);
++		final Strategy strategy = Strategy.getInstance();
++		final int numberOfResults = Config.getInt(Key.NUMBER_OF_QUERY_RESULTS);
++		ExecutorService executor = Executors.newFixedThreadPool(availableProcessors());
++		out.println("READY");
++		try (BufferedReader in = new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8))) {
++			String line;
++			while ((line = in.readLine()) != null && !line.isEmpty()) {
++				final String[] parts = line.split("\t", 2);
++				if (parts.length != 2) {
++					out.println("-1 ; ERROR bad request: " + line);
++					continue;
++				}
++				final String id = parts[0].trim();
++				final String path = parts[1];
++				executor.submit(() -> {
++					try {
++						strategy.query(path, numberOfResults, new HashSet<Integer>(), new QueryResultHandler() {
++							@Override
++							public void handleQueryResult(QueryResult r) { print(out, id, r); }
++							@Override
++							public void handleEmptyResult(QueryResult r) { print(out, id, r); }
++						});
++					} catch (Throwable e) {
++						LOG.severe("Query failed for " + path + ": " + e);
++						out.println(id + " ; ERROR " + e);
++					} finally {
++						out.println(id + " ; END");
++					}
++				});
++			}
++		} catch (Exception e) {
++			LOG.severe("Query server stopped: " + e);
++		}
++		executor.shutdown();
++		System.exit(0);
++	}
++
++	private static void print(PrintStream out, String id, QueryResult r) {
++		// Same columns as Panako.printQueryResult, with the request id as the index; one println so
++		// concurrent requests never split a line.
++		out.println(String.format(Locale.ROOT, "%s ; 1 ; %s ; %.3f ; %.3f ; %s ; %s ; %.3f ; %.3f ; %.0f ; %.3f %% ; %.3f %%; %.2f",
++				id, r.queryPath, r.queryStart, r.queryStop, r.refPath, r.refIdentifier, r.refStart, r.refStop,
++				r.score, r.timeFactor, r.frequencyFactor, r.percentOfSecondsWithMatches));
++	}
++
++	@Override
++	public String description() {
++		return "Keeps the storage open and answers queries read from stdin (id<TAB>path per line).";
++	}
++
++	@Override
++	public String synopsis() {
++		return "";
++	}
++
++	@Override
++	public boolean needsStorage() {
++		return true;
++	}
++
++	@Override
++	public boolean writesToStorage() {
++		return false;
++	}
++}
 diff --git a/src/main/java/be/panako/strategy/panako/PanakoStrategy.java b/src/main/java/be/panako/strategy/panako/PanakoStrategy.java
-index 91eb566..055f500 100644
+index 91eb566..73be2bf 100644
 --- a/src/main/java/be/panako/strategy/panako/PanakoStrategy.java
 +++ b/src/main/java/be/panako/strategy/panako/PanakoStrategy.java
-@@ -280,6 +280,93 @@ public class PanakoStrategy extends Strategy {
+@@ -225,11 +225,16 @@ public class PanakoStrategy extends Strategy {
+ 			size = Config.getInt(Key.PANAKO_AUDIO_BLOCK_SIZE);
+ 			overlap = Config.getInt(Key.PANAKO_AUDIO_BLOCK_OVERLAP);
+ 
+-			AudioDispatcher d;
+-
+-			if(numberOfSeconds==MAX_TIME)
++			AudioDispatcher d = null;
++
++			// A whole PCM WAV already at the target rate (mono, 16-bit) is read directly: the pipe
++			// decoder starts a shell plus ffmpeg per file, which costs ~1.7 s on Windows hosts with
++			// on-access scanning, far more than the fingerprinting itself.
++			if(numberOfSeconds==MAX_TIME && startTimeOffset==0 && resource.toLowerCase().endsWith(".wav"))
++				d = directWav(resource, samplerate, size, overlap);
++			if(d == null && numberOfSeconds==MAX_TIME)
+ 				d = AudioDispatcherFactory.fromPipe(resource, samplerate, size, overlap,startTimeOffset);
+-			else
++			else if(d == null)
+ 				d = AudioDispatcherFactory.fromPipe(resource, samplerate, size, overlap,startTimeOffset,numberOfSeconds);
+ 
+ 			PanakoEventPointProcessor eventPointProcessor = new PanakoEventPointProcessor(size);
+@@ -241,6 +246,19 @@ public class PanakoStrategy extends Strategy {
+ 
+ 	}
+ 
++	/** Dispatcher reading a mono 16-bit PCM WAV at {@code samplerate} directly, or null if the file is not one. */
++	private static AudioDispatcher directWav(String resource, int samplerate, int size, int overlap) {
++		try {
++			javax.sound.sampled.AudioFormat f = javax.sound.sampled.AudioSystem.getAudioFileFormat(new File(resource)).getFormat();
++			if (f.getEncoding() != javax.sound.sampled.AudioFormat.Encoding.PCM_SIGNED || f.getChannels() != 1
++					|| f.getSampleSizeInBits() != 16 || Math.round(f.getSampleRate()) != samplerate)
++				return null;
++			return AudioDispatcherFactory.fromFile(new File(resource), size, overlap);
++		} catch (Exception e) {
++			return null; // not a readable WAV: fall back to the pipe decoder
++		}
++	}
++
+ 	private float blocksToSeconds(int t) {
+ 		float timeResolution = Config.getFloat(Key.PANAKO_TRANSF_TIME_RESOLUTION);
+ 		float sampleRate = Config.getFloat(Key.PANAKO_SAMPLE_RATE);
+@@ -280,6 +298,93 @@ public class PanakoStrategy extends Strategy {
  		}
  		return mostCommonDeltaT;
  	}
@@ -144,7 +292,7 @@ index 91eb566..055f500 100644
  	@Override
  	public void query(String query, int maxNumberOfResults, Set<Integer> avoid, QueryResultHandler handler) {
  		query(query,maxNumberOfResults,avoid,handler,0,MAX_TIME);
-@@ -360,11 +447,30 @@ public class PanakoStrategy extends Strategy {
+@@ -360,11 +465,30 @@ public class PanakoStrategy extends Strategy {
  			 hitsPerIdentifer.remove(identifier);
  		 });
  		 
@@ -177,7 +325,7 @@ index 91eb566..055f500 100644
  			 //view the first and last hits (max 250)
  			 int maxPartListSize = Config.getInt(Key.PANAKO_HIT_PART_MAX_SIZE);
  			 int partDivider = Config.getInt(Key.PANAKO_HIT_PART_DIVIDER);
-@@ -375,13 +481,13 @@ public class PanakoStrategy extends Strategy {
+@@ -375,13 +499,13 @@ public class PanakoStrategy extends Strategy {
  			//find the first x1 where delta t is equals to the median delta t
  			 float y1 = mostCommonDeltaTforHitList(firstHits);
  			 float x1 = 0;
@@ -193,7 +341,7 @@ index 91eb566..055f500 100644
  					 break;
  				 }
  			 }
-@@ -398,8 +504,10 @@ public class PanakoStrategy extends Strategy {
+@@ -398,8 +522,10 @@ public class PanakoStrategy extends Strategy {
  				 }
  			 }
  			 	 

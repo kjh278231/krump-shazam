@@ -120,6 +120,33 @@ Next: validate with real browser recordings (event videos), then decide whether 
 reverb-robust second stage (e.g. chroma/beat alignment over the top-N Panako candidates,
 or source separation before querying) is needed.
 
+## Server performance (2026-10-14, i7-13700F, Windows)
+
+**Pipeline.**
+- One Panako JVM (`queryServer`, 8 threads) is shared by all requests.
+- Each request converts the capture once with ffmpeg to 16 kHz mono WAV. Panako reads that WAV
+  directly, and the rhythm search resamples it in numpy.
+- Requests run on FastAPI's thread pool. At most `RHYTHM_WORKERS` (default 3) rhythm searches
+  run at once, since each holds ~0.5 GB of temporaries.
+
+Panako query of a 30 s clip (`python poc/bench_panako_server.py`). Results are identical to
+the one-shot `query` command (8/8), and non-ASCII paths work.
+
+| | per query | concurrent |
+|---|---|---|
+| one-shot `panako query` | 3.56 s | — |
+| query server, ffmpeg pipe | 2.02 s | — |
+| query server, direct WAV | **0.32 s** | 20 queries/s with 8 callers |
+
+End to end through the HTTP server (`python server/loadtest.py <webm>... --cleanup`):
+
+| Requests | Single request | 8 concurrent clients |
+|---|---|---|
+| fingerprint match | 1.2 s (0.8 s of it is starting ffmpeg) | 3.5 req/s, median 1.9 s |
+| rhythm fallback | 3.3–4.6 s (was 7–9 s) | mixed set: 1.5 req/s |
+
+On Linux, process start-up is milliseconds, so the ffmpeg share should mostly disappear.
+
 ## Rhythm fallback (reverberant room recordings)
 
 **When it runs.** If Panako finds nothing, the server runs a second search on rhythm
@@ -226,3 +253,9 @@ Found while getting the PoC running on Windows with this library:
 5. **Identifiers**: purely numeric file names (`01.mp3`) were used as the track id, so
    same-named files in different albums collided. Now content hash unless
    `-Dpanako.numeric.ids=true`.
+6. **Query server** (`cli/QueryServer.java`, command `queryServer`): a long-running process that
+   keeps the JVM and LMDB open and answers `id<TAB>path` lines from stdin on a thread pool. The
+   Python client is `PanakoServer` in `poc/common.py`.
+7. **Direct WAV input**: a mono 16-bit WAV already at 16 kHz is read with Java Sound instead of
+   the ffmpeg pipe decoder. Each process start costs ~0.8 s on this Windows machine
+   (on-access scanning), and the pipe decoder starts both `cmd.exe` and `ffmpeg`.

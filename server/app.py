@@ -14,6 +14,7 @@ import subprocess
 import sys
 import threading
 import time
+import uuid
 import wave
 from datetime import datetime
 from pathlib import Path
@@ -25,11 +26,12 @@ import uvicorn  # noqa: E402
 from fastapi import FastAPI, HTTPException, Request  # noqa: E402
 from fastapi.middleware.cors import CORSMiddleware  # noqa: E402
 from fastapi.responses import Response  # noqa: E402
+from starlette.concurrency import run_in_threadpool  # noqa: E402
 from pydantic import BaseModel  # noqa: E402
 
-from common import FFMPEG, MUSIC_DIR, ROOT, list_audio, load_excluded, panako, parse_query_output  # noqa: E402
+from common import FFMPEG, MUSIC_DIR, ROOT, PanakoServer, list_audio, load_excluded  # noqa: E402
 from grouping import group, load_links, verdict  # noqa: E402
-from rhythm import RhythmIndex, decode as decode_rhythm, identify as rhythm_identify  # noqa: E402
+from rhythm import SR as RHYTHM_SR, RhythmIndex, identify as rhythm_identify  # noqa: E402
 
 REC_DIR = ROOT / "recordings"
 LOG = REC_DIR / "log.csv"
@@ -43,6 +45,11 @@ EXCLUDED = load_excluded()
 # Fallback for reverberant room recordings where Panako finds nothing (poc/rhythm.py).
 RHYTHM = (RhythmIndex(RHYTHM_FILE, exclude=EXCLUDED, cohort=ROOT / "db" / "rhythm_cohort.npz")
           if RHYTHM_FILE.exists() else None)
+RHYTHM_SLOTS = threading.BoundedSemaphore(int(os.environ.get("RHYTHM_WORKERS", "3")))
+PANAKO_SR = 16000  # Panako's PANAKO_SAMPLE_RATE
+# One JVM for all requests, storage kept open (poc/common.py PanakoServer).
+PANAKO = PanakoServer(threads=int(os.environ.get("PANAKO_THREADS", "8")),
+                      extra_config={"NUMBER_OF_QUERY_RESULTS": "10"})
 
 
 def same_audio(a: int, b: int) -> bool:
@@ -75,23 +82,42 @@ def health() -> dict:
     return {"ok": True}
 
 
+def resample(x: np.ndarray, sr_in: int, sr_out: int) -> np.ndarray:
+    """Band-limited resampling by FFT truncation/padding (no scipy needed)."""
+    n_out = int(round(len(x) * sr_out / sr_in))
+    X = np.fft.rfft(x)
+    m = n_out // 2 + 1
+    X = X[:m] if m <= len(X) else np.concatenate([X, np.zeros(m - len(X), X.dtype)])
+    return (np.fft.irfft(X, n_out) * (n_out / len(x))).astype(np.float32)
+
+
 @app.post("/identify")
 async def identify(request: Request, title: str = "", url: str = "", partial: bool = False) -> dict:
     """partial=1: a mid-recording check from the extension. Fingerprint only (fast); the
-    recording is kept and logged only when it is confirmed, since then it is the final answer."""
+    recording is kept and logged only when it is confirmed, since then it is the final answer.
+
+    The work runs on the thread pool so concurrent requests from several users overlap: the
+    Panako server handles queries on its own Java threads and numpy releases the GIL."""
     body = await request.body()
+    return await run_in_threadpool(identify_audio, body, title, url, partial)
+
+
+def identify_audio(body: bytes, title: str, url: str, partial: bool) -> dict:
     if len(body) < 1000:
         raise HTTPException(400, "recording is empty (is the tab playing audio?)")
     REC_DIR.mkdir(exist_ok=True)
-    stamp = datetime.now().strftime("%Y%m%d-%H%M%S-%f")[:-3]
+    # Unique even for requests arriving in the same millisecond.
+    stamp = datetime.now().strftime("%Y%m%d-%H%M%S-%f")[:-3] + "-" + uuid.uuid4().hex[:4]
     raw = REC_DIR / f"{stamp}.webm"
     wav = REC_DIR / f"{stamp}.wav"
     raw.write_bytes(body)
-    conv = subprocess.run([FFMPEG, "-v", "error", "-y", "-i", str(raw), "-ac", "1", "-ar", "22050", str(wav)],
+    # One ffmpeg call per request. The WAV is at Panako's rate, so Panako reads it directly
+    # (no decoder process) and the rhythm search resamples it in numpy.
+    conv = subprocess.run([FFMPEG, "-v", "error", "-y", "-i", str(raw), "-ac", "1", "-ar", str(PANAKO_SR), str(wav)],
                           capture_output=True, text=True)
+    raw.unlink(missing_ok=True)
     if conv.returncode != 0 or not wav.exists():
         raise HTTPException(400, f"ffmpeg could not decode the recording: {conv.stderr[-300:]}")
-    raw.unlink()
     # Instagram and others start videos muted; a muted tab records digital silence.
     with wave.open(str(wav), "rb") as w:
         pcm = np.frombuffer(w.readframes(w.getnframes()), dtype="<i2").astype(np.float32) / 32768
@@ -100,9 +126,8 @@ async def identify(request: Request, title: str = "", url: str = "", partial: bo
         raise HTTPException(400, "소리가 거의 녹음되지 않았습니다. 탭/영상이 음소거 상태이거나 멈춰 있지 않은지 확인하세요.")
 
     t0 = time.time()
-    res = panako("query", [str(wav)], threads=4, extra_config={"NUMBER_OF_QUERY_RESULTS": "10"})
+    matches = PANAKO.query(wav)
     elapsed = time.time() - t0
-    matches = next(iter(parse_query_output(res.stdout).values()), [])
     matches = [m for m in matches if m.match_path not in EXCLUDED]  # both normcased
     for m in matches:
         m.match_path = ORIGINAL_PATH.get(m.match_path, m.match_path)
@@ -135,9 +160,10 @@ async def identify(request: Request, title: str = "", url: str = "", partial: bo
                 "elapsed": round(elapsed, 2), "songs": out_songs}
 
     if result == "fail" and RHYTHM is not None:
-        y = decode_rhythm(wav)
-        dur = len(y) / 11025
-        r = rhythm_identify(RHYTHM, y, same_audio)
+        y = resample(pcm, PANAKO_SR, RHYTHM_SR)
+        dur = len(y) / RHYTHM_SR
+        with RHYTHM_SLOTS:  # each search holds ~0.5 GB of temporaries
+            r = rhythm_identify(RHYTHM, y, same_audio)
         if r:
             result, reason, method = "check", "rhythm", "rhythm"
             out_songs = [{
