@@ -1,9 +1,10 @@
 // Records the captured tab audio and sends it to the local server.
 //
 // Like Shazam, it doesn't wait for the full duration: from FIRST_CHECK seconds on, the audio
-// recorded so far is sent for a quick fingerprint-only search every CHECK_EVERY seconds. A
-// confirmed match stops the recording right away; otherwise the best candidate so far is shown
-// and, at the end, the full recording gets the complete search (fingerprint + rhythm fallback).
+// recorded so far is searched every CHECK_EVERY seconds (fingerprint; from 15 s also rhythm).
+// When the server marks a check final (fingerprint confirmed, or a strong rhythm candidate after
+// 20 s) the recording stops right away; otherwise the best candidate so far is shown as a hint
+// and, at the end, the full recording gets the complete search.
 
 const SERVER = 'http://127.0.0.1:8765';
 const MIN_SECONDS = 5;
@@ -82,7 +83,8 @@ async function record({ streamId, duration, tabTitle, tabUrl }) {
     try {
       const r = await identify(new Blob(chunks, { type: 'audio/webm' }), { ...page, partial: 1 });
       if (recorder.state !== 'recording') return;  // the final search has taken over
-      if (r.verdict === 'confirmed') {
+      // final: a fingerprint confirmation, or a strong rhythm candidate after >= 20 s (server decides).
+      if (r.final) {
         early = r;
         clearTimeout(stopTimer);
         recorder.stop();

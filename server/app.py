@@ -46,6 +46,8 @@ EXCLUDED = load_excluded()
 RHYTHM = (RhythmIndex(RHYTHM_FILE, exclude=EXCLUDED, cohort=ROOT / "db" / "rhythm_cohort.npz")
           if RHYTHM_FILE.exists() else None)
 RHYTHM_SLOTS = threading.BoundedSemaphore(int(os.environ.get("RHYTHM_WORKERS", "3")))
+RHYTHM_HINT_SECONDS = 15   # partial checks run the rhythm search from here on (hint only)
+RHYTHM_EARLY_SECONDS = 20  # ... and a strong candidate from here on ends the recording
 PANAKO_SR = 16000  # Panako's PANAKO_SAMPLE_RATE
 # One JVM for all requests, storage kept open (poc/common.py PanakoServer).
 PANAKO = PanakoServer(threads=int(os.environ.get("PANAKO_THREADS", "8")),
@@ -154,17 +156,22 @@ def identify_audio(body: bytes, title: str, url: str, partial: bool) -> dict:
     } for s in songs]
     method = "fingerprint"
 
-    if partial and result != "confirmed":
-        wav.unlink()
-        return {"id": None, "verdict": result, "reason": reason, "method": method,
-                "elapsed": round(elapsed, 2), "songs": out_songs}
+    dur = len(pcm) / PANAKO_SR
+    # Mid-recording checks also run the rhythm search once there is enough audio (real hall
+    # recordings almost never confirm by fingerprint). Measured on realtest/rhythm_prefix.jsonl:
+    # a "strong" rhythm candidate at >= 20 s is as reliable as at 30 s (room clips 43 shown/42
+    # right, unknown songs 3/39 in both cases), so it ends the recording early; from 15 s it is
+    # only shown as a hint.
+    run_rhythm = result == "fail" and RHYTHM is not None and (not partial or dur >= RHYTHM_HINT_SECONDS)
+    final = not partial or result == "confirmed"
 
-    if result == "fail" and RHYTHM is not None:
+    if run_rhythm:
         y = resample(pcm, PANAKO_SR, RHYTHM_SR)
-        dur = len(y) / RHYTHM_SR
         with RHYTHM_SLOTS:  # each search holds ~0.5 GB of temporaries
             r = rhythm_identify(RHYTHM, y, same_audio)
-        if r:
+        # Mid-recording, only strong candidates are shown: weak ones also appeared for 6-10/39
+        # songs that are not in the library, and a wrong hint is worse than none.
+        if r and (not partial or r["strength"] == "strong"):
             result, reason, method = "check", "rhythm", "rhythm"
             out_songs = [{
                 "path": h["path"], "file": Path(h["path"]).name, "folder": Path(h["path"]).parent.name,
@@ -175,7 +182,14 @@ def identify_audio(body: bytes, title: str, url: str, partial: bool) -> dict:
             } for h in r["songs"]]
             out_songs[0]["ratio"] = round(r["ratio"], 2)
             out_songs[0]["strength"] = r["strength"]
+            if partial and r["strength"] == "strong" and dur >= RHYTHM_EARLY_SECONDS:
+                final = True
         elapsed = time.time() - t0
+
+    if not final:  # a hint only; the recording continues and the final request is logged
+        wav.unlink()
+        return {"id": None, "verdict": result, "reason": reason, "method": method, "final": False,
+                "elapsed": round(elapsed, 2), "songs": out_songs}
 
     with log_lock:
         rows = read_log()
@@ -191,6 +205,7 @@ def identify_audio(body: bytes, title: str, url: str, partial: bool) -> dict:
         "verdict": result,
         "reason": reason,
         "method": method,
+        "final": True,
         "elapsed": round(elapsed, 2),
         "songs": out_songs,
     }

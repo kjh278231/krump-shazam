@@ -76,8 +76,9 @@ function render(state = {}) {
     if (p) {
       const hint = document.createElement('div');
       hint.className = 'reason';
+      const by = p.method === 'rhythm' ? '리듬 패턴상' : '';
       hint.textContent = p.songs?.length
-        ? `${p.seconds}초까지 들은 결과 가장 유력: ${p.songs[0].file} (점수 ${p.songs[0].score}) — 더 듣는 중`
+        ? `${p.seconds}초까지 들은 결과 ${by} 가장 유력: ${p.songs[0].file} — 더 듣는 중`
         : `${p.seconds}초까지는 아직 후보 없음 — 더 듣는 중`;
       $('result').append(hint);
     }

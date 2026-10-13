@@ -193,6 +193,27 @@ KILL EM comes back 약한. The fifth, a recording across a DJ jump-back, still f
 
 Rhythm results are never 확정, only 추가 확인 with a "listen to check" prompt.
 
+**During recording** (`poc/eval_rhythm_prefix.py` → `realtest/rhythm_prefix.jsonl`). Real hall
+recordings almost never confirm by fingerprint, so mid-recording checks also run the rhythm
+search from 15 s on.
+
+| Prefix | Room clips: 유력 shown / right | Unknown songs: 유력 |
+|---|---|---|
+| 15 s | 5 / 4 | 4 |
+| 20 s | 13 / 13 | 3 |
+| 25 s | 26 / 26 | 3 |
+| 30 s | 43 / 42 | 3 |
+
+Stopping at the first 유력 at ≥ 20 s gives the same result as waiting for 30 s (room clips
+43/42, DARK video 6/6, user captures 3/3, unknown songs 3/39), with a median stop at 25 s.
+So a 유력 candidate at ≥ 20 s ends the recording, and from 15 s a 유력 candidate is shown only
+as a hint. 약한 candidates are never shown mid-recording, because they appeared for 6–10 of
+39 unknown songs.
+
+Simulated through the extension against the server: DARK shows a hint at 15 s and the result
+at 26 s (was 33 s). A clean clip is confirmed at 11 s. An unknown song gets no hint and fails
+at the end.
+
 **Battle videos.** The rhythm search also proposes consistent matches in battle videos that
 Panako missed. The same track shows up over several windows, with track positions advancing
 30 s. Examples:
