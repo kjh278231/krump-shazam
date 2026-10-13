@@ -12,8 +12,10 @@ const FAIL_HELP = '현장 녹음이라 잔향·함성·MC 소리에 음악이 �
 const REASON_TEXT = {
   low: '점수가 낮습니다. 조금 더 길게 다시 들어보세요.',
   rival: '다른 곡도 비슷한 점수로 잡혔습니다 (루프·샘플 공유 가능). 들어보고 골라주세요.',
-  rhythm: '지문 검색으로는 못 찾아서 리듬 패턴으로 찾은 후보입니다 (잔향 큰 현장 녹음용). '
-    + '틀릴 수 있으니 ▶ 해당 위치 듣기로 꼭 확인해 주세요.',
+  rhythm_strong: '유력 후보 — 지문 검색으로는 못 찾아서 리듬 패턴으로 찾았습니다 (잔향 큰 현장 녹음). '
+    + '▶ 해당 위치 듣기로 확인해 주세요.',
+  rhythm_weak: '약한 후보 — 리듬 패턴이 조금 더 비슷한 정도라 틀릴 수 있습니다. '
+    + '꼭 들어보고 확인하거나, 음악이 잘 들리는 구간에서 다시 시도해 주세요.',
 };
 
 let tick = null;
@@ -94,7 +96,8 @@ function renderResult(r, state) {
   v.className = `verdict ${r.verdict}`;
   v.textContent = VERDICT_TEXT[r.verdict];
   box.append(v);
-  const help = r.verdict === 'fail' ? FAIL_HELP : REASON_TEXT[r.reason];
+  const reason = r.reason === 'rhythm' ? `rhythm_${r.songs[0]?.strength || 'weak'}` : r.reason;
+  const help = r.verdict === 'fail' ? FAIL_HELP : REASON_TEXT[reason];
   if (help) {
     const why = document.createElement('div');
     why.className = 'reason';
@@ -121,7 +124,6 @@ function renderResult(r, state) {
       `${m.folder} · ${scoreText} · 곡의 ${fmt(m.match_start)}–${fmt(m.match_stop)}${speed}`;
     const notes = [];
     if (m.ratio) notes.push(`다른 곡보다 ${m.ratio}배 높음`);
-    if (m.consistent) notes.push('녹음 앞·뒤 구간이 같은 위치로 일치');
     if (m.preview_only) notes.push('미리보기 파일에서만 발견됨 — 같은 앨범의 곡입니다');
     if (m.also_in.length) notes.push(`같은 음원: ${m.also_in.map((x) => x.file).join(', ')}`);
     if (notes.length) {

@@ -1,0 +1,13 @@
+# Library files never reported as a match (fingerprint or rhythm). One path per line, relative
+# to music/. Delete a line to bring a file back; no rebuild needed.
+#
+# 30+ minute DJ/session mixes and live shows. They contain many other tracks, so they win rhythm
+# searches they have nothing to do with. Coverage = share of the file that exists as individual
+# library tracks (measured 2026-10-13).
+Playa - Buck the system/PLAYA - BUCK THE SYSTEM - 13 13. PLAYA x SESSION MIX.mp3
+PLAYA X KID NY-STR8BUCK/PLAYA x KID NY - STR8 BUCK - 01 PLAYA x STR8BUCK SESSION MIX.mp3
+Ted/64ksana LIVE FULL SHOW @donuimunmuseumvillage.mp3
+Ted/Ted - Chill Jazz, lofi Mix.wav
+Ted/Ted - Techno Mix 23.10.31.wav
+# 49% coverage: the rest may be tracks that exist only inside this mix.
+Ted/Ted- Krump Mix 23.10.20.wav

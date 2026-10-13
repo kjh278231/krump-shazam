@@ -139,14 +139,30 @@ of the drum hits survives.
   jumps), Panako scored 0. Rhythm put DARK first in 6 of 7 windows, at 2–2.5× the next song.
   The user's own 30 s extension capture also comes back as DARK at 0:40.
 
-**When a candidate is shown.** The best song must beat the best *different* song by 1.3×, or
-two overlapping halves of the recording must agree on song and position.
-- Room clips: 35 shown, 32 correct.
-- DARK video: 6/6.
-- Unknown songs: 6/39 still get a candidate.
+**Loop tracks.** Plain drum loops ("bvckloop" tracks) and long mixes correlate with almost any
+krump beat and win searches they have nothing to do with. Two fixes:
+- `db/exclude.txt` lists files never to report. It holds six 30+ minute DJ/session mixes and
+  live shows: two PLAYA session mixes (99%/81% covered by individual tracks), three Ted mixes
+  and a live show (0% krump library content, except Ted's Krump Mix at 49%). Delete a line to
+  bring a file back; no rebuild is needed.
+- `python poc/rhythm_cohort.py` → `db/rhythm_cohort.npz` stores each track's usual score
+  against audio that is not in the library (252 impostor queries from held-out tracks). The
+  run uses the evaluation's holdout tracks, re-derived with `make_testset.py`'s seed.
 
-So rhythm results are always 추가 확인 with a "listen to check" prompt, never 확정.
-Calibration data: `realtest/rhythm_eval.csv`, `realtest/rhythm_split.csv`.
+Ranking stays on the raw score; z = (score − track mean) / track std alone was worse
+(room clips 64 vs 73 top-1). "Agree" means the raw winner is also the z winner.
+
+**When a candidate is shown** (calibrated on `realtest/rhythm_z.jsonl`):
+
+| Level | Rule | Room clips (100) | Unknown songs (39) |
+|---|---|---|---|
+| 유력 후보 | ratio to best different song ≥ 1.2 and agree | 43 shown, 42 right | 3 |
+| 약한 후보 | ratio ≥ 1.3, or agree and z ≥ 4 | 54 shown, 52 right (both levels) | 10 (both levels) |
+
+User captures that Panako missed: DARK, Afro Krump and one KILL EM come back 유력; another
+KILL EM comes back 약한. The fifth, a recording across a DJ jump-back, still fails.
+
+Rhythm results are never 확정, only 추가 확인 with a "listen to check" prompt.
 
 **Battle videos.** The rhythm search also proposes consistent matches in battle videos that
 Panako missed. The same track shows up over several windows, with track positions advancing

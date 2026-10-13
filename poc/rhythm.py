@@ -6,7 +6,9 @@ cross-correlated against them and scored as a z-score of the correlation peak.
 """
 from __future__ import annotations
 
+import os
 import subprocess
+from pathlib import Path
 
 import numpy as np
 
@@ -55,9 +57,16 @@ class RhythmIndex:
     N = 1 << 16           # chunk length (frames)
     MAX_Q = 2048          # longest query in frames (~47 s)
 
-    def __init__(self, path):
+    def __init__(self, path, exclude: set[str] = frozenset(), cohort=None):
+        """exclude: normcased paths never to return. cohort: path of rhythm_cohort.npz; when
+        given, `search` ranks by z = (score - track mean) / track std instead of raw score."""
         z = np.load(path)
         self.offsets, self.ids, self.paths = z["offsets"], z["ids"], z["paths"]
+        self.excluded = np.array([os.path.normcase(str(p)) in exclude for p in self.paths])
+        self.cohort = None
+        if cohort is not None and Path(cohort).exists():
+            c = np.load(cohort)
+            self.cohort = (c["mean"].astype(np.float32), c["std"].astype(np.float32))
         data = z["data"].astype(np.float32)
         self.total = data.shape[1]
         self.hop = self.N - self.MAX_Q
@@ -103,50 +112,57 @@ class RhythmIndex:
                 for t in ti:
                     a, b = self.offsets[t], self.offsets[t + 1]
                     best_pos[t] = int(np.argmax(c[a:b]))
-        self.last_best = best  # per-track best score of the last search (for calibration)
-        order = np.argsort(-best)[:top]
+        self.last_best = best  # per-track best raw score of the last search (for calibration)
+        usable = np.isfinite(best) & ~self.excluded
+        # Ranking stays on the raw score: z alone over-rewards tracks with a tiny impostor spread
+        # (top-1 on room clips: raw 73/100, z 64/100). z is reported for the confidence check.
+        rank = np.where(usable, best, -np.inf)
+        z = np.full_like(best, np.nan)
+        self.last_z_top = None
+        if self.cohort is not None:
+            z = (best - self.cohort[0]) / self.cohort[1]
+            zr = np.where(usable & np.isfinite(z), z, -np.inf)
+            self.last_z_top = int(self.ids[int(np.argmax(zr))])
+        order = np.argsort(-rank)[:top]
         return [{"id": int(self.ids[t]), "path": str(self.paths[t]), "score": float(best[t]),
-                 "pos": best_pos[t] / FPS, "speed": float(best_speed[t])} for t in order]
+                 "z": float(z[t]), "pos": best_pos[t] / FPS, "speed": float(best_speed[t])}
+                for t in order]
 
 
 SPEEDS = (0.98, 0.99, 1.0, 1.01, 1.02)
-SPEEDS_FAST = (0.99, 1.0, 1.01)
-# Calibrated on realtest/rhythm_eval.csv + rhythm_split.csv: shown candidates were right for
-# 32/35 room-reverb clips and 6/6 windows of a real hall video; 6/39 unknown songs still got one,
-# so rhythm results are never "confirmed", only offered for a by-ear check.
-SHOW_RATIO = 1.3
+SPEEDS_FAST = (0.99, 1.0, 1.01)  # the cohort (rhythm_cohort.py) is measured with these
+# Calibrated on realtest/rhythm_z.jsonl (exclusions applied). "agree" = the raw-score winner is
+# also the cohort-normalised (z) winner, i.e. it is not just a track that matches everything.
+#   strong: ratio >= 1.2 and agree           room clips 43 shown/42 right, unknown songs 3/39
+#   weak:   ratio >= 1.3 or (agree, z >= 4)  room clips 54/52 (incl. strong), unknown songs 10/39
+STRONG_RATIO = 1.2
+WEAK_RATIO = 1.3
+WEAK_Z = 4.0
 
 
 def identify(index: RhythmIndex, y: np.ndarray, same, top: int = 3) -> dict | None:
     """Rhythm candidates for audio `y` (SR mono), or None when nothing stands out.
 
-    `same(id_a, id_b)` says whether two library ids hold the same recording. A candidate is
-    shown when the best song beats the best *different* song by SHOW_RATIO, or when two
-    overlapping halves of the query independently agree on song and position.
+    `same(id_a, id_b)` says whether two library ids hold the same recording; the ratio is taken
+    against the best *different* song. Never a confirmation: always offered for a by-ear check.
     """
-    def ranked(e):
-        hits = index.search(e, speeds=SPEEDS, top=12)
-        songs = []
-        for h in hits:
-            if not any(same(h["id"], s["id"]) for s in songs):
-                songs.append(h)
-        return songs
-
-    songs = ranked(envelope(y))
+    hits = index.search(envelope(y), speeds=SPEEDS_FAST, top=12)
+    songs = []
+    for h in hits:
+        if not any(same(h["id"], s["id"]) for s in songs):
+            songs.append(h)
     if not songs:
         return None
-    ratio = songs[0]["score"] / songs[1]["score"] if len(songs) > 1 else 99.0
-    consistent = False
-    dur = len(y) / SR
-    if ratio < SHOW_RATIO and dur >= 24:  # second chance; halves of >= 16 s each
-        third = dur / 3
-        a = ranked(envelope(y[: int(2 * third * SR)]))[0]
-        b = ranked(envelope(y[int(third * SR):]))[0]
-        consistent = (same(a["id"], songs[0]["id"]) and a["id"] == b["id"]
-                      and abs((b["pos"] - a["pos"]) - third * a["speed"]) < 1.0)
-    if ratio < SHOW_RATIO and not consistent:
+    best = songs[0]
+    ratio = best["score"] / songs[1]["score"] if len(songs) > 1 else 99.0
+    agree = index.last_z_top is not None and same(index.last_z_top, best["id"])
+    if ratio >= STRONG_RATIO and agree:
+        strength = "strong"
+    elif ratio >= WEAK_RATIO or (agree and best["z"] >= WEAK_Z):
+        strength = "weak"
+    else:
         return None
-    return {"songs": songs[:top], "ratio": ratio, "consistent": consistent}
+    return {"songs": songs[:top], "ratio": ratio, "z": best["z"], "strength": strength}
 
 
 def xcorr(ref: np.ndarray, q: np.ndarray) -> np.ndarray:

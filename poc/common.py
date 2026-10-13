@@ -45,6 +45,17 @@ def env() -> dict:
     return e
 
 
+EXCLUDE_FILE = ROOT / "db" / "exclude.txt"
+
+
+def load_excluded() -> set[str]:
+    """Normcased absolute paths of library files that must never be reported (db/exclude.txt)."""
+    if not EXCLUDE_FILE.exists():
+        return set()
+    lines = EXCLUDE_FILE.read_text(encoding="utf-8").splitlines()
+    return {os.path.normcase(str(MUSIC_DIR / l.strip())) for l in lines if l.strip() and not l.startswith("#")}
+
+
 def list_audio(folder: Path = MUSIC_DIR) -> list[Path]:
     return sorted(p for p in folder.rglob("*") if p.suffix.lower() in AUDIO_EXTS and p.is_file())
 

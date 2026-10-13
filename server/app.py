@@ -27,7 +27,7 @@ from fastapi.middleware.cors import CORSMiddleware  # noqa: E402
 from fastapi.responses import FileResponse  # noqa: E402
 from pydantic import BaseModel  # noqa: E402
 
-from common import FFMPEG, MUSIC_DIR, ROOT, list_audio, panako, parse_query_output  # noqa: E402
+from common import FFMPEG, MUSIC_DIR, ROOT, list_audio, load_excluded, panako, parse_query_output  # noqa: E402
 from grouping import group, load_links, verdict  # noqa: E402
 from rhythm import RhythmIndex, decode as decode_rhythm, identify as rhythm_identify  # noqa: E402
 
@@ -38,8 +38,11 @@ LOG_FIELDS = ["clip", "condition", "expected", "offset", "match", "score", "seco
 PORT = 8765
 LINKS = load_links()
 RHYTHM_FILE = ROOT / "db" / "rhythm.npz"
+# Never reported (long DJ/session mixes etc., see db/exclude.txt).
+EXCLUDED = load_excluded()
 # Fallback for reverberant room recordings where Panako finds nothing (poc/rhythm.py).
-RHYTHM = RhythmIndex(RHYTHM_FILE) if RHYTHM_FILE.exists() else None
+RHYTHM = (RhythmIndex(RHYTHM_FILE, exclude=EXCLUDED, cohort=ROOT / "db" / "rhythm_cohort.npz")
+          if RHYTHM_FILE.exists() else None)
 
 
 def same_audio(a: int, b: int) -> bool:
@@ -100,6 +103,7 @@ async def identify(request: Request, title: str = "", url: str = "", partial: bo
     res = panako("query", [str(wav)], threads=4, extra_config={"NUMBER_OF_QUERY_RESULTS": "10"})
     elapsed = time.time() - t0
     matches = next(iter(parse_query_output(res.stdout).values()), [])
+    matches = [m for m in matches if m.match_path not in EXCLUDED]  # both normcased
     for m in matches:
         m.match_path = ORIGINAL_PATH.get(m.match_path, m.match_path)
 
@@ -144,7 +148,7 @@ async def identify(request: Request, title: str = "", url: str = "", partial: bo
                 "time_factor": h["speed"], "preview_only": False, "also_in": [],
             } for h in r["songs"]]
             out_songs[0]["ratio"] = round(r["ratio"], 2)
-            out_songs[0]["consistent"] = r["consistent"]
+            out_songs[0]["strength"] = r["strength"]
         elapsed = time.time() - t0
 
     with log_lock:
