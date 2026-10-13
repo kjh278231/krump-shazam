@@ -64,6 +64,12 @@ async function record({ streamId, duration, tabTitle, tabUrl }) {
   const ctx = new AudioContext();
   ctx.createMediaStreamSource(stream).connect(ctx.destination);
 
+  // Wake the server as soon as recording starts (a cold Lambda needs ~10-20 s; the first check is
+  // at 10 s). Checks wait for this reply: a request sent while the only instance is still starting
+  // would start a second cold instance instead of queueing.
+  let warm = false;
+  fetch(`${SERVER}/health`).catch(() => {}).finally(() => { warm = true; });
+
   const chunks = [];
   const page = { title: tabTitle || '', url: tabUrl || '' };
   recorder = new MediaRecorder(stream, { mimeType: 'audio/webm;codecs=opus', audioBitsPerSecond: 160000 });
@@ -78,7 +84,7 @@ async function record({ streamId, duration, tabTitle, tabUrl }) {
   let nextCheck = FIRST_CHECK;
   const checker = setInterval(async () => {
     const t = (Date.now() - recorder.startedAt) / 1000;
-    if (inflight || early || recorder.state !== 'recording' || t < nextCheck || t > duration - 2) return;
+    if (!warm || inflight || early || recorder.state !== 'recording' || t < nextCheck || t > duration - 2) return;
     inflight = true;
     try {
       const r = await identify(new Blob(chunks, { type: 'audio/webm' }), { ...page, partial: 1 });
