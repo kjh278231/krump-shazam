@@ -1,0 +1,5 @@
+* text=auto
+# Must stay LF: bash scripts and patches applied with `git apply`.
+*.sh text eol=lf
+*.patch text eol=lf
+*.bat text eol=crlf

@@ -1,0 +1,299 @@
+diff --git a/src/main/java/be/panako/cli/Panako.java b/src/main/java/be/panako/cli/Panako.java
+index 2b9cb54..8debad9 100644
+--- a/src/main/java/be/panako/cli/Panako.java
++++ b/src/main/java/be/panako/cli/Panako.java
+@@ -101,7 +101,15 @@ public class Panako {
+ 		//for auto completion
+ 		applicationTrie = new Trie();
+ 		registerApplications();
+-		
++
++		initDecoder();
++	}
++
++	/**
++	 * Initializes the pipe decoder from the current configuration.
++	 * Called again after CLI configuration arguments are applied.
++	 */
++	private void initDecoder() {
+ 		//decoder settings
+ 		String pipeEnvironment = Config.get(Key.DECODER_PIPE_ENVIRONMENT);
+ 		String pipeArgument = Config.get(Key.DECODER_PIPE_ENVIRONMENT_ARG);
+@@ -143,6 +151,7 @@ public class Panako {
+ 		String[] applicationArguments = {};
+ 		if (arguments.length > 0) {
+ 			arguments = filterAndSetConfigurationArguments(arguments);
++			initDecoder();
+ 			application = arguments[0];
+ 			applicationArguments = new String[arguments.length - 1];
+ 			for (int i = 1; i < arguments.length; i++) {
+diff --git a/src/main/java/be/panako/cli/Query.java b/src/main/java/be/panako/cli/Query.java
+index 7aa5fb4..b6bab6d 100644
+--- a/src/main/java/be/panako/cli/Query.java
++++ b/src/main/java/be/panako/cli/Query.java
+@@ -120,7 +120,13 @@ class Query extends Application{
+ 
+ 		@Override
+ 		public void run() {
+-			strategy.query(path, this.numberOfQueryResults,emptyHashSet, this);
++			try {
++				strategy.query(path, this.numberOfQueryResults,emptyHashSet, this);
++			} catch (RuntimeException e) {
++				// executor.submit() swallows exceptions: report them instead of silently dropping the query
++				LOG.severe("Query failed for " + path + ": " + e);
++				e.printStackTrace();
++			}
+ 		}
+ 		
+ 		@Override
+diff --git a/src/main/java/be/panako/strategy/panako/PanakoStrategy.java b/src/main/java/be/panako/strategy/panako/PanakoStrategy.java
+index 91eb566..055f500 100644
+--- a/src/main/java/be/panako/strategy/panako/PanakoStrategy.java
++++ b/src/main/java/be/panako/strategy/panako/PanakoStrategy.java
+@@ -280,6 +280,93 @@ public class PanakoStrategy extends Strategy {
+ 		}
+ 		return mostCommonDeltaT;
+ 	}
++
++	/**
++	 * Hough-style alignment over all hits: searches the line deltaT = slope * queryTime + offset
++	 * that puts the most hits within a narrow band. Unlike the first/last part heuristic this is
++	 * not thrown off by off-alignment hits from repeated loops or noise at the clip edges.
++	 * @param hits Hits for one reference, sorted by query time.
++	 * @return {slope, offset, frequencyFactor}
++	 */
++	private float[] robustAlignment(List<PanakoMatch> hits) {
++		int n = hits.size();
++		float[] q = new float[n];
++		float[] d = new float[n];
++		for(int i = 0 ; i < n ; i++) {
++			q[i] = hits.get(i).queryTime;
++			d[i] = hits.get(i).deltaT();
++		}
++		float span = Math.max(1, q[n-1] - q[0]);
++		float maxChange = Config.getFloat(Key.PANAKO_ROBUST_MAX_SPEED_CHANGE);
++		float minSlope = 1 - 1 / (1 - maxChange);
++		float maxSlope = 1 - 1 / (1 + maxChange);
++		float threshold = Config.getFloat(Key.PANAKO_QUERY_RANGE);
++
++		//coarse search with a wide band, slope 0 (no speed change) always included
++		float coarseWindow = 8;
++		float coarseStep = coarseWindow / 2 / span;
++		float bestSlope = 0;
++		float[] best = densestBand(q, d, 0, coarseWindow);
++		for(float s = minSlope ; s <= maxSlope ; s += coarseStep) {
++			float[] band = densestBand(q, d, s, coarseWindow);
++			if(band[0] > best[0]) {
++				best = band;
++				bestSlope = s;
++			}
++		}
++
++		//fine search around the coarse optimum with the final match tolerance
++		float fineWindow = 2 * threshold;
++		float fineStep = 0.5f / span;
++		float center = bestSlope;
++		best = densestBand(q, d, center, fineWindow);
++		for(float s = center - coarseStep ; s <= center + coarseStep ; s += fineStep) {
++			float[] band = densestBand(q, d, s, fineWindow);
++			if(band[0] > best[0]) {
++				best = band;
++				bestSlope = s;
++			}
++		}
++		float offset = best[1];
++
++		//frequency factor: median over the inliers
++		List<Float> ratios = new ArrayList<>();
++		for(int i = 0 ; i < n ; i++) {
++			if(Math.abs(d[i] - (bestSlope * q[i] + offset)) <= threshold) {
++				PanakoMatch hit = hits.get(i);
++				ratios.add(binToHz(hit.matchF1) / binToHz(hit.queryF1));
++			}
++		}
++		Collections.sort(ratios);
++		float frequencyFactor = ratios.isEmpty() ? 1 : ratios.get(ratios.size() / 2);
++
++		return new float[] {bestSlope, offset, frequencyFactor};
++	}
++
++	/**
++	 * @return {number of hits, band center} of the densest band of the given width
++	 * of residuals deltaT - slope * queryTime.
++	 */
++	private static float[] densestBand(float[] q, float[] d, float slope, float window) {
++		int n = q.length;
++		float[] r = new float[n];
++		for(int i = 0 ; i < n ; i++)
++			r[i] = d[i] - slope * q[i];
++		java.util.Arrays.sort(r);
++		int bestCount = 0;
++		float bestCenter = 0;
++		int start = 0;
++		for(int end = 0 ; end < n ; end++) {
++			while(r[end] - r[start] > window)
++				start++;
++			int count = end - start + 1;
++			if(count > bestCount) {
++				bestCount = count;
++				bestCenter = (r[start] + r[end]) / 2;
++			}
++		}
++		return new float[] {bestCount, bestCenter};
++	}
+ 	@Override
+ 	public void query(String query, int maxNumberOfResults, Set<Integer> avoid, QueryResultHandler handler) {
+ 		query(query,maxNumberOfResults,avoid,handler,0,MAX_TIME);
+@@ -360,11 +447,30 @@ public class PanakoStrategy extends Strategy {
+ 			 hitsPerIdentifer.remove(identifier);
+ 		 });
+ 		 
++		 final boolean robustAlign = Config.getBoolean(Key.PANAKO_ROBUST_ALIGN);
++		 if(robustAlign) {
++			 //only align the candidates with the most raw hits
++			 int topCandidates = Config.getInt(Key.PANAKO_ROBUST_TOP_CANDIDATES);
++			 List<Integer> byHits = new ArrayList<>(hitsPerIdentifer.keySet());
++			 byHits.sort((a, b) -> Integer.compare(hitsPerIdentifer.get(b).size(), hitsPerIdentifer.get(a).size()));
++			 for(int i = topCandidates ; i < byHits.size() ; i++)
++				 hitsPerIdentifer.remove(byHits.get(i));
++		 }
++
+ 		 hitsPerIdentifer.forEach((identifier, hitlist) -> {
+-			 
++
+ 			 //sort by query time
+ 			 Collections.sort(hitlist, (Comparator<? super PanakoMatch>) (PanakoMatch a, PanakoMatch b) -> Integer.valueOf(a.queryTime).compareTo(Integer.valueOf(b.queryTime)));
+-			
++
++			 final float slope;
++			 final float offset;
++			 final float frequencyFactor;
++			 if(robustAlign) {
++				 float[] alignment = robustAlignment(hitlist);
++				 slope = alignment[0];
++				 offset = alignment[1];
++				 frequencyFactor = alignment[2];
++			 } else {
+ 			 //view the first and last hits (max 250)
+ 			 int maxPartListSize = Config.getInt(Key.PANAKO_HIT_PART_MAX_SIZE);
+ 			 int partDivider = Config.getInt(Key.PANAKO_HIT_PART_DIVIDER);
+@@ -375,13 +481,13 @@ public class PanakoStrategy extends Strategy {
+ 			//find the first x1 where delta t is equals to the median delta t
+ 			 float y1 = mostCommonDeltaTforHitList(firstHits);
+ 			 float x1 = 0;
+-			 float frequencyFactor = 0;
++			 float firstFrequencyFactor = 0;
+ 			 for(int i = 0 ; i < firstHits.size() ; i++) {
+ 				 PanakoMatch hit = firstHits.get(i);
+ 				 int diff = hit.deltaT();
+ 				 if(diff == y1) {
+ 					 x1 = hit.queryTime;
+-					 frequencyFactor = binToHz(hit.matchF1) / binToHz(hit.queryF1);
++					 firstFrequencyFactor = binToHz(hit.matchF1) / binToHz(hit.queryF1);
+ 					 break;
+ 				 }
+ 			 }
+@@ -398,8 +504,10 @@ public class PanakoStrategy extends Strategy {
+ 				 }
+ 			 }
+ 			 	 
+-			 float slope = (y2-y1)/(x2-x1);
+-			 float offset = -x1 * slope + y1;
++			 slope = (y2-y1)/(x2-x1);
++			 offset = -x1 * slope + y1;
++			 frequencyFactor = firstFrequencyFactor;
++			 }
+ 			 float timeFactor = 1.0f/(1-slope);
+ 			 	 
+ 			 //System.out.printf("slope %f offset %f  timefactor %f  freqfactor %f \n",slope,offset,timeFactor,frequencyFactor);
+diff --git a/src/main/java/be/panako/strategy/panako/storage/PanakoStorageFile.java b/src/main/java/be/panako/strategy/panako/storage/PanakoStorageFile.java
+index e96a20c..e38b80e 100644
+--- a/src/main/java/be/panako/strategy/panako/storage/PanakoStorageFile.java
++++ b/src/main/java/be/panako/strategy/panako/storage/PanakoStorageFile.java
+@@ -98,7 +98,8 @@ public class PanakoStorageFile implements PanakoStorage {
+ 		
+ 		storeDir = new File(folder);
+ 		
+-		storeQueue = new HashMap<Long,List<long[]>>();
++		// filled concurrently by worker threads
++		storeQueue = new java.util.concurrent.ConcurrentHashMap<Long,List<long[]>>();
+ 	}
+ 	
+ 	
+diff --git a/src/main/java/be/panako/strategy/panako/storage/PanakoStorageKV.java b/src/main/java/be/panako/strategy/panako/storage/PanakoStorageKV.java
+index 94760a5..a0c04e9 100644
+--- a/src/main/java/be/panako/strategy/panako/storage/PanakoStorageKV.java
++++ b/src/main/java/be/panako/strategy/panako/storage/PanakoStorageKV.java
+@@ -114,9 +114,11 @@ public class PanakoStorageKV implements PanakoStorage{
+ 		}
+ 		
+ 		env =  org.lmdbjava.Env.create()
+-        .setMapSize(1024l * 1024l * 1024l * 1024l)//1 TB max!
++        // On Windows LMDB preallocates the full map size on disk, so allow overriding it (in GB).
++        .setMapSize(Long.getLong("panako.lmdb.mapsize.gb", 1024l) * 1024l * 1024l * 1024l)
+         .setMaxDbs(2)
+-        .setMaxReaders(Application.availableProcessors())
++        // reader slots are bound to threads (main + workers), so leave headroom
++        .setMaxReaders(Math.max(126, 4 * Application.availableProcessors()))
+         .open(new File(folder));
+ 		
+ 		final String fingerprintName = "panako_fingerprints";
+@@ -125,9 +127,11 @@ public class PanakoStorageKV implements PanakoStorage{
+ 		final String resourceName = "panako_resource_map";		
+ 		resourceMap = env.openDbi(resourceName,DbiFlags.MDB_CREATE, DbiFlags.MDB_INTEGERKEY);
+ 		
+-		storeQueue = new HashMap<Long,List<long[]>>();
+-		deleteQueue = new HashMap<Long,List<long[]>>();
+-		queryQueue = new HashMap<Long,List<Long>>();
++		// Per-thread queues are created concurrently by worker threads: a plain HashMap
++		// silently loses entries under concurrent puts (dropped stores and empty queries).
++		storeQueue = new java.util.concurrent.ConcurrentHashMap<Long,List<long[]>>();
++		deleteQueue = new java.util.concurrent.ConcurrentHashMap<Long,List<long[]>>();
++		queryQueue = new java.util.concurrent.ConcurrentHashMap<Long,List<Long>>();
+ 	}
+ 
+ 	/**
+diff --git a/src/main/java/be/panako/util/FileUtils.java b/src/main/java/be/panako/util/FileUtils.java
+index 74172c3..ac80d52 100644
+--- a/src/main/java/be/panako/util/FileUtils.java
++++ b/src/main/java/be/panako/util/FileUtils.java
+@@ -455,7 +455,9 @@ public final class FileUtils {
+ 		String fileName = new File(resource).getName();
+ 		String tokens[] = fileName.split("\\.(?=[^\\.]+$)");
+ 		int identifier;
+-		if (tokens.length == 2 && tokens[0].matches("\\d+")) {
++		// Numeric names ("01.mp3") collide across albums, so they only count as identifiers
++		// when explicitly enabled.
++		if (tokens.length == 2 && tokens[0].matches("\\d+") && Boolean.getBoolean("panako.numeric.ids")) {
+ 			identifier = Integer.valueOf(tokens[0]);
+ 		} else {
+ 			int hash = getFileHash(new File(resource));
+diff --git a/src/main/java/be/panako/util/Key.java b/src/main/java/be/panako/util/Key.java
+index 3072c9e..ac70b07 100644
+--- a/src/main/java/be/panako/util/Key.java
++++ b/src/main/java/be/panako/util/Key.java
+@@ -409,7 +409,23 @@ public enum Key{
+ 	 * Matching config: A match is only reported if it has a duration of more than 5 seconds.
+ 	 */
+ 	PANAKO_MIN_MATCH_DURATION(5),
+-	
++
++	/**
++	 * Matching config: estimate the query/reference time alignment with a Hough-style
++	 * search over all hits instead of only the first and last hit parts. More robust for
++	 * noisy queries of loop-based music where many off-alignment hits exist.
++	 */
++	PANAKO_ROBUST_ALIGN("TRUE"),
++	/**
++	 * Matching config: with robust alignment, only the candidates with the most
++	 * unfiltered hits are aligned.
++	 */
++	PANAKO_ROBUST_TOP_CANDIDATES(50),
++	/**
++	 * Matching config: with robust alignment, the maximum speed change searched (0.1 = +-10%).
++	 */
++	PANAKO_ROBUST_MAX_SPEED_CHANGE(0.1),
++
+ 	/**
+ 	 * The storage to use: MEM|LMDB
+ 	 * Stands for Memory, files on disk or the LMDB key-value store

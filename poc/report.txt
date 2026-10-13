@@ -1,0 +1,82 @@
+Avg query time (amortized, 8 threads): 0.25 s/query
+
+
+## threshold score >= 0
+condition           n  raw_top1    top1   wrong  false_pos
+clean             100       99%     99%      1%          -
+crowd0_room       100        3%      3%      0%          -
+crowd3            100       87%     87%      3%          -
+holdout_crowd3     39         -       -       -       13% 
+pink10            100       98%     98%      2%          -
+speed+3           100       85%     85%      1%          -
+speed-3           100       85%     85%      2%          -
+
+## threshold score >= 5
+condition           n  raw_top1    top1   wrong  false_pos
+clean             100       99%     99%      1%          -
+crowd0_room       100        3%      3%      0%          -
+crowd3            100       87%     87%      3%          -
+holdout_crowd3     39         -       -       -       13% 
+pink10            100       98%     98%      2%          -
+speed+3           100       85%     85%      1%          -
+speed-3           100       85%     85%      2%          -
+
+## threshold score >= 8
+condition           n  raw_top1    top1   wrong  false_pos
+clean             100       99%     99%      1%          -
+crowd0_room       100        3%      1%      0%          -
+crowd3            100       87%     85%      3%          -
+holdout_crowd3     39         -       -       -       13% 
+pink10            100       98%     98%      2%          -
+speed+3           100       85%     85%      1%          -
+speed-3           100       85%     84%      2%          -
+
+## threshold score >= 10
+condition           n  raw_top1    top1   wrong  false_pos
+clean             100       99%     99%      1%          -
+crowd0_room       100        3%      0%      0%          -
+crowd3            100       87%     83%      3%          -
+holdout_crowd3     39         -       -       -       13% 
+pink10            100       98%     97%      2%          -
+speed+3           100       85%     81%      1%          -
+speed-3           100       85%     84%      2%          -
+
+## threshold score >= 15
+condition           n  raw_top1    top1   wrong  false_pos
+clean             100       99%     99%      1%          -
+crowd0_room       100        3%      0%      0%          -
+crowd3            100       87%     74%      3%          -
+holdout_crowd3     39         -       -       -       10% 
+pink10            100       98%     97%      2%          -
+speed+3           100       85%     74%      1%          -
+speed-3           100       85%     73%      2%          -
+
+## threshold score >= 20
+condition           n  raw_top1    top1   wrong  false_pos
+clean             100       99%     99%      1%          -
+crowd0_room       100        3%      0%      0%          -
+crowd3            100       87%     65%      2%          -
+holdout_crowd3     39         -       -       -       10% 
+pink10            100       98%     96%      2%          -
+speed+3           100       85%     69%      1%          -
+speed-3           100       85%     62%      2%          -
+
+## threshold score >= 30
+condition           n  raw_top1    top1   wrong  false_pos
+clean             100       99%     99%      1%          -
+crowd0_room       100        3%      0%      0%          -
+crowd3            100       87%     55%      1%          -
+holdout_crowd3     39         -       -       -        5% 
+pink10            100       98%     95%      2%          -
+speed+3           100       85%     52%      1%          -
+speed-3           100       85%     51%      1%          -
+
+## threshold score >= 50
+condition           n  raw_top1    top1   wrong  false_pos
+clean             100       99%     99%      1%          -
+crowd0_room       100        3%      0%      0%          -
+crowd3            100       87%     28%      0%          -
+holdout_crowd3     39         -       -       -        3% 
+pink10            100       98%     90%      2%          -
+speed+3           100       85%     31%      1%          -
+speed-3           100       85%     30%      0%          -

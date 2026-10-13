@@ -1,0 +1,339 @@
+cond,src,start,top,score,rival,ratio,speed,pos,correct,secs
+crowd3,clip0000_crowd3.wav,0,H.(B.Eatz) - NFRNO - 63 INSTRUMENTAL.mp3,0.5194,0.3061,1.697,1.0,82.6,True,4.78
+crowd0_room,clip0000_crowd0_room.wav,0,H.(B.Eatz) - NFRNO - 63 INSTRUMENTAL.mp3,0.3421,0.2635,1.298,1.0,69.8,True,3.52
+crowd3,clip0001_crowd3.wav,0,BravoDomo - ELITE VOL. 1 (THE BRUI5ER WAY) - 09 BUSYA HEAD.mp3,0.3449,0.3024,1.141,1.0,46.7,True,3.48
+crowd0_room,clip0001_crowd0_room.wav,0,FCDKrump - FCD Krump Worldwide - 13 KlawBeatz - Spain.mp3,0.1559,0.1531,1.018,1.0,1.4,False,3.49
+crowd3,clip0002_crowd3.wav,0,MOWGLI - LIFE 2 LIFE - 03 MY LIFE.mp3,0.7653,0.5965,1.283,1.0,28.6,True,3.48
+crowd0_room,clip0002_crowd0_room.wav,0,FCDKrump - FCD Kidz Worldwide - 14 Iron Fist - Memory.mp3,0.3632,0.3578,1.015,1.0,9.7,False,3.48
+crowd3,clip0003_crowd3.wav,0,Flipside Madrootz - The Rebirth - 02 - OG.mp3,0.4997,0.2553,1.957,1.0,56.9,True,3.49
+crowd0_room,clip0003_crowd0_room.wav,0,Flipside Madrootz - The Rebirth - 02 - OG.mp3,0.2953,0.1864,1.584,1.0,59.6,True,3.49
+crowd3,clip0004_crowd3.wav,0,BUCK Desiigner.mp3,0.5658,0.5307,1.066,1.0,5.1,True,3.43
+crowd0_room,clip0004_crowd0_room.wav,0,BUCK Desiigner.mp3,0.2771,0.2727,1.016,1.0,80.6,True,3.53
+crowd3,clip0005_crowd3.wav,0,8. No tomorrow.mp3,0.2956,0.2284,1.294,1.0,52.4,True,3.51
+crowd0_room,clip0005_crowd0_room.wav,0,Playa - Savage Kulture Collective Artist Mixtape vol.1 - 02 Bass.mp3,0.1767,0.1724,1.025,1.0199999809265137,14.9,False,3.46
+crowd3,clip0006_crowd3.wav,0,TightEyex - K.R.U.M.P - 10 They ain't Rowdy.mp3,0.2046,0.1929,1.06,1.0,38.2,True,3.48
+crowd0_room,clip0006_crowd0_room.wav,0,REALRAW - PURE RAW 2 - 11 11.VEGAS KRUMP.mp3,0.1795,0.1636,1.097,0.9800000190734863,0.1,False,3.53
+crowd3,clip0007_crowd3.wav,0,REALRAW - PURE RAW 2 - 06 6.90's Hip Hop(Saint).mp3,0.5332,0.5132,1.039,1.0,99.4,True,3.49
+crowd0_room,clip0007_crowd0_room.wav,0,Lil Galvatron - Savage Kulture Collective Artist Mixtape vol.1 - 11 Speaker Box.mp3,0.3762,0.3691,1.019,1.0,12.9,False,3.51
+crowd3,clip0008_crowd3.wav,0,Soulfabangx - Krumpire - 02 El Kana Elements.mp3,0.4988,0.4113,1.213,1.0,128.1,True,3.5
+crowd0_room,clip0008_crowd0_room.wav,0,Soulfabangx - Krumpire - 02 El Kana Elements.mp3,0.3895,0.325,1.198,1.0,128.1,True,3.54
+crowd3,clip0009_crowd3.wav,0,Eest - BLK FRIDAY '19 - 09 - Pressure.mp3,0.3968,0.2519,1.575,1.0,150.7,True,3.51
+crowd0_room,clip0009_crowd0_room.wav,0,Eest - BLK FRIDAY '19 - 09 - Pressure.mp3,0.2303,0.2024,1.138,1.0,143.4,True,3.53
+crowd3,clip0010_crowd3.wav,0,Buck Hospital (The Overcome).mp3,0.5758,0.3829,1.504,1.0,125.2,True,3.51
+crowd0_room,clip0010_crowd0_room.wav,0,Buck Hospital (The Overcome).mp3,0.2721,0.1804,1.509,1.0,44.1,True,3.48
+crowd3,clip0011_crowd3.wav,0,XREWFACE PAK 1 - Aka3hundred  - 01 STREETLIFE.wav,0.5263,0.2913,1.807,1.0,58.1,True,3.46
+crowd0_room,clip0011_crowd0_room.wav,0,XREWFACE PAK 1 - Aka3hundred  - 01 STREETLIFE.wav,0.4062,0.1964,2.068,1.0,58.1,True,3.41
+crowd3,clip0012_crowd3.wav,0,Rucboi - Too Street 4 U.mp3,0.5498,0.2225,2.471,1.0,135.8,True,3.41
+crowd0_room,clip0012_crowd0_room.wav,0,Rucboi - Too Street 4 U.mp3,0.3707,0.1931,1.92,1.0,152.3,True,3.49
+crowd3,clip0013_crowd3.wav,0,Ted- Krump Mix 23.10.20.wav,0.507,0.4051,1.251,0.9800000190734863,1281.8,False,3.46
+crowd0_room,clip0013_crowd0_room.wav,0,Ted- Krump Mix 23.10.20.wav,0.4157,0.2996,1.387,0.9800000190734863,1278.5,False,3.47
+crowd3,clip0014_crowd3.wav,0,10XGULLY - GOD LIKE IV - 18 PAST GODZ.mp3,0.5929,0.2347,2.526,1.0,13.5,True,3.47
+crowd0_room,clip0014_crowd0_room.wav,0,10XGULLY - GOD LIKE IV - 18 PAST GODZ.mp3,0.3386,0.1796,1.885,1.0,13.4,True,3.54
+crowd3,clip0015_crowd3.wav,0,7 JR GUST (YOU LIVE BVCKSTER INS.).wav,0.414,0.3805,1.088,1.0,84.9,True,3.54
+crowd0_room,clip0015_crowd0_room.wav,0,MORFMUZIK - TRINITY - THE REEDITIONS - REMASTERED - 14 IGHTMIRE.mp3,0.2978,0.2934,1.015,1.0,30.6,False,3.47
+crowd3,clip0016_crowd3.wav,0,A20250813_235404973_MOZARF-MOZARFAGAINSTMMPVOL5-08THEYKILLEDMARIO.mp3,0.503,0.3002,1.675,1.0,102.4,True,3.52
+crowd0_room,clip0016_crowd0_room.wav,0,A20250813_235404973_MOZARF-MOZARFAGAINSTMMPVOL5-08THEYKILLEDMARIO.mp3,0.3508,0.2449,1.433,1.0,87.2,True,3.49
+crowd3,clip0017_crowd3.wav,0,MORFMUZIK - OUTSIDERZ VOL 2 - 05 MORFMUZIK - MOZARF (BG BASTOS SAMPLE).mp3,0.5725,0.3543,1.616,1.0,29.9,True,3.52
+crowd0_room,clip0017_crowd0_room.wav,0,MORFMUZIK - OUTSIDERZ VOL 2 - 05 MORFMUZIK - MOZARF (BG BASTOS SAMPLE).mp3,0.4175,0.2651,1.575,1.0,29.8,True,3.49
+crowd3,clip0018_crowd3.wav,0,Ted- Krump Mix 23.10.20.wav,0.4991,0.4738,1.053,1.0,1276.3,False,3.51
+crowd0_room,clip0018_crowd0_room.wav,0,Ted- Krump Mix 23.10.20.wav,0.3891,0.3405,1.143,1.0,1289.3,False,3.49
+crowd3,clip0019_crowd3.wav,0,PLAYA - KRUMPIRE 2018 - 10 -OUTRO- SPACE INSIDE ME.mp3,0.4763,0.454,1.049,1.0,280.4,True,3.42
+crowd0_room,clip0019_crowd0_room.wav,0,PLAYA - KRUMPIRE 2018 - 10 -OUTRO- SPACE INSIDE ME.mp3,0.3409,0.328,1.039,1.0,162.3,True,3.42
+crowd3,clip0020_crowd3.wav,0,AKA3HUNDRED - FUCK OUTTA HERE.mp3,0.5679,0.2956,1.921,1.0,124.8,True,3.53
+crowd0_room,clip0020_crowd0_room.wav,0,AKA3HUNDRED - FUCK OUTTA HERE.mp3,0.3264,0.2607,1.252,1.0,124.8,True,3.5
+crowd3,clip0021_crowd3.wav,0,Aka3Hundred - Chaos Theory 2 - THERE WILL BE CASUALTIES (DELUXE) - 11 Da Reaper (prod. by TayKae & SV).mp3,0.4768,0.2014,2.367,1.0,23.9,True,3.51
+crowd0_room,clip0021_crowd0_room.wav,0,Aka3Hundred - Chaos Theory 2 - THERE WILL BE CASUALTIES (DELUXE) - 11 Da Reaper (prod. by TayKae & SV).mp3,0.2567,0.212,1.211,1.0,23.9,True,3.52
+crowd3,clip0022_crowd3.wav,0,aka3hundred - LEAKS - 08 ANTE UP.mp3,0.4335,0.1904,2.277,1.0,228.0,True,3.58
+crowd0_room,clip0022_crowd0_room.wav,0,aka3hundred - LEAKS - 08 ANTE UP.mp3,0.3122,0.2145,1.456,1.0,228.0,True,3.49
+crowd3,clip0023_crowd3.wav,0,Konkrete aka Jr Tight Eyex - BuckNowBuckLater - 11 WeTakin (Session Track).mp3,0.3674,0.3669,1.002,1.0,163.3,False,3.54
+crowd0_room,clip0023_crowd0_room.wav,0,Big Rulez - DISTORTION - 02 Liveness Only.mp3,0.2629,0.2545,1.033,1.0,12.4,False,3.5
+crowd3,clip0024_crowd3.wav,0,REALRAW - PURE RAW 2 - 19 BULLETHEAD.mp3,0.4402,0.2224,1.979,1.0,91.5,True,3.53
+crowd0_room,clip0024_crowd0_room.wav,0,REALRAW - PURE RAW 2 - 19 BULLETHEAD.mp3,0.2103,0.157,1.339,1.0,91.5,True,3.51
+crowd3,clip0025_crowd3.wav,0,BANGA - Mind Of A MADMAN - 04 The Cauldron (Xkeleton Anthem).mp3,0.4784,0.3936,1.215,1.0,14.3,False,3.48
+crowd0_room,clip0025_crowd0_room.wav,0,BANGA - Mind Of A MADMAN - 04 The Cauldron (Xkeleton Anthem).mp3,0.2433,0.2133,1.141,1.0,14.2,False,3.52
+crowd3,clip0026_crowd3.wav,0,Sniper Deuce - WORLD IZ YOURS - 06 SHEL'LIVE FT. TWIN GAMEOVER.mp3,0.5449,0.2973,1.833,1.0,200.5,True,3.46
+crowd0_room,clip0026_crowd0_room.wav,0,Sniper Deuce - WORLD IZ YOURS - 06 SHEL'LIVE FT. TWIN GAMEOVER.mp3,0.3912,0.3066,1.276,1.0,11.9,True,3.42
+crowd3,clip0027_crowd3.wav,0,Aka3Hundred - XREWFACE PAK 12 - 03 UPTOWN.mp3,0.4981,0.2699,1.846,1.0,49.6,True,3.42
+crowd0_room,clip0027_crowd0_room.wav,0,Aka3Hundred - XREWFACE PAK 12 - 03 UPTOWN.mp3,0.3127,0.2107,1.484,1.0,20.7,True,3.5
+crowd3,clip0028_crowd3.wav,0,A20241231_175859014_MANiACTRACKS-BUCKTALK-08RAGEUNLEASHED.mp3,0.5234,0.4149,1.262,1.0,89.8,True,3.54
+crowd0_room,clip0028_crowd0_room.wav,0,A20241231_175859014_MANiACTRACKS-BUCKTALK-08RAGEUNLEASHED.mp3,0.4197,0.3971,1.057,1.0,89.8,True,3.5
+crowd3,clip0029_crowd3.wav,0,10 - SOULFABEX - SOULFABEX - INVOQ.mp3,0.5139,0.3916,1.312,1.0,130.7,True,3.55
+crowd0_room,clip0029_crowd0_room.wav,0,10 - SOULFABEX - SOULFABEX - INVOQ.mp3,0.3752,0.2998,1.252,1.0,50.7,True,3.47
+crowd3,clip0030_crowd3.wav,0,StreetStreet.mp3,0.3951,0.3455,1.143,1.0,107.4,True,3.49
+crowd0_room,clip0030_crowd0_room.wav,0,Flipside Madrootz - 8 Buckz - 04 Kill The Stage.mp3,0.2833,0.2582,1.097,1.0,103.7,False,3.51
+crowd3,clip0031_crowd3.wav,0,MORFMUZIK - FOR THE STREET - MOZARF - 11 Mozarf_War in Paradise.mp3,0.5672,0.5587,1.015,1.0,15.2,True,3.5
+crowd0_room,clip0031_crowd0_room.wav,0,MORFMUZIK - FOR THE STREET - MOZARF - 11 Mozarf_War in Paradise.mp3,0.4417,0.4261,1.037,1.0,15.2,True,3.54
+crowd3,clip0032_crowd3.wav,0,TWIN GAMEOVER x BIG GAMEOVER - THE POP OUT - 08 I C U.mp3,0.5677,0.3759,1.51,1.0,185.4,True,3.51
+crowd0_room,clip0032_crowd0_room.wav,0,TWIN GAMEOVER x BIG GAMEOVER - THE POP OUT - 08 I C U.mp3,0.3765,0.3076,1.224,1.0,185.3,True,3.54
+crowd3,clip0033_crowd3.wav,0,Morf&Rulez - OVERDOSE -2- - 09 Mozarf - Kill You.mp3,0.5093,0.3827,1.331,1.0,171.4,True,3.51
+crowd0_room,clip0033_crowd0_room.wav,0,Morf&Rulez - OVERDOSE -2- - 09 Mozarf - Kill You.mp3,0.3518,0.345,1.02,1.0,107.4,True,3.5
+crowd3,clip0034_crowd3.wav,0,MOZARF - 2020 - 08 BOI GOTHAM ANTHEM.mp3,0.2744,0.2722,1.008,1.0,44.1,False,3.48
+crowd0_room,clip0034_crowd0_room.wav,0,LUKE aka Lil Greed - THE BIRTH - 08 -OUTRO- TELL ME.mp3,0.2128,0.1763,1.207,1.0,28.3,True,3.44
+crowd3,clip0035_crowd3.wav,0,Tighteyex - The Othxrz - 15 GOAT TALK.mp3,0.4498,0.1957,2.298,1.0,78.3,True,3.49
+crowd0_room,clip0035_crowd0_room.wav,0,Tighteyex - The Othxrz - 15 GOAT TALK.mp3,0.2951,0.1926,1.532,1.0,78.3,True,3.5
+crowd3,clip0036_crowd3.wav,0,Morf&Rulez - OVERDOSE -3- - 06 Big Rulez - Drop.mp3,0.38,0.2795,1.36,1.0,131.4,True,3.49
+crowd0_room,clip0036_crowd0_room.wav,0,Morf&Rulez - OVERDOSE -3- - 06 Big Rulez - Drop.mp3,0.2426,0.2158,1.124,1.0,131.4,True,3.57
+crowd3,clip0037_crowd3.wav,0,Aka3Hundred - Chaos Theory 2 - THERE WILL BE CASUALTIES (DELUXE) - 04 Up The Score ft. SV (prod. By aka3hundred).mp3,0.4078,0.1765,2.311,1.0,59.6,True,3.51
+crowd0_room,clip0037_crowd0_room.wav,0,Aka3Hundred - Chaos Theory 2 - THERE WILL BE CASUALTIES (DELUXE) - 04 Up The Score ft. SV (prod. By aka3hundred).mp3,0.246,0.1937,1.27,1.0,59.6,True,3.53
+crowd3,clip0038_crowd3.wav,0,Sniper Deuce - KRUMP GEEK - 11 STREETLYTE.mp3,0.4828,0.3477,1.388,1.0,3.3,True,3.51
+crowd0_room,clip0038_crowd0_room.wav,0,Sniper Deuce - KRUMP GEEK - 11 STREETLYTE.mp3,0.3481,0.2446,1.423,1.0,143.0,True,3.49
+crowd3,clip0039_crowd3.wav,0,EEST aka 300 - Strictly BangN - BTS2 - 11 Up ft RealRaw.mp3,0.3466,0.2245,1.544,1.0,147.2,True,3.47
+crowd0_room,clip0039_crowd0_room.wav,0,EEST aka 300 - Strictly BangN - BTS2 - 11 Up ft RealRaw.mp3,0.2085,0.1751,1.191,1.0,75.2,True,3.46
+crowd3,clip0040_crowd3.wav,0,Kid NY - WORLDWIDE - 09 9 BASS (Congo).mp3,0.4212,0.2872,1.467,1.0,114.2,True,3.49
+crowd0_room,clip0040_crowd0_room.wav,0,Kid NY - WORLDWIDE - 09 9 BASS (Congo).mp3,0.3382,0.2273,1.488,1.0,16.0,True,3.48
+crowd3,clip0041_crowd3.wav,0,PLAYA - BANGERZ ØNLY - 01 BANGERZ ONLY PREVIEW.mp3,0.4284,0.2704,1.584,1.0,30.8,True,3.46
+crowd0_room,clip0041_crowd0_room.wav,0,PLAYA - BANGERZ ØNLY - 01 BANGERZ ONLY PREVIEW.mp3,0.2338,0.1855,1.26,1.0,30.8,True,3.48
+crowd3,clip0042_crowd3.wav,0,TONY NOSCRIPT - Street F - 06 Noscript - Dream labb.mp3,0.3802,0.348,1.093,1.0,64.2,False,3.43
+crowd0_room,clip0042_crowd0_room.wav,0,Gon music - GON - WAR CRY - 10 GON - PLAYER.mp3,0.2696,0.2583,1.044,1.0,11.1,True,3.58
+crowd3,clip0043_crowd3.wav,0,"Flipside, Kid NY - FCD KRUMP BUCKIN - 05 Flipside X Kid NY - Yo.mp3",0.3512,0.3079,1.14,1.0,46.2,False,3.56
+crowd0_room,clip0043_crowd0_room.wav,0,Big Rulez - THE MASSACRE - 09 The Flute Song (Krump Remix).mp3,0.2468,0.2452,1.007,1.0,79.3,False,3.51
+crowd3,clip0044_crowd3.wav,0,Y A S U D A - CULTURE CREATE - 09 Killa FleshKilla.mp3,0.3103,0.1997,1.554,1.0,13.7,True,3.53
+crowd0_room,clip0044_crowd0_room.wav,0,Y A S U D A - CULTURE CREATE - 09 Killa FleshKilla.mp3,0.2085,0.1856,1.123,1.0,45.9,True,3.5
+crowd3,clip0045_crowd3.wav,0,ʟʊӄɛ - ATMOSFEAR VOL . II - 16 BORN ALONE - LUKE x PLAYA.mp3,0.4916,0.2959,1.661,1.0,46.0,True,3.48
+crowd0_room,clip0045_crowd0_room.wav,0,ʟʊӄɛ - ATMOSFEAR VOL . II - 16 BORN ALONE - LUKE x PLAYA.mp3,0.3175,0.2335,1.359,1.0,59.5,True,3.48
+crowd3,clip0046_crowd3.wav,0,Mozarf X Dabl2ody - K.M.D VOL 2 - 03 GREEN EFFECT - GET LIVE.mp3,0.2214,0.195,1.135,1.0,117.3,True,3.52
+crowd0_room,clip0046_crowd0_room.wav,0,Ted- Krump Mix 23.10.20.wav,0.196,0.1574,1.246,0.9900000095367432,1278.4,False,3.54
+crowd3,clip0047_crowd3.wav,0,PLAYA - DRAMA - 13 REDRUM.mp3,0.4537,0.3545,1.28,1.0,61.6,True,3.48
+crowd0_room,clip0047_crowd0_room.wav,0,Big Rulez x Mozarf - THE MASSACRE - 01 Intro.mp3,0.3638,0.3239,1.123,1.0,15.3,False,3.46
+crowd3,clip0048_crowd3.wav,0,NOSCRIPT - -BUCKZONE- - 10 No Script - Blood Feat Kid Ny.mp3,0.3724,0.2517,1.479,1.0,25.2,True,3.49
+crowd0_room,clip0048_crowd0_room.wav,0,NOSCRIPT - -BUCKZONE- - 10 No Script - Blood Feat Kid Ny.mp3,0.2972,0.2844,1.045,1.0,25.2,True,3.5
+crowd3,clip0049_crowd3.wav,0,Xrewface Pak 6 - aka3Hundred - 02 MY NYGGAZ.wav,0.4528,0.2162,2.095,1.0,186.9,True,3.55
+crowd0_room,clip0049_crowd0_room.wav,0,Xrewface Pak 6 - aka3Hundred - 02 MY NYGGAZ.wav,0.3011,0.1731,1.739,1.0,186.9,True,3.42
+crowd3,clip0050_crowd3.wav,0,10 - DEATH GAME - YOUNG NC VOL.3 - SOULFABEX.mp3,0.5261,0.4319,1.218,1.0,166.0,True,3.51
+crowd0_room,clip0050_crowd0_room.wav,0,PLAYA - KRUMPIRE RUSSIA - 11 KRYPTON.mp3,0.3538,0.3515,1.007,1.0,21.5,False,3.49
+crowd3,clip0051_crowd3.wav,0,RUGA - Crimes against humanity (ruga x soju) - 03 Thomas the kat (soju).mp3,0.4881,0.2012,2.427,1.0,185.1,True,3.5
+crowd0_room,clip0051_crowd0_room.wav,0,RUGA - Crimes against humanity (ruga x soju) - 03 Thomas the kat (soju).mp3,0.3169,0.2112,1.501,1.0,84.8,True,3.51
+crowd3,clip0052_crowd3.wav,0,A20250924_110654572_BigRulez-BuckAt5(Vol.2)-031PMBucktothePoint.mp3,0.3597,0.2711,1.327,1.0,114.4,True,3.51
+crowd0_room,clip0052_crowd0_room.wav,0,A20250924_110654572_BigRulez-BuckAt5(Vol.2)-031PMBucktothePoint.mp3,0.2559,0.227,1.127,1.0,106.6,True,3.49
+crowd3,clip0053_crowd3.wav,0,Lil HBeatz - The Alley-Oop - 01 The Alley-Oop (Intro)-feat. Rucboi & HBeatz-.mp3,0.3958,0.2885,1.372,1.0,88.2,True,3.49
+crowd0_room,clip0053_crowd0_room.wav,0,Lil HBeatz - The Alley-Oop - 01 The Alley-Oop (Intro)-feat. Rucboi & HBeatz-.mp3,0.3156,0.1952,1.617,1.0,88.2,True,3.51
+crowd3,clip0054_crowd3.wav,0,MORFMUZIK - OPERA - 04 Survivor.mp3,0.6437,0.4475,1.438,1.0,46.3,True,3.48
+crowd0_room,clip0054_crowd0_room.wav,0,MORFMUZIK - OPERA - 04 Survivor.mp3,0.3686,0.2716,1.357,1.0,46.3,True,3.49
+crowd3,clip0055_crowd3.wav,0,Big Rulez x Mozarf - THE MASSACRE - 01 Intro.mp3,0.5257,0.5161,1.019,1.0,12.1,False,3.5
+crowd0_room,clip0055_crowd0_room.wav,0,Ted - Techno Mix 23.10.31.wav,0.3462,0.3377,1.025,1.0,6.3,False,3.47
+crowd3,clip0056_crowd3.wav,0,A20250924_112241617_SniperDeuce-2.S.4.U-09GODKNOWZ.mp3,0.4579,0.3593,1.275,1.0,118.5,True,3.5
+crowd0_room,clip0056_crowd0_room.wav,0,A20250924_112241617_SniperDeuce-2.S.4.U-09GODKNOWZ.mp3,0.2439,0.2419,1.008,1.0,86.5,True,3.48
+crowd3,clip0057_crowd3.wav,0,Kid NY - I.D.G.A Buck - 03 Shabba.mp3,0.4186,0.3423,1.223,1.0,66.4,True,3.46
+crowd0_room,clip0057_crowd0_room.wav,0,Kid NY - I.D.G.A Buck - 03 Shabba.mp3,0.3174,0.2679,1.185,1.0,74.3,True,3.53
+crowd3,clip0058_crowd3.wav,0,Proof the Xrook - Master Of The Goon Talk Vol. Z - 03 Murda Jutsu Ft. StreetVoice (Prod. 10xGully).mp3,0.3628,0.2192,1.655,1.0,44.6,True,3.49
+crowd0_room,clip0058_crowd0_room.wav,0,TightEyex - 5417923 - 03 Another raw Get-off (bvckloop).mp3,0.1917,0.1916,1.001,1.0099999904632568,4.6,False,3.52
+crowd3,clip0059_crowd3.wav,0,RAZOR FACE×ASIA - WE ARE ASIA - 20 BUCK HOLE - PRINCE KILLIK×RAZOR FACE.mp3,0.4516,0.2504,1.804,1.0,27.6,True,3.47
+crowd0_room,clip0059_crowd0_room.wav,0,Aka3Hundred - Chaos Theory 2 - THERE WILL BE CASUALTIES (DELUXE) - 20 Knicks in 5 (prod. by Kozmik).mp3,0.1703,0.1677,1.015,1.0099999904632568,0.1,False,3.54
+crowd3,clip0060_crowd3.wav,0,KATA - DIFFERENT KIND OF BUCK - 04 Schizophrenia.mp3,0.4307,0.3819,1.128,1.0,61.6,True,3.49
+crowd0_room,clip0060_crowd0_room.wav,0,64ksana LIVE FULL SHOW @donuimunmuseumvillage.mp3,0.3131,0.3117,1.005,1.0,2595.4,False,3.5
+crowd3,clip0061_crowd3.wav,0,18 - SOULFABEX - SOULFABEX - STUPID CLOWNZ.mp3,0.4709,0.3373,1.396,1.0,57.4,True,3.51
+crowd0_room,clip0061_crowd0_room.wav,0,18 - SOULFABEX - SOULFABEX - STUPID CLOWNZ.mp3,0.2826,0.1932,1.463,1.0,57.4,True,3.48
+crowd3,clip0062_crowd3.wav,0,MOZARF - - THE KRUMPIRE - - 01 Mozarf_M gon Giv it to yall.mp3,0.5644,0.3959,1.425,1.0,131.3,True,3.48
+crowd0_room,clip0062_crowd0_room.wav,0,나이키-1.mp3,0.3692,0.3105,1.189,1.0,81.8,True,3.48
+crowd3,clip0063_crowd3.wav,0,FCDKrump - FCD NATION WORLDCUP MIXTAPE - 08 BTeck - Payback anthem.mp3,0.3771,0.3614,1.043,1.0,55.7,True,3.57
+crowd0_room,clip0063_crowd0_room.wav,0,FCDKrump - FCD NATION WORLDCUP MIXTAPE - 08 BTeck - Payback anthem.mp3,0.2618,0.2244,1.166,1.0,55.7,True,3.54
+crowd3,clip0064_crowd3.wav,0,PLAYA - BUCKALITY - 07 BUCKALITY 7.mp3,0.4623,0.4204,1.1,1.0,127.9,True,3.5
+crowd0_room,clip0064_crowd0_room.wav,0,PLAYA - BUCKALITY - 07 BUCKALITY 7.mp3,0.4018,0.3455,1.163,1.0,127.9,True,3.44
+crowd3,clip0065_crowd3.wav,0,RUGA - Crimes against humanity (ruga x soju) - 02 Dragons (ruga).mp3,0.5741,0.3603,1.593,1.0,145.7,True,3.49
+crowd0_room,clip0065_crowd0_room.wav,0,RUGA - Crimes against humanity (ruga x soju) - 02 Dragons (ruga).mp3,0.3828,0.2718,1.408,1.0,145.7,True,3.53
+crowd3,clip0066_crowd3.wav,0,Razor Face - ZERO OF THE UPPER MOON-上弦の零- - 03 No.3 AKAZA.mp3,0.6276,0.3744,1.676,1.0,14.7,True,3.48
+crowd0_room,clip0066_crowd0_room.wav,0,Razor Face - ZERO OF THE UPPER MOON-上弦の零- - 03 No.3 AKAZA.mp3,0.2738,0.1812,1.511,1.0,14.7,True,3.49
+crowd3,clip0067_crowd3.wav,0,FCDKrump - FCD Krump Worldwide - 13 KlawBeatz - Spain.mp3,0.4732,0.4251,1.113,1.0,0.6,False,3.48
+crowd0_room,clip0067_crowd0_room.wav,0,Various Artists - KING OF BUCK Ⅹ MIXTAPE ALBUM 2K19 - 04 ４、PLAYA - KOB10 BATTLE.mp3,0.3277,0.3088,1.061,1.0,91.0,True,3.48
+crowd3,clip0068_crowd3.wav,0,aka3hundred - XREWFACE PAK 7 - 04 STILL MUDDY.mp3,0.4055,0.1941,2.089,1.0,79.9,True,3.52
+crowd0_room,clip0068_crowd0_room.wav,0,aka3hundred - XREWFACE PAK 7 - 04 STILL MUDDY.mp3,0.1809,0.1689,1.071,1.0,175.9,True,3.49
+crowd3,clip0069_crowd3.wav,0,TightEyex - BVCKLOOPS 3 - 11 Tarry 4 Power (Bonus).mp3,0.5334,0.2183,2.443,1.0,158.1,True,3.48
+crowd0_room,clip0069_crowd0_room.wav,0,TightEyex - BVCKLOOPS 3 - 11 Tarry 4 Power (Bonus).mp3,0.2642,0.1646,1.605,1.0,158.0,True,3.53
+crowd3,clip0070_crowd3.wav,0,Big Rulez - Payback - 01 Glory (Intro).mp3,0.4053,0.2876,1.409,1.0,19.9,True,3.52
+crowd0_room,clip0070_crowd0_room.wav,0,Big Rulez - Payback - 01 Glory (Intro).mp3,0.2476,0.1757,1.409,1.0,19.8,True,3.56
+crowd3,clip0071_crowd3.wav,0,PLAYA - ILLEST.DAYS - 06 KRUMP IS ART.mp3,0.6066,0.5716,1.061,1.0,0.8,True,3.51
+crowd0_room,clip0071_crowd0_room.wav,0,PLAYA - ILLEST.DAYS - 06 KRUMP IS ART.mp3,0.4924,0.4437,1.11,1.0,55.6,True,3.55
+crowd3,clip0072_crowd3.wav,0,RUGA - Crimes against humanity (ruga x soju) - 05 Golden freeza (soju).mp3,0.4525,0.2126,2.129,1.0,48.5,True,3.4
+crowd0_room,clip0072_crowd0_room.wav,0,RUGA - Crimes against humanity (ruga x soju) - 05 Golden freeza (soju).mp3,0.2603,0.1905,1.367,1.0,48.5,True,3.55
+crowd3,clip0073_crowd3.wav,0,Kid NY - Buck The System - 08 Rugged Part 1.5.mp3,0.498,0.4397,1.133,1.0,119.7,True,3.54
+crowd0_room,clip0073_crowd0_room.wav,0,Lil Galvatron - Savage Kulture Collective Artist Mixtape vol.1 - 11 Speaker Box.mp3,0.3615,0.3556,1.016,1.0,44.4,False,3.51
+crowd3,clip0074_crowd3.wav,0,kid ny - BUCK THAT - 03 KingOfBuck.mp3,0.4463,0.3697,1.207,1.0,41.9,True,3.5
+crowd0_room,clip0074_crowd0_room.wav,0,kid ny - BUCK THAT - 03 KingOfBuck.mp3,0.3436,0.2675,1.284,1.0,124.8,True,3.52
+crowd3,clip0075_crowd3.wav,0,YASUDA - 日本史上最狂の音源 - 06 UNderson feat. TheMiXx.mp3,0.3758,0.3468,1.084,1.0,4.7,True,3.56
+crowd0_room,clip0075_crowd0_room.wav,0,FCDKrump - FCD Kidz Worldwide - 14 Iron Fist - Memory.mp3,0.2696,0.2661,1.013,1.0,1.3,False,3.53
+crowd3,clip0076_crowd3.wav,0,MOZARF - MORF AGAINST MMP VOL 3 - 11 11_MMP - I WHIP YEAH HEAD BOY.mp3,0.5725,0.4783,1.197,1.0,189.1,True,3.56
+crowd0_room,clip0076_crowd0_room.wav,0,TONY NOSCRIPT - Street F - 03 Noscript - Murder.mp3,0.4097,0.3793,1.08,1.0,183.1,False,3.57
+crowd3,clip0077_crowd3.wav,0,Tight Eyez - Making A Mxrderer - 06 BVCK 4 BVCK.mp3,0.5775,0.2297,2.514,1.0,110.8,True,3.51
+crowd0_room,clip0077_crowd0_room.wav,0,Tight Eyez - Making A Mxrderer - 06 BVCK 4 BVCK.mp3,0.3205,0.1651,1.941,1.0,110.8,True,3.52
+crowd3,clip0078_crowd3.wav,0,KOBeatz - KING OF BUCK 13 MIX TAPE 2K22 - 09 8. Super Energy Flow Buck Ver ft.Gallop KOBeatz (GeneralTwiggz vs XⅢ) - BLACKBELT.mp3,0.353,0.2324,1.519,1.0,81.6,True,3.47
+crowd0_room,clip0078_crowd0_room.wav,0,KOBeatz - KING OF BUCK 13 MIX TAPE 2K22 - 09 8. Super Energy Flow Buck Ver ft.Gallop KOBeatz (GeneralTwiggz vs XⅢ) - BLACKBELT.mp3,0.2682,0.2129,1.26,1.0,81.6,True,3.53
+crowd3,clip0079_crowd3.wav,0,MORFMUZIK - FOR THE STREET - MOZARF - 03 Mozarf_Battle Anybody.mp3,0.5372,0.4676,1.149,1.0,70.1,True,3.5
+crowd0_room,clip0079_crowd0_room.wav,0,Big Rulez x Mozarf - THE MASSACRE - 01 Intro.mp3,0.3244,0.2787,1.164,1.0,14.6,False,3.42
+crowd3,clip0080_crowd3.wav,0,Scripterz - SUMMER BUCK SHXT - 05 Scripterz - NoScript Track 2.mp3,0.644,0.5708,1.128,1.0,170.7,True,3.46
+crowd0_room,clip0080_crowd0_room.wav,0,Scripterz - SUMMER BUCK SHXT - 05 Scripterz - NoScript Track 2.mp3,0.3826,0.3786,1.011,1.0,170.7,True,3.49
+crowd3,clip0081_crowd3.wav,0,Tight-EYEX - BUCKSTER - 03 The Badd & The Buck.mp3,0.4399,0.2971,1.481,1.0,51.4,True,3.52
+crowd0_room,clip0081_crowd0_room.wav,0,PLAYA x TIGHT EYEX - THE KRUMPIRE OST - 04 PLAYA FT TIGHTEYEX x THE BADD THE BUCK.mp3,0.2865,0.213,1.345,1.0,51.5,True,3.48
+crowd3,clip0082_crowd3.wav,0,PLAYA aka GAMEOVER - THE POP OUT - 11 TOO RUGGED.mp3,0.3321,0.2082,1.595,1.0,51.6,True,3.52
+crowd0_room,clip0082_crowd0_room.wav,0,Ted- Krump Mix 23.10.20.wav,0.1956,0.1697,1.153,0.9800000190734863,1271.8,False,3.48
+crowd3,clip0083_crowd3.wav,0,PLAYA - BUCK THE SYSTEM 2 - 07 RESPECT 2 BOI NY.mp3,0.4107,0.3245,1.265,1.0,114.9,True,3.49
+crowd0_room,clip0083_crowd0_room.wav,0,PLAYA - BUCK THE SYSTEM 2 - 07 RESPECT 2 BOI NY.mp3,0.3282,0.2997,1.095,1.0,11.5,True,3.52
+crowd3,clip0084_crowd3.wav,0,Tighteyex - The Othxrz - 11 KRUMP Lullaby.mp3,0.2808,0.1942,1.446,1.0,39.7,True,3.53
+crowd0_room,clip0084_crowd0_room.wav,0,PLAYA - THE KRUMPIRE 3 OST - 13 BUCK BUILDERS (all styles remix).mp3,0.2083,0.1995,1.044,0.9800000190734863,103.8,False,3.53
+crowd3,clip0085_crowd3.wav,0,Ted- Krump Mix 23.10.20.wav,0.4201,0.3647,1.152,0.9800000190734863,1288.5,False,3.53
+crowd0_room,clip0085_crowd0_room.wav,0,Ted- Krump Mix 23.10.20.wav,0.3382,0.2793,1.211,0.9800000190734863,1270.6,False,3.52
+crowd3,clip0086_crowd3.wav,0,10xGully - Plus MADDNESS Tap3 - 16 10xgully x SkyHigh -Danger.mp3,0.331,0.2253,1.469,1.0,117.4,True,3.53
+crowd0_room,clip0086_crowd0_room.wav,0,10xGully - Plus MADDNESS Tap3 - 16 10xgully x SkyHigh -Danger.mp3,0.3365,0.2818,1.194,1.0,36.9,True,3.53
+crowd3,clip0087_crowd3.wav,0,RoxxdaMus - HIDDEN (Lost Tape1) - 08 LIVE MFs.mp3,0.5175,0.4665,1.109,1.0,175.4,True,3.45
+crowd0_room,clip0087_crowd0_room.wav,0,Konkrete aka Jr Tight Eyex - BuckNowBuckLater - 11 WeTakin (Session Track).mp3,0.273,0.2702,1.011,1.0,168.4,False,3.51
+crowd3,clip0088_crowd3.wav,0,Konkrete aka Jr Tight Eyex - BuckNowBuckLater - 06 RawNow.mp3,0.4782,0.3541,1.35,1.0,183.2,True,3.53
+crowd0_room,clip0088_crowd0_room.wav,0,Konkrete aka Jr Tight Eyex - BuckNowBuckLater - 06 RawNow.mp3,0.3047,0.2992,1.018,1.0,156.7,True,3.51
+crowd3,clip0089_crowd3.wav,0,H.(B.Eatz) - NFRNO - 19 NEW_MAC3_Raw.mp3,0.516,0.3597,1.434,1.0,23.5,True,3.53
+crowd0_room,clip0089_crowd0_room.wav,0,H.(B.Eatz) - NFRNO - 19 NEW_MAC3_Raw.mp3,0.2758,0.2032,1.357,1.0,63.5,True,3.51
+crowd3,clip0090_crowd3.wav,0,Konkrete aka Jr Tight Eyex - BuckNowBuckLater - 05 N.K.O (Instrumental).mp3,0.3113,0.2726,1.142,1.0,1.2,True,3.57
+crowd0_room,clip0090_crowd0_room.wav,0,PLAYA - DEADLY JøKE - 11 SPITFIRE ANTHEM.mp3,0.2046,0.1874,1.092,1.0,116.7,False,3.53
+crowd3,clip0091_crowd3.wav,0,SOJU - Junk Yard Vol.3 - 08 Honto Yabai.mp3,0.5719,0.3271,1.748,1.0,188.7,True,3.52
+crowd0_room,clip0091_crowd0_room.wav,0,SOJU - Junk Yard Vol.3 - 08 Honto Yabai.mp3,0.3447,0.2102,1.64,1.0,180.7,True,3.5
+crowd3,clip0092_crowd3.wav,0,Mozarf - THE MASSACRE - 10 EBS France.mp3,0.5301,0.3655,1.45,1.0,169.6,True,3.52
+crowd0_room,clip0092_crowd0_room.wav,0,Mozarf - THE MASSACRE - 10 EBS France.mp3,0.3742,0.3183,1.176,1.0,70.5,True,3.51
+crowd3,clip0093_crowd3.wav,0,RucBoi_-_Rated_Ruc.mp3,0.565,0.3123,1.809,1.0,207.9,True,3.56
+crowd0_room,clip0093_crowd0_room.wav,0,RucBoi_-_Rated_Ruc.mp3,0.4064,0.2888,1.407,1.0,141.7,True,3.53
+crowd3,clip0094_crowd3.wav,0,Proof the Xrook - D.T.T.A.H (DON'T TRY THIS AT HOME) - 04 M! 4 MURDA (Prod. Aka3Hundr3d).mp3,0.5732,0.3674,1.56,1.0,60.4,True,3.5
+crowd0_room,clip0094_crowd0_room.wav,0,Proof the Xrook - D.T.T.A.H (DON'T TRY THIS AT HOME) - 04 M! 4 MURDA (Prod. Aka3Hundr3d).mp3,0.3016,0.2713,1.112,1.0,60.4,True,3.42
+crowd3,clip0095_crowd3.wav,0,KOBeatz - KING OF BUCK 13 MIX TAPE 2K22 - 12 11. Destron (Soulja Loopz vs Jr Loopz) - Prince KiLLiK.mp3,0.4194,0.2711,1.547,1.0,170.5,True,3.48
+crowd0_room,clip0095_crowd0_room.wav,0,KOBeatz - KING OF BUCK 13 MIX TAPE 2K22 - 12 11. Destron (Soulja Loopz vs Jr Loopz) - Prince KiLLiK.mp3,0.281,0.2168,1.296,1.0,170.5,True,3.5
+crowd3,clip0096_crowd3.wav,0,05 - COLD BUCK - YOUNG NC VOL.3 - SOULFABEX.mp3,0.4396,0.3809,1.154,1.0,15.0,True,3.51
+crowd0_room,clip0096_crowd0_room.wav,0,05 - COLD BUCK - YOUNG NC VOL.3 - SOULFABEX.mp3,0.3688,0.2989,1.234,1.0,26.4,True,3.48
+crowd3,clip0097_crowd3.wav,0,Sleek - WHAT'S LIVE 2 - 09 ONE TWO ONE TWO.mp3,0.5461,0.2461,2.219,1.0,80.5,True,3.49
+crowd0_room,clip0097_crowd0_room.wav,0,Sleek - WHAT'S LIVE 2 - 09 ONE TWO ONE TWO.mp3,0.3866,0.2249,1.719,1.0,17.0,True,3.51
+crowd3,clip0098_crowd3.wav,0,TRUST - Metamorphosis - 04 Core Senses.mp3,0.4282,0.3343,1.281,1.0,12.5,True,3.5
+crowd0_room,clip0098_crowd0_room.wav,0,TRUST - Metamorphosis - 04 Core Senses.mp3,0.3525,0.296,1.191,1.0,15.9,True,3.54
+crowd3,clip0099_crowd3.wav,0,Pluton aka Boi Gameover - Boi Gameover (Part 1) - 15 OSG BANG - Straight Buck Ver (Part 2 Leak).mp3,0.2398,0.1986,1.207,1.0,141.1,True,3.53
+crowd0_room,clip0099_crowd0_room.wav,0,DIMITracks - Absolute -platinum- - 12 HEAVY SKILLZ.mp3,0.1522,0.1511,1.007,0.9800000190734863,0.4,False,3.53
+holdout_crowd3,clip0100_holdout_crowd3.wav,0,TONY NOSCRIPT - Street F - 03 Noscript - Murder.mp3,0.3938,0.3828,1.029,1.0,182.0,,3.5
+holdout_crowd3,clip0101_holdout_crowd3.wav,0,MORFMUZIK - GALAXY - THE WAR - 11 SAVASTANO.mp3,0.2548,0.1948,1.308,1.0,192.8,,3.51
+holdout_crowd3,clip0102_holdout_crowd3.wav,0,Eest - Lost Files EP - 04 Wild boy.mp3,0.2562,0.2559,1.001,1.0,146.2,,3.52
+holdout_crowd3,clip0103_holdout_crowd3.wav,0,Tight Eyez - BVCKSTR #2 - 03 Grizzly mode bvck.mp3,0.2319,0.2038,1.138,1.0,2.7,,3.51
+holdout_crowd3,clip0104_holdout_crowd3.wav,0,Big Rulez - The Pandemic - 07 Dangerous (Remix).mp3,0.2012,0.1764,1.141,1.0,211.5,,3.45
+holdout_crowd3,clip0105_holdout_crowd3.wav,0,Flipside Madrootz - 8 Buckz - 02 Mans Not Hot Remix.mp3,0.3041,0.2975,1.022,1.0,67.8,,3.45
+holdout_crowd3,clip0106_holdout_crowd3.wav,0,Big Rulez - Krump - 02 Man Down.mp3,0.2943,0.2871,1.025,1.0,133.6,,3.52
+holdout_crowd3,clip0107_holdout_crowd3.wav,0,GONTRAXX - MF PARIS - 20 GONTRAXX - BANG.mp3,0.2513,0.2084,1.206,1.0,2.6,,3.49
+holdout_crowd3,clip0108_holdout_crowd3.wav,0,PLAYA x KID NY - STR8 BUCK - 01 PLAYA x STR8BUCK SESSION MIX.mp3,0.6056,0.3598,1.683,1.0,1411.1,,3.54
+holdout_crowd3,clip0109_holdout_crowd3.wav,0,HIT THE ROAD J.mp3,0.4798,0.4261,1.126,1.0,77.7,,3.58
+holdout_crowd3,clip0111_holdout_crowd3.wav,0,Big Rulez - G Y R N - 04 Signature De FDP.mp3,0.4304,0.3101,1.388,1.0,3.3,,3.49
+holdout_crowd3,clip0112_holdout_crowd3.wav,0,The Onlyz ( AKA3HUNDRED & KNKRT ) - Warning - 03 KNKRT - 2 LOUD.mp3,0.5302,0.3212,1.651,1.0,116.0,,3.54
+holdout_crowd3,clip0113_holdout_crowd3.wav,0,PLAYA Soulfabex MOZARF Kid NY Mindlezz HYPESTEREO Kaataaa Young Twiggz - KING OF BUCK Ⅸ MIX TAPE ALBUM 2K18 - 01 HYPESTEREO - THIS IS KRUMP.mp3,0.3654,0.3377,1.082,1.0,16.5,,3.49
+holdout_crowd3,clip0114_holdout_crowd3.wav,0,KOBeatz - KING OF BUCK 16 MIXTAPE - 13 13_Razor Face _ BUCK RIDEN.mp3,0.3226,0.2678,1.205,1.0,13.7,,3.55
+holdout_crowd3,clip0115_holdout_crowd3.wav,0,SOULFABANGX - RECKONING - 08 - ETERNAL .mp3,0.4015,0.3224,1.246,1.0,11.6,,3.5
+holdout_crowd3,clip0116_holdout_crowd3.wav,0,MORFMUZIK - TRINITY - THE REEDITIONS - REMASTERED - 01 ABYSSE.mp3,0.3982,0.3559,1.119,1.0,22.0,,3.47
+holdout_crowd3,clip0117_holdout_crowd3.wav,0,MORFMUZIK - G-MUZIK - 14 G-PARTY.mp3,0.147,0.1465,1.004,0.9800000190734863,71.0,,3.52
+holdout_crowd3,clip0118_holdout_crowd3.wav,0,TightEyex - BVCK 4 GRACE - 02 New Era Bvck.mp3,0.3363,0.3145,1.069,1.0,196.5,,3.5
+holdout_crowd3,clip0119_holdout_crowd3.wav,0,WHIPHEAD x PLAYA - 01 - 02 -EXPLORE- LOW BOX.mp3,0.2671,0.2545,1.049,1.0,14.6,,3.55
+holdout_crowd3,clip0120_holdout_crowd3.wav,0,MOWGLI - LIFE 2 LIFE - 08 LIVE ALL NIGHT.mp3,0.3218,0.3111,1.034,1.0,2.7,,3.49
+holdout_crowd3,clip0121_holdout_crowd3.wav,0,TightEyex - BVCKLOOPS 3 - 10 Bap Bap Bap (bvckloop).mp3,0.2177,0.2116,1.029,1.0,7.2,,3.54
+holdout_crowd3,clip0122_holdout_crowd3.wav,0,Eest - N.R.A. Volume 3 - 04 Avenue Anthem.mp3,0.5325,0.4706,1.132,1.0,6.4,,3.56
+holdout_crowd3,clip0123_holdout_crowd3.wav,0,03 - SOULFABEX - SOULFABEX - EARTHQUAKE RAW.mp3,0.2359,0.2335,1.011,1.0,34.8,,3.58
+holdout_crowd3,clip0124_holdout_crowd3.wav,0,PLAYA x ODESSA GHETTO SESSION.mp3,0.5285,0.3094,1.708,1.0,155.2,,3.53
+holdout_crowd3,clip0125_holdout_crowd3.wav,0,PLAYA Soulfabex MOZARF Kid NY Mindlezz HYPESTEREO Kaataaa Young Twiggz - KING OF BUCK Ⅸ MIX TAPE ALBUM 2K18 - 01 HYPESTEREO - THIS IS KRUMP.mp3,0.3243,0.3033,1.069,1.0,17.3,,3.48
+holdout_crowd3,clip0126_holdout_crowd3.wav,0,Big Rulez - THE MASSACRE - 09 The Flute Song (Krump Remix).mp3,0.6063,0.5372,1.129,1.0,15.0,,3.57
+holdout_crowd3,clip0127_holdout_crowd3.wav,0,Konkrete aka Jr Tight Eyex - BuckNowBuckLater - 11 WeTakin (Session Track).mp3,0.4425,0.3717,1.19,1.0,169.0,,3.53
+holdout_crowd3,clip0128_holdout_crowd3.wav,0,MORFMUZIK - GALAXY - THE WAR - 11 SAVASTANO.mp3,0.3486,0.27,1.291,1.0,189.1,,3.54
+holdout_crowd3,clip0129_holdout_crowd3.wav,0,Ted - Techno Mix 23.10.31.wav,0.2477,0.1833,1.351,1.0,1914.9,,3.58
+holdout_crowd3,clip0130_holdout_crowd3.wav,0,FCDKrump - FCD Krump Worldwide - 13 KlawBeatz - Spain.mp3,0.2917,0.2763,1.056,1.0199999809265137,0.3,,3.54
+holdout_crowd3,clip0131_holdout_crowd3.wav,0,A20250924_110654581_BigRulez-BuckAt5(Vol.2)-049PMMyMovesAre.mp3,0.245,0.2392,1.024,1.0,5.1,,3.53
+holdout_crowd3,clip0132_holdout_crowd3.wav,0,TRUST - EPIC KILLA - 08 Epic #8 My Krump Is Different.mp3,0.3934,0.3711,1.06,1.0,90.1,,3.54
+holdout_crowd3,clip0133_holdout_crowd3.wav,0,Big Rulez - π Afro Samurai π - 12 Affirmative Action.mp3,0.2391,0.2338,1.023,1.0,24.3,,3.57
+holdout_crowd3,clip0134_holdout_crowd3.wav,0,Ted - Techno Mix 23.10.31.wav,0.2653,0.2196,1.208,1.0,4.5,,3.59
+holdout_crowd3,clip0135_holdout_crowd3.wav,0,Ted- Krump Mix 23.10.20.wav,0.3436,0.311,1.105,1.0,1272.9,,3.53
+holdout_crowd3,clip0136_holdout_crowd3.wav,0,Hbeatz-CHINA EAST-Twinn Galvatron-BuckoMAn-GURU-V - SHVPE SH1FT BVCK - 60 FURTHER90.mp3,0.2453,0.2319,1.058,1.0,0.0,,3.54
+holdout_crowd3,clip0137_holdout_crowd3.wav,0,Rucboi - THE UNDERCITY - 10 Can't Hide (prod. Lil Galvatron aka Bravodomo).mp3,0.2288,0.217,1.054,0.9800000190734863,14.1,,3.57
+holdout_crowd3,clip0138_holdout_crowd3.wav,0,LUKE aka Lil Greed - THE BIRTH - 02 GROOV-EO.mp3,0.3676,0.2976,1.235,1.0,15.2,,3.54
+holdout_crowd3,clip0139_holdout_crowd3.wav,0,T_Phonk Buck.mp3,0.3828,0.3584,1.068,1.0,84.0,,3.53
+video_known,N5w_1Jv0S8U.webm,30,TightEyex - 5417923 - 03 Another raw Get-off (bvckloop).mp3,0.307,0.2941,1.044,1.0,4.7,False,3.55
+video_known,N5w_1Jv0S8U.webm,45,2. Lil ROXXDAMUS - DARK (team Blackout).wav,0.3151,0.2221,1.418,1.0,24.4,True,3.51
+video_known,N5w_1Jv0S8U.webm,60,2. Lil ROXXDAMUS - DARK (team Blackout).wav,0.5856,0.2444,2.396,1.0,39.4,True,3.51
+video_known,N5w_1Jv0S8U.webm,75,2. Lil ROXXDAMUS - DARK (team Blackout).wav,0.501,0.2219,2.258,1.0,54.4,True,3.55
+video_known,N5w_1Jv0S8U.webm,90,2. Lil ROXXDAMUS - DARK (team Blackout).wav,0.4304,0.2155,1.997,1.0,112.4,True,3.51
+video_known,N5w_1Jv0S8U.webm,105,2. Lil ROXXDAMUS - DARK (team Blackout).wav,0.5828,0.2365,2.464,1.0,127.4,True,3.52
+video_known,N5w_1Jv0S8U.webm,120,2. Lil ROXXDAMUS - DARK (team Blackout).wav,0.4123,0.1895,2.176,1.0,142.4,True,3.51
+battle_unknown,2fJL2bUOdkU.webm,0,Various Artists - KING OF BUCK Ⅹ MIXTAPE ALBUM 2K19 - 09 １０、Soulfabex - CALAMITY RIP Anthem.mp3,0.4034,0.3763,1.072,1.0,16.3,,3.49
+battle_unknown,2fJL2bUOdkU.webm,30,PLAYA - BANGERZ ØNLY - 04 CRAZYVIBE.mp3,0.3368,0.3119,1.08,0.9800000190734863,5.1,,3.52
+battle_unknown,2fJL2bUOdkU.webm,60,04 - SOULFABEX - BULLY - DISCIPLE - SOULFABEX.mp3,0.3731,0.3576,1.043,1.0,2.0,,3.49
+battle_unknown,2fJL2bUOdkU.webm,90,PLAYA - BANGERZ ØNLY - 04 CRAZYVIBE.mp3,0.4462,0.4323,1.032,0.9800000190734863,2.7,,3.44
+battle_unknown,2fJL2bUOdkU.webm,120,Various Artists - KING OF BUCK Ⅹ MIXTAPE ALBUM 2K19 - 09 １０、Soulfabex - CALAMITY RIP Anthem.mp3,0.3806,0.3672,1.036,1.0,11.4,,3.57
+battle_unknown,2fJL2bUOdkU.webm,150,Various Artists - KING OF BUCK Ⅹ MIXTAPE ALBUM 2K19 - 09 １０、Soulfabex - CALAMITY RIP Anthem.mp3,0.4021,0.3949,1.018,1.0,13.5,,3.53
+battle_unknown,aYJM1KmS0B0.webm,0,Look at me Buck (Instrumental).mp3,0.3236,0.2988,1.083,1.0099999904632568,171.2,,3.57
+battle_unknown,aYJM1KmS0B0.webm,30,Big Rulez - The Pandemic - 13 Unchained Kung-Fu.mp3,0.3457,0.241,1.435,1.0,101.4,,3.55
+battle_unknown,aYJM1KmS0B0.webm,60,Sleek - Savage Kulture Collective Artist Mixtape vol.1 - 03 What you want.mp3,0.264,0.2431,1.086,0.9800000190734863,9.8,,3.51
+battle_unknown,aYJM1KmS0B0.webm,90,Big Rulez - The Pandemic - 13 Unchained Kung-Fu.mp3,0.2784,0.2282,1.22,1.0,84.8,,3.55
+battle_unknown,aYJM1KmS0B0.webm,120,Big Rulez - The Pandemic - 13 Unchained Kung-Fu.mp3,0.3139,0.2603,1.206,1.0,111.5,,3.55
+battle_unknown,aYJM1KmS0B0.webm,150,Ted- Krump Mix 23.10.20.wav,0.2686,0.1861,1.443,0.9800000190734863,1270.5,,3.5
+battle_unknown,BWDvt2DwraA.webm,0,EEST - No Smoke 1 - 03 Crude.mp3,0.5358,0.4064,1.318,1.0,0.5,,3.47
+battle_unknown,BWDvt2DwraA.webm,30,PLAYA x TIGHT EYEX - THE KRUMPIRE OST - 02 PLAYA x KRUMP KING.mp3,0.4098,0.2603,1.574,1.0,126.2,,3.43
+battle_unknown,BWDvt2DwraA.webm,60,PLAYA x TIGHT EYEX - THE KRUMPIRE OST - 02 PLAYA x KRUMP KING.mp3,0.3578,0.2511,1.425,1.0,179.1,,3.55
+battle_unknown,BWDvt2DwraA.webm,90,PLAYA x TIGHT EYEX - THE KRUMPIRE OST - 02 PLAYA x KRUMP KING.mp3,0.3696,0.2788,1.326,1.0,134.8,,3.51
+battle_unknown,BWDvt2DwraA.webm,120,ʟʊӄɛ - ATMOSFEAR VOL . II - 02 INHUMAN - LUKE.mp3,0.71,0.4199,1.691,1.0,5.3,,3.56
+battle_unknown,BWDvt2DwraA.webm,150,ʟʊӄɛ - ATMOSFEAR VOL . II - 02 INHUMAN - LUKE.mp3,0.3946,0.337,1.171,1.0,35.3,,3.57
+battle_unknown,BWDvt2DwraA.webm,180,ʟʊӄɛ - ATMOSFEAR VOL . II - 02 INHUMAN - LUKE.mp3,0.7102,0.4248,1.672,1.0,10.7,,3.51
+battle_unknown,BWDvt2DwraA.webm,210,ʟʊӄɛ - ATMOSFEAR VOL . II - 02 INHUMAN - LUKE.mp3,0.2697,0.231,1.168,1.0,33.2,,3.53
+battle_unknown,f9-gXgisIHg.webm,0,RAZOR FACE×ASIA - WE ARE ASIA - 16 SOMEBODY - BOI GAMEOVER(Korea)×RAZOR FACE.mp3,0.7088,0.6312,1.123,1.0,0.1,,3.54
+battle_unknown,f9-gXgisIHg.webm,30,RAZOR FACE×ASIA - WE ARE ASIA - 16 SOMEBODY - BOI GAMEOVER(Korea)×RAZOR FACE.mp3,0.4618,0.4266,1.083,1.0,30.1,,3.47
+battle_unknown,f9-gXgisIHg.webm,60,BANGA - Mind Of A MADMAN - 04 The Cauldron (Xkeleton Anthem).mp3,0.6279,0.6196,1.013,1.0,17.9,,3.52
+battle_unknown,f9-gXgisIHg.webm,90,RAZOR FACE×ASIA - WE ARE ASIA - 16 SOMEBODY - BOI GAMEOVER(Korea)×RAZOR FACE.mp3,0.5161,0.4986,1.035,1.0,88.4,,3.51
+battle_unknown,f9-gXgisIHg.webm,120,RAZOR FACE - YOU NEED - 08 BOOM!!.mp3,0.6078,0.5722,1.062,1.0,1.8,,3.54
+battle_unknown,f9-gXgisIHg.webm,150,RAZOR FACE×ASIA - WE ARE ASIA - 16 SOMEBODY - BOI GAMEOVER(Korea)×RAZOR FACE.mp3,0.5216,0.5074,1.028,1.0,27.8,,3.44
+battle_unknown,f9-gXgisIHg.webm,180,RAZOR FACE - YOU NEED - 08 BOOM!!.mp3,0.2806,0.2727,1.029,1.0,3.8,,3.51
+battle_unknown,Fau8MEe31-g.webm,0,TONY NOSCRIPT - Street F - 03 Noscript - Murder.mp3,0.4953,0.3246,1.526,1.0,184.2,,3.56
+battle_unknown,Fau8MEe31-g.webm,30,Big Rulez - FINALEM CAPITULUM - 02 Interitus.mp3,0.3847,0.2399,1.603,1.0,107.0,,3.52
+battle_unknown,Fau8MEe31-g.webm,60,TONY NOSCRIPT - Street F - 03 Noscript - Murder.mp3,0.2624,0.2583,1.016,1.0,181.1,,3.55
+battle_unknown,Fau8MEe31-g.webm,90,Big Rulez - FINALEM CAPITULUM - 02 Interitus.mp3,0.4861,0.3117,1.559,1.0,12.3,,3.59
+battle_unknown,Fau8MEe31-g.webm,120,Big Rulez - FINALEM CAPITULUM - 02 Interitus.mp3,0.2197,0.1873,1.173,1.0,42.3,,3.54
+battle_unknown,Fau8MEe31-g.webm,150,TightEyex - The SHIFT - 01 Out of sheol-Blood rnd 1 EYEX.mp3,0.3763,0.306,1.23,1.0099999904632568,526.3,,3.52
+battle_unknown,htJImN2lFQI.webm,0,Pluton aka Boi Gameover - Boi Gameover (Part 2) - 01 Boi x Twin Gameover - Squid Game.mp3,0.5101,0.466,1.094,1.0,2.6,,3.56
+battle_unknown,htJImN2lFQI.webm,30,Pluton aka Boi Gameover - Boi Gameover (Part 2) - 01 Boi x Twin Gameover - Squid Game.mp3,0.4874,0.3575,1.363,1.0,63.0,,3.52
+battle_unknown,htJImN2lFQI.webm,60,Pluton aka Boi Gameover - Boi Gameover (Part 2) - 01 Boi x Twin Gameover - Squid Game.mp3,0.6049,0.4647,1.302,1.0,6.0,,3.45
+battle_unknown,htJImN2lFQI.webm,90,Pluton aka Boi Gameover - Boi Gameover (Part 2) - 01 Boi x Twin Gameover - Squid Game.mp3,0.4972,0.3752,1.325,1.0,96.9,,3.55
+battle_unknown,htJImN2lFQI.webm,120,Pluton aka Boi Gameover - Boi Gameover (Part 2) - 01 Boi x Twin Gameover - Squid Game.mp3,0.6379,0.4547,1.403,1.0,12.7,,3.51
+battle_unknown,htJImN2lFQI.webm,150,Pluton aka Boi Gameover - Boi Gameover (Part 2) - 01 Boi x Twin Gameover - Squid Game.mp3,0.6081,0.443,1.373,1.0,73.2,,3.54
+battle_unknown,htJImN2lFQI.webm,180,Ted- Krump Mix 23.10.20.wav,0.2853,0.2798,1.019,1.0199999809265137,1275.0,,3.53
+battle_unknown,IxDuNFZnWZM.webm,0,REALRAW - PURE RAW 2 - 11 11.VEGAS KRUMP.mp3,0.2067,0.1995,1.037,1.0,0.1,,3.55
+battle_unknown,IxDuNFZnWZM.webm,30,Proof the Xrook - Master Of The Goon Talk Vol. Z - 09 Beast Of The Belly Ft. StreetVoice (Prod. 10xGully).mp3,0.2524,0.1943,1.299,1.0,18.9,,3.51
+battle_unknown,IxDuNFZnWZM.webm,60,Proof the Xrook - Master Of The Goon Talk Vol. Z - 09 Beast Of The Belly Ft. StreetVoice (Prod. 10xGully).mp3,0.3945,0.1856,2.125,1.0,48.9,,3.56
+battle_unknown,IxDuNFZnWZM.webm,90,Proof the Xrook - Master Of The Goon Talk Vol. Z - 09 Beast Of The Belly Ft. StreetVoice (Prod. 10xGully).mp3,0.3333,0.1644,2.027,1.0,78.8,,3.54
+battle_unknown,IxDuNFZnWZM.webm,120,Proof the Xrook - Master Of The Goon Talk Vol. Z - 09 Beast Of The Belly Ft. StreetVoice (Prod. 10xGully).mp3,0.4423,0.2669,1.657,1.0,30.0,,3.53
+battle_unknown,IxDuNFZnWZM.webm,150,Proof the Xrook - Master Of The Goon Talk Vol. Z - 09 Beast Of The Belly Ft. StreetVoice (Prod. 10xGully).mp3,0.4213,0.2158,1.952,1.0,60.0,,3.56
+battle_unknown,IxDuNFZnWZM.webm,180,aka3hundred - VENGEANCE- SIDE B - 14 Bangs Y'Lin (prod.by Kozmik).mp3,0.4136,0.2344,1.765,1.0,8.3,,3.54
+battle_unknown,IxDuNFZnWZM.webm,210,aka3hundred - VENGEANCE- SIDE B - 15 Bangs Y'Lin V2 (prod.by Kozmik & aka3hundred)).mp3,0.4485,0.215,2.087,1.0,38.3,,3.48
+battle_unknown,IxDuNFZnWZM.webm,240,Look at me Buck (Instrumental).mp3,0.1813,0.1797,1.009,1.0,157.1,,3.5
+battle_unknown,IxDuNFZnWZM.webm,270,aka3hundred - VENGEANCE- SIDE B - 15 Bangs Y'Lin V2 (prod.by Kozmik & aka3hundred)).mp3,0.3656,0.2137,1.711,1.0,24.0,,3.54
+battle_unknown,IxDuNFZnWZM.webm,300,NOSCRIPT - -BUCKZONE- - 13 No Script - 8 BUCKS.mp3,0.1926,0.1715,1.123,1.0,209.1,,3.54
+battle_unknown,IxDuNFZnWZM.webm,330,Kid NY - Buck The System 2 - 01 1Train (Buck version).mp3,0.326,0.2974,1.096,1.0,251.0,,3.6
+battle_unknown,IxDuNFZnWZM.webm,360,MORFMUZIK - OPERA - 09 Les indes galantes.mp3,0.2635,0.242,1.089,1.0,261.8,,3.56
+battle_unknown,IxDuNFZnWZM.webm,390,Kid NY - Buck The System 2 - 01 1Train (Buck version).mp3,0.2541,0.2452,1.036,1.0,251.1,,3.53
+battle_unknown,IxDuNFZnWZM.webm,420,SOULFABANGX - RECKONING - 01 - I can't bring you back.mp3,0.3016,0.2497,1.208,0.9800000190734863,5.6,,3.49
+battle_unknown,IxDuNFZnWZM.webm,450,SOULFABANGX - RECKONING - 01 - I can't bring you back.mp3,0.2031,0.1945,1.044,0.9800000190734863,5.9,,3.51
+battle_unknown,IxDuNFZnWZM.webm,480,Razor Face - ZERO OF THE UPPER MOON-上弦の零- - 11 BRING BUCK part2.mp3,0.3779,0.3519,1.074,1.0,4.7,,3.55
+battle_unknown,IxDuNFZnWZM.webm,510,TightEyex - BVCKLOOPS 3 - 10 Bap Bap Bap (bvckloop).mp3,0.3965,0.2602,1.524,1.0,0.5,,3.59
+battle_unknown,IxDuNFZnWZM.webm,540,TightEyex - BVCKLOOPS 3 - 10 Bap Bap Bap (bvckloop).mp3,0.3089,0.264,1.17,0.9900000095367432,4.4,,3.56
+battle_unknown,LT5w68x4Bh8.webm,0,A20251110_204930644_MOZARFXVL-UNLEASHEDRAWNESS-02SHITTAHGONGDISTRICT.mp3,0.3973,0.2232,1.78,1.0,3.6,,3.58
+battle_unknown,LT5w68x4Bh8.webm,30,A20251110_204930644_MOZARFXVL-UNLEASHEDRAWNESS-02SHITTAHGONGDISTRICT.mp3,0.2369,0.1925,1.23,1.0,33.5,,3.56
+battle_unknown,LT5w68x4Bh8.webm,60,A20251110_204930644_MOZARFXVL-UNLEASHEDRAWNESS-02SHITTAHGONGDISTRICT.mp3,0.218,0.2024,1.077,1.0,102.3,,3.57
+battle_unknown,LT5w68x4Bh8.webm,90,A20251110_204930644_MOZARFXVL-UNLEASHEDRAWNESS-02SHITTAHGONGDISTRICT.mp3,0.4112,0.1858,2.213,1.0,26.1,,3.43
+battle_unknown,LT5w68x4Bh8.webm,120,A20251110_204930644_MOZARFXVL-UNLEASHEDRAWNESS-02SHITTAHGONGDISTRICT.mp3,0.2518,0.1783,1.412,1.0,56.0,,3.5
+battle_unknown,MxVOd0_sAlM.webm,0,ʟʊӄɛ - ATMOSFEAR VOL . II - 19 KILL EM - LUKE x 2R.mp3,0.4632,0.4238,1.093,1.0,11.0,,3.58
+battle_unknown,MxVOd0_sAlM.webm,30,ʟʊӄɛ - ATMOSFEAR VOL . II - 19 KILL EM - LUKE x 2R.mp3,0.3559,0.255,1.396,1.0,40.9,,3.54
+battle_unknown,MxVOd0_sAlM.webm,60,ʟʊӄɛ - ATMOSFEAR VOL . II - 19 KILL EM - LUKE x 2R.mp3,0.4873,0.3259,1.495,1.0,19.0,,3.51
+battle_unknown,MxVOd0_sAlM.webm,90,ʟʊӄɛ - ATMOSFEAR VOL . II - 19 KILL EM - LUKE x 2R.mp3,0.2258,0.2138,1.056,1.0,49.0,,3.53
+battle_unknown,MxVOd0_sAlM.webm,120,ʟʊӄɛ - ATMOSFEAR VOL . II - 19 KILL EM - LUKE x 2R.mp3,0.555,0.3405,1.63,1.0,24.9,,3.52
+battle_unknown,MxVOd0_sAlM.webm,150,ʟʊӄɛ - ATMOSFEAR VOL . II - 19 KILL EM - LUKE x 2R.mp3,0.2272,0.2232,1.018,1.0,54.9,,3.55
+battle_unknown,UTihCqA8Y_I.webm,0,Eest - N.R.A. Volume 3 - 04 Avenue Anthem.mp3,0.358,0.3568,1.003,1.0,0.4,,3.54
+battle_unknown,UTihCqA8Y_I.webm,30,NOSCRIPT - -BUCKZONE- - 07 No Script - Buckzone ( Instrumental).mp3,0.2956,0.2778,1.064,1.0,161.5,,3.48
+battle_unknown,UTihCqA8Y_I.webm,60,kob.ent - 03.Gallop_Stranger.mp3,0.2183,0.2149,1.016,1.0,29.8,,3.49
+battle_unknown,UTihCqA8Y_I.webm,90,Eest - N.R.A. Volume 3 - 04 Avenue Anthem.mp3,0.3469,0.3283,1.057,1.0,7.6,,3.55
+battle_unknown,UTihCqA8Y_I.webm,120,Morf&Rulez - OVERDOSE -3- - 12 Big Rulez - Trap House.mp3,0.2561,0.2522,1.015,1.0,2.5,,3.55
+battle_unknown,UTihCqA8Y_I.webm,150,KickBack.mp3,0.5789,0.4578,1.265,1.0,90.2,,3.58
+battle_unknown,UTihCqA8Y_I.webm,180,KickBack.mp3,0.6371,0.3928,1.622,1.0,104.8,,3.49
+battle_unknown,UTihCqA8Y_I.webm,210,DIMITracks - Absolute -platinum- - 02 Absolute.mp3,0.3582,0.3541,1.012,1.0,113.5,,3.51
+battle_unknown,UTihCqA8Y_I.webm,240,KickBack.mp3,0.9467,0.6525,1.451,1.0,10.2,,3.54
+battle_unknown,UTihCqA8Y_I.webm,270,KickBack.mp3,0.4552,0.3045,1.495,1.0,9.5,,3.51
+battle_unknown,UTihCqA8Y_I.webm,300,Ted- Krump Mix 23.10.20.wav,0.1797,0.1791,1.003,0.9900000095367432,1279.7,,3.53
+battle_unknown,UTihCqA8Y_I.webm,330,PLAYA - PREQUEL - 08 SPOOKY.mp3,0.2593,0.2315,1.12,1.0,153.4,,3.51
+battle_unknown,UTihCqA8Y_I.webm,360,DIMITracks - FEMALE FASCINATION - 01 Intro.mp3,0.1819,0.1794,1.014,1.0,41.8,,3.53
+battle_unknown,UTihCqA8Y_I.webm,390,PLAYA - DEADLY JøKE - 06 WHO REALLY KRUMP-.mp3,0.2227,0.2154,1.034,1.0,18.4,,3.5
+battle_unknown,UTihCqA8Y_I.webm,420,Ted- Krump Mix 23.10.20.wav,0.2314,0.1882,1.23,1.0,1286.3,,3.52
+battle_unknown,UTihCqA8Y_I.webm,450,Razor Face - ZERO OF THE UPPER MOON-上弦の零- - 11 BRING BUCK part2.mp3,0.2009,0.1983,1.013,1.0099999904632568,1.6,,3.5
+battle_unknown,y3U3TDcCKYg.webm,0,DIMITracks - Absolute -platinum- - 17 devil child.mp3,0.3844,0.2981,1.29,1.0,24.8,,3.49
+battle_unknown,y3U3TDcCKYg.webm,30,DIMITracks - Absolute -platinum- - 17 devil child.mp3,0.3761,0.3015,1.247,1.0,29.2,,3.54
+battle_unknown,y3U3TDcCKYg.webm,60,Razor Face - ZERO OF THE UPPER MOON-上弦の零- - 11 BRING BUCK part2.mp3,0.2505,0.2467,1.015,1.0,2.4,,3.53
+battle_unknown,y3U3TDcCKYg.webm,90,DIMITracks - Absolute -platinum- - 17 devil child.mp3,0.3983,0.2784,1.431,1.0,25.9,,3.54
+battle_unknown,y3U3TDcCKYg.webm,120,MOZARF - OVERDOSE 4 - 05 ILLUZION.mp3,0.2852,0.2835,1.006,1.0,150.8,,3.52
+battle_unknown,y3U3TDcCKYg.webm,150,TightEyex - The SHIFT - 02 The Blood (bvckloop).mp3,0.2589,0.1957,1.323,1.0,178.6,,3.53

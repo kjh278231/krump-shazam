@@ -1,0 +1,27 @@
+# Music library (copy of the NAS folder, ~38 GB)
+music/
+
+# Generated databases (rebuild with the poc/ scripts)
+db/panako/
+db/rhythm.npz
+db/rhythm_cohort.npz
+
+# Panako source checkout; our changes live in patches/panako.patch
+tools/
+
+# User's browser captures (personal)
+recordings/
+
+# Downloaded video audio and generated clips
+realtest/audio*/
+realtest/windows/
+poc/testset/
+poc/diag/
+poc/samples/
+poc/smoke*/
+poc/test_db/
+poc/lenprobe/
+poc/rev_db/
+
+*.log
+__pycache__/
