@@ -31,8 +31,8 @@ Lambda 단가 (서울):
 - 하루 5회 × 30일 = 150회 → 약 27,000GB-초 → x86 기준 약 $0.45/월.
 - Lambda 상시 무료 한도(월 40만 GB-초, 100만 요청)가 계정에 적용되면 실행비는 0원이다.
 
-참고: 혼자 쓰는 동안은 로컬 PC에서 서버를 돌리는 것도 0원이다. 확장 프로그램의 **서버 설정**에서
-주소를 비우면 로컬 서버(`http://127.0.0.1:8765`)를 쓴다.
+참고: 혼자 쓰는 동안은 로컬 PC에서 서버를 돌리는 것도 0원이다. 확장 프로그램의 기본 서버는 Lambda이고,
+**서버 설정**의 주소에 `http://127.0.0.1:8765`를 넣으면 로컬 서버를 쓴다.
 
 ## 배포된 구성
 
@@ -50,7 +50,7 @@ Chrome 확장 ──HTTPS(Function URL, X-Api-Key 헤더)──▶ Lambda krump-
 | 리소스 | 이름 / 값 |
 |---|---|
 | Lambda 함수 | `krump-finder`, 메모리 6144MB, 타임아웃 60초, `/tmp` 3072MB, 동시 실행 상한 3 |
-| Function URL | `build/function_url.txt` (git에 없음). `AuthType NONE` + 앱의 API 키 확인 |
+| Function URL | `build/function_url.txt`, 확장 프로그램의 기본 서버. `AuthType NONE` + 앱의 API 키 확인 |
 | API 키 | `build/api_key.txt` (git에 없음), 함수 환경 변수 `KF_API_KEY` |
 | ECR 저장소 | `krump-finder`, 최근 이미지 3개만 유지 |
 | IAM 역할 | `krump-finder-lambda`: CloudWatch Logs + 이 버킷의 `previews/`·`runtime/` 읽기, `recordings/` 읽기·쓰기 |
@@ -75,7 +75,10 @@ python server/deploy/aws_setup.py bucket data image function
 - 앨범 목록(`GET /albums`)은 표지를 data URI로 넣은 JSON 하나(약 2MB)로 보낸다. 표지마다 요청하면
   300번 넘게 Lambda를 호출하게 되고 동시 실행 상한(3)에 걸린다.
 - 코드만 바꾸면 `stage.py` → `aws_setup.py image function`. 이미지에서 코드가 마지막 레이어라 몇 MB만 올라간다.
-- 확장 프로그램: 팝업 아래 **서버 설정**에 Function URL과 API 키를 넣고 저장.
+- 확장 프로그램: Function URL이 기본 서버로 들어 있다(`extension/popup.js`, `library.js`의 `DEFAULT_SERVER`;
+  함수를 다시 만들어 URL이 바뀌면 고친다). 팝업 아래 **서버 설정**에 API 키만 넣고 저장.
+- 주소는 공개돼도 된다. 키 없는 요청은 401로 거절되지만 Lambda 실행은 과금되므로, 최악의 경우(동시 실행 3개를
+  한 달 내내) 약 $780/월이다. 이상하면 API 키를 바꾸거나(`KF_API_KEY`) 동시 실행 상한을 0으로 내린다.
 
 ## 서버 코드에서 바뀐 것
 

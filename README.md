@@ -62,8 +62,9 @@ song is not in the library), then `python poc/evaluate.py --manifest your.csv`.
    double-click `server\start.bat` (or `python server/app.py`), listening on
    `http://127.0.0.1:8765`. Needs `pip install fastapi uvicorn[standard]`.
 2. Chrome → `chrome://extensions` → enable *Developer mode* → *Load unpacked* → pick `extension/`.
-   Pin the extension. In the popup's **서버 설정**, enter the server address and API key
-   (`build/function_url.txt`, `build/api_key.txt`); empty = local server, no key.
+   Pin the extension. The default server is the deployed Lambda; enter the API key
+   (`build/api_key.txt`, shared separately) in the popup's **서버 설정** (it opens by itself
+   until a key is saved). For a local server enter `http://127.0.0.1:8765` and no key.
 3. On a tab playing a video, click the extension icon → **현재 탭에서 찾기**. The popup can be
    closed while recording; the badge shows REC → ... → OK / ? / X.
 4. The result shows the best song only, with its score and position in the library track.

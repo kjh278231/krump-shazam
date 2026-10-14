@@ -1,7 +1,8 @@
-const LOCAL_SERVER = 'http://127.0.0.1:8765';
+// The deployed AWS Lambda (docs/lambda-deployment.md); a local server is set in 서버 설정.
+const DEFAULT_SERVER = 'https://n7m4s62lmqfrtif557t7i4omji0evzfa.lambda-url.ap-northeast-2.on.aws';
 const $ = (id) => document.getElementById(id);
-// { url, apiKey } from the settings section (chrome.storage.local); local server by default.
-let server = { url: LOCAL_SERVER, apiKey: '' };
+// { url, apiKey } from the settings section (chrome.storage.local); the Lambda by default.
+let server = { url: DEFAULT_SERVER, apiKey: '' };
 const authHeaders = () => (server.apiKey ? { 'X-Api-Key': server.apiKey } : {});
 const VERDICT_TEXT = {
   confirmed: '확정',
@@ -43,13 +44,15 @@ async function checkServer() {
 
 async function loadSettings() {
   const { settings } = await chrome.storage.local.get('settings');
-  server = { url: LOCAL_SERVER, apiKey: '', ...settings };
+  server = { url: DEFAULT_SERVER, apiKey: '', ...settings };
   $('server-url').value = server.url;
   $('api-key').value = server.apiKey;
+  // First run: the default server needs the API key the user was given.
+  if (server.url === DEFAULT_SERVER && !server.apiKey) $('settings').open = true;
 }
 
 async function saveSettings() {
-  const url = $('server-url').value.trim().replace(/\/+$/, '') || LOCAL_SERVER;
+  const url = $('server-url').value.trim().replace(/\/+$/, '') || DEFAULT_SERVER;
   server = { url, apiKey: $('api-key').value.trim() };
   await chrome.storage.local.set({ settings: server });
   $('server-url').value = url;

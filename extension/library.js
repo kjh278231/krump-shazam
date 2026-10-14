@@ -1,7 +1,8 @@
 // Album list of the server's library (GET /albums, server/build_albums.py).
 // The last list is cached in chrome.storage.local so the page shows at once; a cold Lambda takes
 // ~10 s to answer the refresh.
-const LOCAL_SERVER = 'http://127.0.0.1:8765';
+// The deployed AWS Lambda (docs/lambda-deployment.md); a local server is set in 서버 설정.
+const DEFAULT_SERVER = 'https://n7m4s62lmqfrtif557t7i4omji0evzfa.lambda-url.ap-northeast-2.on.aws';
 const $ = (id) => document.getElementById(id);
 let albums = [];
 const expanded = new Set();  // ids of albums the user opened
@@ -132,7 +133,7 @@ async function load() {
   try {
     ({ settings } = await chrome.storage.local.get('settings'));
   } catch {}
-  const server = { url: LOCAL_SERVER, apiKey: '', ...settings };
+  const server = { url: DEFAULT_SERVER, apiKey: '', ...settings };
   let cached = null;
   try {
     ({ albumsCache: cached } = await chrome.storage.local.get('albumsCache'));
