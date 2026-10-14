@@ -203,6 +203,7 @@ async function feedback(id, correct, path, el) {
 $('start').onclick = start;
 $('stop').onclick = () => chrome.runtime.sendMessage({ target: 'background', type: 'stop' });
 $('save-settings').onclick = saveSettings;
+$('library').onclick = () => chrome.tabs.create({ url: chrome.runtime.getURL('library.html') });
 chrome.storage.session.get('state').then(({ state }) => render(state));
 chrome.storage.onChanged.addListener((changes, area) => {
   if (area === 'session' && changes.state) render(changes.state.newValue);

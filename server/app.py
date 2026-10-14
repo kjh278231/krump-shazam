@@ -406,5 +406,33 @@ def preview(path: str, start: float = 0.0) -> Response:
     return Response(cut_preview(str(MUSIC_DIR / path), start), media_type="audio/mpeg")
 
 
+ALBUMS_FILE = ROOT / "db" / "albums.json"  # server/build_albums.py
+albums_body: bytes | None = None
+
+
+@app.get("/albums", dependencies=[Depends(check_key)])
+def albums() -> Response:
+    """The library's albums for the extension's library page. Covers are inlined as data URIs
+    (~4 KB each) so the page needs one request: one per cover would each be a Lambda invocation."""
+    global albums_body
+    if albums_body is None:
+        import base64
+
+        if not ALBUMS_FILE.exists():
+            raise HTTPException(404, "앨범 목록이 없습니다 (server/build_albums.py를 실행하세요).")
+        out = []
+        for a in json.loads(ALBUMS_FILE.read_text(encoding="utf-8")):
+            tracks = [t for t in a["tracks"] if LIBRARY.keys.get(t.lower()) == t and t not in EXCLUDED]
+            if not tracks:
+                continue
+            cover = ALBUMS_FILE.parent / "covers" / f"{a['id']}.jpg"
+            uri = None
+            if a["cover"] and cover.exists():
+                uri = "data:image/jpeg;base64," + base64.b64encode(cover.read_bytes()).decode()
+            out.append({**a, "tracks": tracks, "cover": uri})
+        albums_body = json.dumps({"albums": out}, ensure_ascii=False).encode()
+    return Response(albums_body, media_type="application/json")
+
+
 if __name__ == "__main__":
     uvicorn.run(app, host=os.environ.get("HOST", "127.0.0.1"), port=int(os.environ.get("PORT", "8765")))

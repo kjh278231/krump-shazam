@@ -37,7 +37,8 @@ cd tools/Panako && gradlew.bat shadowJar
 ```
 
 Not in git (see `.gitignore`): `music/`, the generated DBs (`db/panako/`, `db/rhythm*.npz`;
-rebuild with `build_index.py`, `build_rhythm_index.py`, `rhythm_cohort.py`), `recordings/`,
+rebuild with `build_index.py`, `build_rhythm_index.py`, `rhythm_cohort.py`), the album list
+(`db/albums.json`, `db/covers/`; `server/build_albums.py`), `recordings/`,
 downloaded video audio and generated test clips. `db/same_audio.csv` and `db/holdout.txt` are
 committed because they are small and slow to rebuild.
 
@@ -69,6 +70,14 @@ song is not in the library), then `python poc/evaluate.py --manifest your.csv`.
    **▶ 10초 미리듣기** plays a 10 s MP3 excerpt from that spot, cut by the server's `/preview`.
    Full library files are never served, because of copyright once this is distributed.
    **✔ 맞음 / ✘ 틀림** records ground truth.
+5. **라이브러리** (popup header) opens a tab listing the library's albums: cover, title, artist,
+   track count; click an album for its tracks, search by album, artist or track name. The list
+   comes from the server's `/albums` (cached in the extension, so it shows at once next time).
+   Rebuild it after adding music: `python server/build_albums.py` → `db/albums.json` +
+   `db/covers/` (needs `pip install mutagen pillow`). An album is a top-level folder, named by
+   the files' album / album-artist tags or else the folder name ("Artist - Album"); a folder of
+   loose tracks from several albums (`트랙리스트`) is split by album tag. Covers are the embedded
+   pictures (287 of 319 albums), as 120 px JPEGs.
 
 Candidates are grouped into songs (`poc/grouping.py`):
 - Files containing the same recording (other album copy, a session mix or judge-showcase

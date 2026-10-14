@@ -1,0 +1,35 @@
+:root {
+  --bg: #fff; --card: #f8f9fa; --fg: #202124; --muted: #5f6368; --line: #e0e0e0;
+  --bad: #d93025; --accent: #1a73e8; --mark: #fde293;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #202124; --card: #292a2d; --fg: #e8eaed; --muted: #9aa0a6; --line: #3c4043;
+          --bad: #f28b82; --accent: #8ab4f8; --mark: #5c4a00; }
+}
+body { margin: 0; padding: 20px 24px 40px; font: 14px/1.45 system-ui, sans-serif;
+       background: var(--bg); color: var(--fg); }
+header { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+         max-width: 1200px; margin: 0 auto 12px; }
+h1 { font-size: 20px; margin: 0; }
+#summary, #status { color: var(--muted); font-size: 13px; }
+#status { max-width: 1200px; margin: 0 auto 10px; min-height: 1.4em; }
+#status.error { color: var(--bad); }
+#search { width: min(360px, 100%); font: inherit; padding: 7px 10px; border-radius: 8px;
+          border: 1px solid var(--line); background: var(--bg); color: var(--fg); }
+#albums { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 10px;
+          align-items: start; max-width: 1200px; margin: 0 auto; }
+.album { background: var(--card); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.album > button { all: unset; box-sizing: border-box; width: 100%; display: flex; gap: 12px; align-items: center;
+                  padding: 8px; cursor: pointer; }
+.album > button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; border-radius: 10px; }
+.cover { width: 60px; height: 60px; flex: none; border-radius: 6px; object-fit: cover; background: var(--line);
+         display: grid; place-items: center; color: var(--muted); font-size: 22px; font-weight: 700; }
+.info { min-width: 0; }
+.title, .artist { display: block; }
+.title { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.artist { color: var(--muted); font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.count { color: var(--muted); font-size: 12px; }
+.tracks { margin: 0; padding: 4px 12px 10px 80px; list-style: none; font-size: 13px; border-top: 1px solid var(--line); }
+.tracks li { padding: 1px 0; word-break: break-word; }
+mark { background: var(--mark); color: inherit; border-radius: 2px; }
+.empty { color: var(--muted); grid-column: 1 / -1; }

@@ -10,6 +10,8 @@ body { width: 380px; margin: 0; padding: 12px 14px; font: 13px/1.45 system-ui, s
        background: var(--bg); color: var(--fg); }
 header { display: flex; align-items: center; justify-content: space-between; }
 h1 { font-size: 15px; margin: 0 0 10px; }
+.tools { display: flex; gap: 8px; align-items: center; margin-bottom: 10px; }
+#library { padding: 2px 8px; font-size: 12px; }
 .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--muted); }
 .dot.on { background: var(--ok); } .dot.off { background: var(--bad); }
 #controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }

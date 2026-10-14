@@ -5,6 +5,8 @@ music/
 db/panako/
 db/rhythm.npz
 db/rhythm_cohort.npz
+db/albums.json
+db/covers/
 
 # Panako source checkout; our changes live in patches/panako.patch
 tools/

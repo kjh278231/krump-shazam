@@ -64,13 +64,16 @@ Chrome 확장 ──HTTPS(Function URL, X-Api-Key 헤더)──▶ Lambda krump-
 ## 배포·갱신 방법
 
 ```bash
+python server/build_albums.py                    # 앨범 목록·표지 → db/albums.json, db/covers/ (이미지에 포함)
 python server/deploy/make_previews.py            # 라이브러리 → build/previews/ (96kbps CBR MP3)
 aws s3 sync build/previews s3://krump-finder-previews-136575447624/previews/
 python server/deploy/stage.py                    # build/lambda (이미지), build/runtime (S3 데이터)
 python server/deploy/aws_setup.py bucket data image function
 ```
 
-- 곡을 추가하면: 인덱스 재생성 → `make_previews.py` + `s3 sync` → `stage.py` → `aws_setup.py data image function`.
+- 곡을 추가하면: 인덱스 재생성 → `build_albums.py` → `make_previews.py` + `s3 sync` → `stage.py` → `aws_setup.py data image function`.
+- 앨범 목록(`GET /albums`)은 표지를 data URI로 넣은 JSON 하나(약 2MB)로 보낸다. 표지마다 요청하면
+  300번 넘게 Lambda를 호출하게 되고 동시 실행 상한(3)에 걸린다.
 - 코드만 바꾸면 `stage.py` → `aws_setup.py image function`. 이미지에서 코드가 마지막 레이어라 몇 MB만 올라간다.
 - 확장 프로그램: 팝업 아래 **서버 설정**에 Function URL과 API 키를 넣고 저장.
 
