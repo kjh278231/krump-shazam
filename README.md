@@ -1,5 +1,7 @@
 # music-analyzer
 
+<img src="docs/logo.png" alt="Krump Track Finder logo" width="160">
+
 Identify which track from the local library (`music/`) is playing in a browser, even with
 crowd noise (cheering, clapping, MC). Approach: audio fingerprinting with
 [Panako](https://github.com/JorenSix/Panako), validated first as an offline PoC on WAV clips
