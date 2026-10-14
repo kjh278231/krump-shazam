@@ -17,7 +17,7 @@ before building the Chrome extension.
 | `db/same_audio.csv` | Library files that contain the same recording |
 | `db/holdout.txt` | ~2% of tracks never indexed, used to measure false positives |
 | `poc/` | Indexing, evaluation and matching code (shared by the server) |
-| `server/` | FastAPI backend for the extension |
+| `server/` | FastAPI backend for the extension; `server/deploy/` builds and deploys it to AWS Lambda |
 | `extension/` | Chrome extension (Manifest V3) |
 | `realtest/` | Real-video test results (CSV) |
 
@@ -57,10 +57,12 @@ song is not in the library), then `python poc/evaluate.py --manifest your.csv`.
 
 ## Browser extension
 
-1. Start the server: double-click `server\start.bat` (or `python server/app.py`).
-   It listens on `http://127.0.0.1:8765`. Needs `pip install fastapi uvicorn[standard]`.
+1. Server: either the deployed AWS Lambda (see `docs/lambda-deployment.md`) or a local one —
+   double-click `server\start.bat` (or `python server/app.py`), listening on
+   `http://127.0.0.1:8765`. Needs `pip install fastapi uvicorn[standard]`.
 2. Chrome → `chrome://extensions` → enable *Developer mode* → *Load unpacked* → pick `extension/`.
-   Pin the extension.
+   Pin the extension. In the popup's **서버 설정**, enter the server address and API key
+   (`build/function_url.txt`, `build/api_key.txt`); empty = local server, no key.
 3. On a tab playing a video, click the extension icon → **현재 탭에서 찾기**. The popup can be
    closed while recording; the badge shows REC → ... → OK / ? / X.
 4. The result shows the best song only, with its score and position in the library track.
@@ -85,7 +87,8 @@ records with `MediaRecorder` (Opus) while playing the audio back to the speakers
 `POST /identify` → server converts with FFmpeg and runs a Panako query (~2.5 s, mostly JVM
 start-up).
 
-Every recording is kept in `recordings/` and logged in `recordings/log.csv`, which is a valid
+On Lambda, final recordings go to S3 instead (`recordings/<id>.wav` + `<id>.json` in the
+bucket). Locally, every recording is kept in `recordings/` and logged in `recordings/log.csv`, which is a valid
 evaluate.py manifest (rows without feedback are skipped):
 `python poc/evaluate.py --manifest recordings/log.csv`.
 
@@ -280,3 +283,5 @@ Found while getting the PoC running on Windows with this library:
 7. **Direct WAV input**: a mono 16-bit WAV already at 16 kHz is read with Java Sound instead of
    the ffmpeg pipe decoder. Each process start costs ~0.8 s on this Windows machine
    (on-access scanning), and the pipe decoder starts both `cmd.exe` and `ffmpeg`.
+8. **Read-only DB** (`-Dpanako.lmdb.readonly=true`): opens LMDB with `MDB_RDONLY` +
+   `MDB_NOLOCK` and without creating databases, for read-only file systems (AWS Lambda).

@@ -1,10 +1,10 @@
 {
   "manifest_version": 3,
   "name": "Krump Track Finder",
-  "version": "0.1.0",
-  "description": "Captures the current tab's audio and finds the track in the local library.",
+  "version": "0.2.0",
+  "description": "Captures the current tab's audio and finds the track in the krump library.",
   "permissions": ["tabCapture", "offscreen", "storage", "activeTab"],
-  "host_permissions": ["http://127.0.0.1:8765/*"],
+  "host_permissions": ["http://127.0.0.1:8765/*", "https://*.lambda-url.ap-northeast-2.on.aws/*"],
   "background": { "service_worker": "background.js" },
   "action": { "default_popup": "popup.html", "default_title": "Krump Track Finder" }
 }

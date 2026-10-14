@@ -40,7 +40,7 @@ def load_links(path=LINKS_FILE) -> set[frozenset]:
 
 
 def is_preview(m: Match) -> bool:
-    return bool(PREVIEW_RE.search(m.match_path.rsplit("\\", 1)[-1]))
+    return bool(PREVIEW_RE.search(m.match_path.replace("\\", "/").rsplit("/", 1)[-1]))
 
 
 @dataclass

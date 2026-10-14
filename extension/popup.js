@@ -1,5 +1,8 @@
-const SERVER = 'http://127.0.0.1:8765';
+const LOCAL_SERVER = 'http://127.0.0.1:8765';
 const $ = (id) => document.getElementById(id);
+// { url, apiKey } from the settings section (chrome.storage.local); local server by default.
+let server = { url: LOCAL_SERVER, apiKey: '' };
+const authHeaders = () => (server.apiKey ? { 'X-Api-Key': server.apiKey } : {});
 const VERDICT_TEXT = {
   confirmed: '확정',
   check: '추가 확인 필요',
@@ -26,13 +29,32 @@ function fmt(sec) {
 }
 
 async function checkServer() {
+  // Also wakes a cold Lambda while the user is still picking a duration.
+  $('server').className = 'dot';
   try {
-    const r = await fetch(`${SERVER}/health`);
+    const r = await fetch(`${server.url}/health`);
     $('server').className = r.ok ? 'dot on' : 'dot off';
+    $('server').title = `${server.url} 연결됨`;
   } catch {
     $('server').className = 'dot off';
-    $('server').title = '서버 꺼짐: python server/app.py';
+    $('server').title = `서버 연결 안 됨: ${server.url}`;
   }
+}
+
+async function loadSettings() {
+  const { settings } = await chrome.storage.local.get('settings');
+  server = { url: LOCAL_SERVER, apiKey: '', ...settings };
+  $('server-url').value = server.url;
+  $('api-key').value = server.apiKey;
+}
+
+async function saveSettings() {
+  const url = $('server-url').value.trim().replace(/\/+$/, '') || LOCAL_SERVER;
+  server = { url, apiKey: $('api-key').value.trim() };
+  await chrome.storage.local.set({ settings: server });
+  $('server-url').value = url;
+  $('settings').open = false;
+  checkServer();
 }
 
 async function start() {
@@ -46,7 +68,7 @@ async function start() {
   }
   chrome.runtime.sendMessage({
     target: 'background', type: 'start', streamId,
-    duration: Number($('duration').value), tabTitle: tab.title, tabUrl: tab.url,
+    duration: Number($('duration').value), tabTitle: tab.title, tabUrl: tab.url, server,
   });
 }
 
@@ -134,27 +156,44 @@ function renderResult(r, state) {
       n.textContent = notes.join(' · ');
       el.querySelector('.meta').after(n);
     }
-    el.querySelector('[data-act=play]').onclick = () => play(m);
+    el.querySelector('[data-act=play]').onclick = (e) => play(m, e.currentTarget);
     el.querySelector('[data-act=yes]').onclick = () => feedback(r.id, true, m.path, el);
     el.querySelector('[data-act=no]').onclick = () => feedback(r.id, false, m.path, el);
     box.append(el);
   });
 }
 
-function play(m) {
-  const p = $('player');
-  p.hidden = false;
+async function play(m, button) {
   // The server cuts a 10 s excerpt from the matched spot; full files are never sent.
-  p.src = `${SERVER}/preview?path=${encodeURIComponent(m.path)}&start=${Math.max(0, m.match_start).toFixed(1)}`;
-  p.play();
+  // Fetched rather than set as <audio src> because the request needs the API key header.
+  const label = button.textContent;
+  button.disabled = true;
+  button.textContent = '불러오는 중…';
+  try {
+    const r = await fetch(
+      `${server.url}/preview?path=${encodeURIComponent(m.path)}&start=${Math.max(0, m.match_start).toFixed(1)}`,
+      { headers: authHeaders() });
+    if (!r.ok) throw new Error(r.status);
+    const p = $('player');
+    if (p.src.startsWith('blob:')) URL.revokeObjectURL(p.src);
+    p.src = URL.createObjectURL(await r.blob());
+    p.hidden = false;
+    p.play();
+  } catch (e) {
+    showError(`미리듣기를 불러오지 못했습니다 (${e.message})`);
+  } finally {
+    button.disabled = false;
+    button.textContent = label;
+  }
 }
 
 async function feedback(id, correct, path, el) {
   try {
-    await fetch(`${SERVER}/feedback`, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
+    const r = await fetch(`${server.url}/feedback`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json', ...authHeaders() },
       body: JSON.stringify({ id, correct, path }),
     });
+    if (!r.ok) throw new Error(r.status);
     el.querySelector('.actions').outerHTML = `<div class="thanks">${correct ? '맞음' : '틀림'}으로 기록했습니다.</div>`;
   } catch {
     showError('피드백 저장 실패 (서버 확인)');
@@ -163,8 +202,9 @@ async function feedback(id, correct, path, el) {
 
 $('start').onclick = start;
 $('stop').onclick = () => chrome.runtime.sendMessage({ target: 'background', type: 'stop' });
+$('save-settings').onclick = saveSettings;
 chrome.storage.session.get('state').then(({ state }) => render(state));
 chrome.storage.onChanged.addListener((changes, area) => {
   if (area === 'session' && changes.state) render(changes.state.newValue);
 });
-checkServer();
+loadSettings().then(checkServer);

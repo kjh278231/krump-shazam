@@ -25,3 +25,6 @@ poc/rev_db/
 
 *.log
 __pycache__/
+
+# Deployment build output (server/deploy/): image context, preview MP3s, API key
+build/

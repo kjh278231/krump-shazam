@@ -57,15 +57,46 @@ def load_excluded() -> set[str]:
     return {os.path.normcase(str(MUSIC_DIR / l.strip())) for l in lines if l.strip() and not l.startswith("#")}
 
 
+CATALOG_FILE = ROOT / "db" / "catalog.json"
+
+
+class Library:
+    """Maps the paths stored in the fingerprint DB and rhythm index (absolute Windows paths of the
+    PC that indexed them, lowercased by parse_query_output) to library keys: the original-case path
+    relative to music/ with '/' separators. Keys work the same where music/ does not exist (Lambda),
+    using db/catalog.json written by server/deploy/build_catalog.py."""
+
+    def __init__(self):
+        if CATALOG_FILE.exists() and not MUSIC_DIR.exists():
+            import json
+            cat = json.loads(CATALOG_FILE.read_text(encoding="utf-8"))
+            roots, keys = [cat["indexed_root"]], cat["files"]
+        else:
+            roots, keys = [str(MUSIC_DIR)], [p.relative_to(MUSIC_DIR).as_posix() for p in list_audio()]
+        self.roots = [r.replace("\\", "/").rstrip("/").lower() + "/" for r in roots]
+        self.keys = {k.lower(): k for k in keys}
+
+    def key(self, path: str | Path) -> str:
+        s = str(path).replace("\\", "/")
+        low = s.lower()
+        for root in self.roots:
+            i = low.find(root)
+            if i >= 0:
+                rel = s[i + len(root):]
+                return self.keys.get(rel.lower(), rel)
+        return s
+
+
 def list_audio(folder: Path = MUSIC_DIR) -> list[Path]:
     return sorted(p for p in folder.rglob("*") if p.suffix.lower() in AUDIO_EXTS and p.is_file())
 
 
-def _panako_cmd(command: str, db_dir: Path, threads: int, map_gb: int, extra_config: dict | None) -> list[str]:
+def _panako_cmd(command: str, db_dir: Path, threads: int, map_gb: int, extra_config: dict | None,
+                readonly: bool = False) -> list[str]:
     config = {
         "STRATEGY": "PANAKO",
-        "DECODER_PIPE_ENVIRONMENT": "cmd.exe",
-        "DECODER_PIPE_ENVIRONMENT_ARG": "/C",
+        "DECODER_PIPE_ENVIRONMENT": "cmd.exe" if os.name == "nt" else "/bin/sh",
+        "DECODER_PIPE_ENVIRONMENT_ARG": "/C" if os.name == "nt" else "-c",
         "PANAKO_LMDB_FOLDER": str(db_dir / "db"),
         "PANAKO_CACHE_FOLDER": str(db_dir / "cache"),
         "AVAILABLE_PROCESSORS": str(threads),
@@ -77,6 +108,8 @@ def _panako_cmd(command: str, db_dir: Path, threads: int, map_gb: int, extra_con
     return [
         JAVA,
         f"-Dpanako.lmdb.mapsize.gb={map_gb}",
+        # Query-only, no lock file (read-only file systems such as AWS Lambda).
+        *(["-Dpanako.lmdb.readonly=true"] if readonly else []),
         "-Dfile.encoding=UTF-8", "-Dsun.stdout.encoding=UTF-8", "-Dsun.stderr.encoding=UTF-8",
         "--add-opens", "java.base/java.nio=ALL-UNNAMED",
         "--add-opens", "java.base/sun.nio.ch=ALL-UNNAMED",
@@ -115,8 +148,8 @@ class PanakoServer:
     """
 
     def __init__(self, db_dir: Path = DB_DIR, threads: int = 4, map_gb: int = 32,
-                 extra_config: dict | None = None, log_path: Path | None = None):
-        self._cmd = _panako_cmd("queryServer", db_dir, threads, map_gb, extra_config)
+                 extra_config: dict | None = None, log_path: Path | None = None, readonly: bool = False):
+        self._cmd = _panako_cmd("queryServer", db_dir, threads, map_gb, extra_config, readonly)
         self._log_path = log_path or (ROOT / "panako_server.log")
         self._lock = threading.Lock()
         self._pending: dict[str, tuple[list[str], threading.Event]] = {}
@@ -132,7 +165,9 @@ class PanakoServer:
             if line.strip() == "READY":
                 break
         else:
-            raise RuntimeError(f"Panako query server did not start, see {self._log_path}")
+            log.close()
+            tail = self._log_path.read_text(encoding="utf-8", errors="replace")[-1500:]
+            raise RuntimeError(f"Panako query server did not start ({self._log_path}):\n{tail}")
         threading.Thread(target=self._read, args=(self.proc,), daemon=True).start()
 
     def _read(self, proc) -> None:

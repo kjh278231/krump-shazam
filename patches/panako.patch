@@ -369,26 +369,53 @@ index e96a20c..e38b80e 100644
  	
  	
 diff --git a/src/main/java/be/panako/strategy/panako/storage/PanakoStorageKV.java b/src/main/java/be/panako/strategy/panako/storage/PanakoStorageKV.java
-index 94760a5..a0c04e9 100644
+index 94760a5..5b7a0f3 100644
 --- a/src/main/java/be/panako/strategy/panako/storage/PanakoStorageKV.java
 +++ b/src/main/java/be/panako/strategy/panako/storage/PanakoStorageKV.java
-@@ -114,9 +114,11 @@ public class PanakoStorageKV implements PanakoStorage{
- 		}
+@@ -106,28 +106,42 @@ public class PanakoStorageKV implements PanakoStorage{
+ 		String folder = Config.get(Key.PANAKO_LMDB_FOLDER);
+ 		folder = FileUtils.expandHomeDir(folder);
  		
+-		if(!new File(folder).exists()) {
++		// Read-only mode for query-only deployments on a read-only file system (AWS Lambda):
++		// no lock file is written and the databases must already exist.
++		final boolean readOnly = Boolean.getBoolean("panako.lmdb.readonly");
++		if(!readOnly && !new File(folder).exists()) {
+ 			FileUtils.mkdirs(folder);
+ 		}
+ 		if(!new File(folder).exists()) {
+ 			throw new RuntimeException("Could not create LMDB folder: " + folder);
+ 		}
+-		
++
++		org.lmdbjava.EnvFlags[] envFlags = readOnly
++				? new org.lmdbjava.EnvFlags[] {org.lmdbjava.EnvFlags.MDB_RDONLY_ENV, org.lmdbjava.EnvFlags.MDB_NOLOCK}
++				: new org.lmdbjava.EnvFlags[0];
  		env =  org.lmdbjava.Env.create()
 -        .setMapSize(1024l * 1024l * 1024l * 1024l)//1 TB max!
 +        // On Windows LMDB preallocates the full map size on disk, so allow overriding it (in GB).
 +        .setMapSize(Long.getLong("panako.lmdb.mapsize.gb", 1024l) * 1024l * 1024l * 1024l)
          .setMaxDbs(2)
 -        .setMaxReaders(Application.availableProcessors())
+-        .open(new File(folder));
+-		
 +        // reader slots are bound to threads (main + workers), so leave headroom
 +        .setMaxReaders(Math.max(126, 4 * Application.availableProcessors()))
-         .open(new File(folder));
- 		
++        .open(new File(folder), envFlags);
++
  		final String fingerprintName = "panako_fingerprints";
-@@ -125,9 +127,11 @@ public class PanakoStorageKV implements PanakoStorage{
- 		final String resourceName = "panako_resource_map";		
- 		resourceMap = env.openDbi(resourceName,DbiFlags.MDB_CREATE, DbiFlags.MDB_INTEGERKEY);
+-		fingerprints = env.openDbi(fingerprintName, DbiFlags.MDB_CREATE, DbiFlags.MDB_INTEGERKEY, DbiFlags.MDB_DUPSORT, DbiFlags.MDB_DUPFIXED);
+-		
+-		final String resourceName = "panako_resource_map";		
+-		resourceMap = env.openDbi(resourceName,DbiFlags.MDB_CREATE, DbiFlags.MDB_INTEGERKEY);
++		final String resourceName = "panako_resource_map";
++		if(readOnly) {
++			fingerprints = env.openDbi(fingerprintName, DbiFlags.MDB_INTEGERKEY, DbiFlags.MDB_DUPSORT, DbiFlags.MDB_DUPFIXED);
++			resourceMap = env.openDbi(resourceName, DbiFlags.MDB_INTEGERKEY);
++		} else {
++			fingerprints = env.openDbi(fingerprintName, DbiFlags.MDB_CREATE, DbiFlags.MDB_INTEGERKEY, DbiFlags.MDB_DUPSORT, DbiFlags.MDB_DUPFIXED);
++			resourceMap = env.openDbi(resourceName,DbiFlags.MDB_CREATE, DbiFlags.MDB_INTEGERKEY);
++		}
  		
 -		storeQueue = new HashMap<Long,List<long[]>>();
 -		deleteQueue = new HashMap<Long,List<long[]>>();

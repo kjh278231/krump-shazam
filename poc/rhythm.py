@@ -57,12 +57,14 @@ class RhythmIndex:
     N = 1 << 16           # chunk length (frames)
     MAX_Q = 2048          # longest query in frames (~47 s)
 
-    def __init__(self, path, exclude: set[str] = frozenset(), cohort=None):
-        """exclude: normcased paths never to return. cohort: path of rhythm_cohort.npz; when
-        given, `search` ranks by z = (score - track mean) / track std instead of raw score."""
+    def __init__(self, path, exclude=frozenset(), cohort=None):
+        """exclude: normcased paths never to return, or a predicate on the stored path. cohort: path
+        of rhythm_cohort.npz; when given, `search` ranks by z = (score - track mean) / track std
+        instead of raw score."""
         z = np.load(path)
         self.offsets, self.ids, self.paths = z["offsets"], z["ids"], z["paths"]
-        self.excluded = np.array([os.path.normcase(str(p)) in exclude for p in self.paths])
+        is_excluded = exclude if callable(exclude) else (lambda p: os.path.normcase(p) in exclude)
+        self.excluded = np.array([is_excluded(str(p)) for p in self.paths])
         self.cohort = None
         if cohort is not None and Path(cohort).exists():
             c = np.load(cohort)
