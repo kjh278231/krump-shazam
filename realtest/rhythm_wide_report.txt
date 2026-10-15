@@ -1,0 +1,31 @@
+wide grid 0.95-1.05, step 0.005; wide thresholds strong ratio>=1.25 and agree, weak ratio>=1.3 or (agree, z>=5.0)
+condition       rule          n       strong         weak   (shown/right)
+battle_unknown  fast         93    34/0        18/0    
+battle_unknown  fast+wide    93    34/0        18/0    
+crowd0_room     fast        100    43/43       11/11   
+crowd0_room     fast+wide   100    43/43       11/11   
+holdout_crowd3  fast         39     3/0         7/0    
+holdout_crowd3  fast+wide    39     3/0         7/0    
+holdout_fast    fast         39     0/0         3/0    
+holdout_fast    fast+wide    39     1/0         3/0    
+room_fast       fast        100     1/1         5/0    
+room_fast       fast+wide   100     8/8        11/6    
+user_known      fast          7     4/4         1/1    
+user_known      fast+wide     7     5/5         1/1    
+video_known     fast          7     6/6         0/0    
+video_known     fast+wide     7     6/6         0/0    
+  wide only: user_known     20261014-112605-245-f2c1.wav       speed 1.0300 -> strong found 1.030 ratio 1.30 z 6.5 right
+  wide only: room_fast      clip0000_crowd0_room.wav           speed 1.0205 -> strong found 1.020 ratio 1.33 z 3.4 right
+  wide only: room_fast      clip0011_crowd0_room.wav           speed 1.0353 -> strong found 1.035 ratio 1.49 z 10.6 right
+  wide only: room_fast      clip0020_crowd0_room.wav           speed 1.0153 -> strong found 1.015 ratio 1.29 z 3.4 right
+  wide only: room_fast      clip0021_crowd0_room.wav           speed 0.9642 -> weak   found 0.965 ratio 1.17 z 6.8 right
+  wide only: room_fast      clip0022_crowd0_room.wav           speed 1.0195 -> strong found 1.020 ratio 1.36 z 5.7 right
+  wide only: room_fast      clip0027_crowd0_room.wav           speed 0.9643 -> weak   found 0.965 ratio 1.20 z 6.4 right
+  wide only: room_fast      clip0049_crowd0_room.wav           speed 1.0139 -> strong found 1.015 ratio 1.33 z 6.8 right
+  wide only: room_fast      clip0054_crowd0_room.wav           speed 0.9703 -> weak   found 0.970 ratio 1.41 z 1.7 right
+  wide only: room_fast      clip0060_crowd0_room.wav           speed 0.9747 -> weak   found 0.975 ratio 1.34 z 2.1 right
+  wide only: room_fast      clip0065_crowd0_room.wav           speed 1.0298 -> strong found 1.030 ratio 1.36 z 5.8 right
+  wide only: room_fast      clip0072_crowd0_room.wav           speed 1.0257 -> weak   found 1.025 ratio 1.15 z 5.7 right
+  wide only: room_fast      clip0077_crowd0_room.wav           speed 0.9683 -> strong found 0.970 ratio 1.33 z 3.4 right
+  wide only: room_fast      clip0091_crowd0_room.wav           speed 0.9848 -> weak   found 0.985 ratio 1.42 z 3.2 right
+  wide only: holdout_fast   clip0112_holdout_crowd3.wav        speed 1.0143 -> strong found 1.015 ratio 1.58 z 4.3 ?

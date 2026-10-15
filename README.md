@@ -170,11 +170,12 @@ of the drum hits survives.
 **How it works.**
 - Each track is reduced to band-wise onset envelopes at ~43 frames/s, using 150–5500 Hz
   because the low end is lost in such recordings.
-- A query is cross-correlated against the whole library at speeds 0.98–1.02.
+- A query is cross-correlated against the whole library at speeds 0.99–1.01; the final search
+  also tries 0.95–1.05 when that finds nothing (see **Off-speed videos** below).
 - The library side is precomputed as overlap-save FFT chunks.
 - Build: `python poc/build_rhythm_index.py` → `db/rhythm.npz` (~15 min). Re-run after adding
   music.
-- A search takes ~5–10 s.
+- A search takes ~1 s at 3 speeds with 3 threads, plus ~4 s for the wide stage (this PC).
 
 **Results.**
 - Synthetic crowd 0 dB + heavy reverb clips, where Panako finds 0–3%: top-1 correct 71/100.
@@ -206,6 +207,21 @@ User captures that Panako missed: DARK, Afro Krump and one KILL EM come back 유
 KILL EM comes back 약한. The fifth, a recording across a DJ jump-back, still fails.
 
 Rhythm results are never 확정, only 추가 확인 with a "listen to check" prompt.
+
+**Off-speed videos** (`poc/eval_rhythm_wide.py` → `realtest/rhythm_wide_report.txt`). Some
+uploads play the track faster or slower: the shorts hdnJN-k6ePg plays WLDLF 07 at 1.03. Panako
+found nothing in it, even with the speed undone, because of the venue noise. A 30 s query loses
+its rhythm match about 0.3% off the true speed, so 0.99–1.01 missed it. When that search shows
+nothing, the final search (not the mid-recording checks) runs again at 0.95–1.05 in 0.005
+steps. It uses its own cohort (`rhythm_cohort.py --wide` → `db/rhythm_cohort_wide.npz`) and
+stricter thresholds: 유력 at ratio ≥ 1.25 and agree, 약한 at ratio ≥ 1.3 or agree and z ≥ 5.
+
+| Added by the wide stage | Shown | Right |
+|---|---|---|
+| Room clips played 1.2–4.8% off speed (100; first stage alone 6 shown, 1 right) | +13 | 13 |
+| Room clips at 1.0, DARK video, battle windows | 0 | – |
+| Unknown songs (39 at 1.0, 39 off speed) | +1 | – |
+| User captures | WLDLF 07 (유력) | yes |
 
 **During recording** (`poc/eval_rhythm_prefix.py` → `realtest/rhythm_prefix.jsonl`). Real hall
 recordings almost never confirm by fingerprint, so mid-recording checks also run the rhythm

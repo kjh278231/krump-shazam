@@ -5,6 +5,8 @@ music/
 db/panako/
 db/rhythm.npz
 db/rhythm_cohort.npz
+db/rhythm_cohort_wide.npz
+realtest/*_speeds.npz
 db/albums.json
 db/covers/
 

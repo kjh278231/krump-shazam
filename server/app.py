@@ -128,10 +128,11 @@ EXCLUDED = {l.strip() for l in EXCLUDE_FILE.read_text(encoding="utf-8").splitlin
 startup_log("links, catalog")
 # Fallback for reverberant room recordings where Panako finds nothing (poc/rhythm.py).
 RHYTHM = (RhythmIndex(RHYTHM_FILE, exclude=lambda p: LIBRARY.key(p) in EXCLUDED,
-                      cohort=ROOT / "db" / "rhythm_cohort.npz")
+                      cohort=ROOT / "db" / "rhythm_cohort.npz", cohort_wide=ROOT / "db" / "rhythm_cohort_wide.npz")
           if RHYTHM_FILE.exists() else None)
 startup_log("rhythm index")
 RHYTHM_SLOTS = threading.BoundedSemaphore(int(os.environ.get("RHYTHM_WORKERS", "3")))
+RHYTHM_THREADS = int(os.environ.get("RHYTHM_THREADS", "3"))  # speeds searched at once per request
 RHYTHM_HINT_SECONDS = 15   # partial checks run the rhythm search from here on (hint only)
 RHYTHM_EARLY_SECONDS = 20  # ... and a strong candidate from here on ends the recording
 PANAKO_SR = 16000  # Panako's PANAKO_SAMPLE_RATE
@@ -289,8 +290,12 @@ def identify_audio(body: bytes, title: str, url: str, partial: bool) -> dict:
 
     if run_rhythm:
         y = resample(pcm, PANAKO_SR, RHYTHM_SR)
-        with RHYTHM_SLOTS:  # each search holds ~0.5 GB of temporaries
-            r = rhythm_identify(RHYTHM, y, same_audio)
+        with RHYTHM_SLOTS:  # each speed searched holds ~0.5 GB of temporaries
+            r = rhythm_identify(RHYTHM, y, same_audio, threads=RHYTHM_THREADS)
+            # The final search also tries 0.95-1.05x speed (re-uploads played faster or slower).
+            # Not mid-recording: it takes several times longer.
+            if r is None and not partial:
+                r = rhythm_identify(RHYTHM, y, same_audio, wide=True, threads=RHYTHM_THREADS)
         # Mid-recording, only strong candidates are shown: weak ones also appeared for 6-10/39
         # songs that are not in the library, and a wrong hint is worse than none.
         if r and (not partial or r["strength"] == "strong"):

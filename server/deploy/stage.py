@@ -3,7 +3,7 @@ large data files the function downloads from S3 at start (aws_setup.py data uplo
 
 Image (no music files):
   app/poc/*.py, app/server/app.py         code
-  app/db/rhythm_cohort.npz, same_audio.csv, exclude.txt
+  app/db/rhythm_cohort.npz, rhythm_cohort_wide.npz, same_audio.csv, exclude.txt
   app/db/catalog.json                     library keys (music/ is not in the image)
   app/db/albums.json, covers/             album list (server/build_albums.py, run it first)
   app/tools/Panako/build/libs/*.jar
@@ -64,7 +64,7 @@ def main() -> None:
 
     db = app / "db"
     db.mkdir()
-    for name in ("rhythm_cohort.npz", "same_audio.csv", "exclude.txt", "albums.json"):
+    for name in ("rhythm_cohort.npz", "rhythm_cohort_wide.npz", "same_audio.csv", "exclude.txt", "albums.json"):
         shutil.copy2(ROOT / "db" / name, db / name)
     shutil.copytree(ROOT / "db" / "covers", db / "covers")
     catalog = {"indexed_root": str(MUSIC_DIR),
