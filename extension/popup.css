@@ -33,8 +33,3 @@ progress { width: 100%; }
 .match .actions button { padding: 2px 8px; font-size: 12px; }
 .thanks { color: var(--muted); font-size: 12px; }
 audio { width: 100%; margin-top: 6px; }
-#settings { margin-top: 10px; border-top: 1px solid var(--line); padding-top: 6px; color: var(--muted); font-size: 12px; }
-#settings summary { cursor: pointer; }
-#settings label { display: flex; gap: 6px; align-items: center; margin: 5px 0; }
-#settings input { flex: 1; font: inherit; padding: 3px 6px; border-radius: 6px; border: 1px solid var(--line);
-                  background: var(--bg); color: var(--fg); }

@@ -1,9 +1,6 @@
-// The deployed AWS Lambda (docs/lambda-deployment.md); a local server is set in 서버 설정.
-const DEFAULT_SERVER = 'https://n7m4s62lmqfrtif557t7i4omji0evzfa.lambda-url.ap-northeast-2.on.aws';
+// SERVER ({ url, apiKey } of the deployed Lambda) comes from config.js; there is no settings UI.
 const $ = (id) => document.getElementById(id);
-// { url, apiKey } from the settings section (chrome.storage.local); the Lambda by default.
-let server = { url: DEFAULT_SERVER, apiKey: '' };
-const authHeaders = () => (server.apiKey ? { 'X-Api-Key': server.apiKey } : {});
+const authHeaders = () => ({ 'X-Api-Key': SERVER.apiKey });
 const VERDICT_TEXT = {
   confirmed: '확정',
   check: '추가 확인 필요',
@@ -33,31 +30,13 @@ async function checkServer() {
   // Also wakes a cold Lambda while the user is still picking a duration.
   $('server').className = 'dot';
   try {
-    const r = await fetch(`${server.url}/health`);
+    const r = await fetch(`${SERVER.url}/health`);
     $('server').className = r.ok ? 'dot on' : 'dot off';
-    $('server').title = `${server.url} 연결됨`;
+    $('server').title = r.ok ? '서버 연결됨' : '서버 응답 오류';
   } catch {
     $('server').className = 'dot off';
-    $('server').title = `서버 연결 안 됨: ${server.url}`;
+    $('server').title = '서버 연결 안 됨';
   }
-}
-
-async function loadSettings() {
-  const { settings } = await chrome.storage.local.get('settings');
-  server = { url: DEFAULT_SERVER, apiKey: '', ...settings };
-  $('server-url').value = server.url;
-  $('api-key').value = server.apiKey;
-  // First run: the default server needs the API key the user was given.
-  if (server.url === DEFAULT_SERVER && !server.apiKey) $('settings').open = true;
-}
-
-async function saveSettings() {
-  const url = $('server-url').value.trim().replace(/\/+$/, '') || DEFAULT_SERVER;
-  server = { url, apiKey: $('api-key').value.trim() };
-  await chrome.storage.local.set({ settings: server });
-  $('server-url').value = url;
-  $('settings').open = false;
-  checkServer();
 }
 
 async function start() {
@@ -71,7 +50,7 @@ async function start() {
   }
   chrome.runtime.sendMessage({
     target: 'background', type: 'start', streamId,
-    duration: Number($('duration').value), tabTitle: tab.title, tabUrl: tab.url, server,
+    duration: Number($('duration').value), tabTitle: tab.title, tabUrl: tab.url,
   });
 }
 
@@ -108,7 +87,7 @@ function render(state = {}) {
       $('result').append(hint);
     }
   } else if (state.status === 'searching') {
-    $('status').textContent = '마지막 정밀 검색 중… (리듬 검색까지 하면 10초 정도 걸립니다)';
+    $('status').textContent = '마지막 정밀 검색 중… (리듬 검색까지 하면 10~20초 걸립니다)';
   } else if (state.status === 'error') {
     showError(state.error);
   } else if (state.status === 'done' && state.result) {
@@ -174,7 +153,7 @@ async function play(m, button) {
   button.textContent = '불러오는 중…';
   try {
     const r = await fetch(
-      `${server.url}/preview?path=${encodeURIComponent(m.path)}&start=${Math.max(0, m.match_start).toFixed(1)}`,
+      `${SERVER.url}/preview?path=${encodeURIComponent(m.path)}&start=${Math.max(0, m.match_start).toFixed(1)}`,
       { headers: authHeaders() });
     if (!r.ok) throw new Error(r.status);
     const p = $('player');
@@ -192,7 +171,7 @@ async function play(m, button) {
 
 async function feedback(id, correct, path, el) {
   try {
-    const r = await fetch(`${server.url}/feedback`, {
+    const r = await fetch(`${SERVER.url}/feedback`, {
       method: 'POST', headers: { 'Content-Type': 'application/json', ...authHeaders() },
       body: JSON.stringify({ id, correct, path }),
     });
@@ -205,10 +184,11 @@ async function feedback(id, correct, path, el) {
 
 $('start').onclick = start;
 $('stop').onclick = () => chrome.runtime.sendMessage({ target: 'background', type: 'stop' });
-$('save-settings').onclick = saveSettings;
 $('library').onclick = () => chrome.tabs.create({ url: chrome.runtime.getURL('library.html') });
 chrome.storage.session.get('state').then(({ state }) => render(state));
 chrome.storage.onChanged.addListener((changes, area) => {
   if (area === 'session' && changes.state) render(changes.state.newValue);
 });
-loadSettings().then(checkServer);
+// Old builds kept { url, apiKey } in storage; drop it.
+chrome.storage.local.remove('settings');
+checkServer();

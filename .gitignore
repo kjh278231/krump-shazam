@@ -30,3 +30,5 @@ __pycache__/
 
 # Deployment build output (server/deploy/): image context, preview MP3s, API key
 build/
+# Endpoint + API key baked into the extension (aws_setup.py writes it)
+extension/config.js

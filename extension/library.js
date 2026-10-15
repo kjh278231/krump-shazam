@@ -1,8 +1,7 @@
 // Album list of the server's library (GET /albums, server/build_albums.py).
 // The last list is cached in chrome.storage.local so the page shows at once; a cold Lambda takes
 // ~10 s to answer the refresh.
-// The deployed AWS Lambda (docs/lambda-deployment.md); a local server is set in 서버 설정.
-const DEFAULT_SERVER = 'https://n7m4s62lmqfrtif557t7i4omji0evzfa.lambda-url.ap-northeast-2.on.aws';
+// SERVER ({ url, apiKey } of the deployed Lambda) comes from config.js.
 const $ = (id) => document.getElementById(id);
 let albums = [];
 const expanded = new Set();  // ids of albums the user opened
@@ -129,22 +128,17 @@ function render() {
 }
 
 async function load() {
-  let settings;
-  try {
-    ({ settings } = await chrome.storage.local.get('settings'));
-  } catch {}
-  const server = { url: DEFAULT_SERVER, apiKey: '', ...settings };
   let cached = null;
   try {
     ({ albumsCache: cached } = await chrome.storage.local.get('albumsCache'));
   } catch {}
-  if (cached?.url === server.url) {
+  if (cached?.albums) {
     albums = cached.albums;
     render();
   }
   status(albums.length ? '최신 목록 확인 중…' : '서버에서 불러오는 중… (서버가 쉬고 있었다면 10초 정도 걸립니다)');
   try {
-    const r = await fetch(`${server.url}/albums`, { headers: server.apiKey ? { 'X-Api-Key': server.apiKey } : {} });
+    const r = await fetch(`${SERVER.url}/albums`, { headers: { 'X-Api-Key': SERVER.apiKey } });
     if (!r.ok) {
       let detail = '';
       try { detail = (await r.json()).detail || ''; } catch {}
@@ -154,10 +148,10 @@ async function load() {
     render();
     status('');
     try {
-      await chrome.storage.local.set({ albumsCache: { url: server.url, albums } });
+      await chrome.storage.local.set({ albumsCache: { albums } });
     } catch {}
   } catch (e) {
-    const msg = e instanceof TypeError ? `서버(${server.url})에 연결할 수 없습니다. 팝업의 서버 설정을 확인하세요.` : e.message;
+    const msg = e instanceof TypeError ? '서버에 연결할 수 없습니다. 잠시 후 다시 시도하세요.' : e.message;
     status(albums.length ? `${msg} — 저장해 둔 목록을 보여줍니다.` : msg, true);
   }
 }

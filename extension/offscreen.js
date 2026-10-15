@@ -6,8 +6,7 @@
 // 20 s) the recording stops right away; otherwise the best candidate so far is shown as a hint
 // and, at the end, the full recording gets the complete search.
 
-// Server address and API key come with each 'record' message (popup settings; offscreen documents
-// have no chrome.storage).
+// Server address and API key: SERVER from config.js (fixed at build time, aws_setup.py).
 const MIN_SECONDS = 5;
 // Panako needs ~10 s: on clean clips 5-6 s confirmed 0/10, 8 s 2/10, 10 s 10/10.
 const FIRST_CHECK = 10;
@@ -40,15 +39,15 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   }
 });
 
-async function identify(server, blob, params) {
+async function identify(blob, params) {
   const qs = new URLSearchParams(params);
   let res;
   try {
-    res = await fetch(`${server.url}/identify?${qs}`, {
-      method: 'POST', body: blob, headers: server.apiKey ? { 'X-Api-Key': server.apiKey } : {},
+    res = await fetch(`${SERVER.url}/identify?${qs}`, {
+      method: 'POST', body: blob, headers: { 'X-Api-Key': SERVER.apiKey },
     });
   } catch {
-    throw new Error(`서버(${server.url})에 연결할 수 없습니다. 팝업의 서버 설정을 확인하세요.`);
+    throw new Error('서버에 연결할 수 없습니다. 잠시 후 다시 시도하세요.');
   }
   if (!res.ok) {
     const text = await res.text();
@@ -59,7 +58,7 @@ async function identify(server, blob, params) {
   return res.json();
 }
 
-async function record({ streamId, duration, tabTitle, tabUrl, server }) {
+async function record({ streamId, duration, tabTitle, tabUrl }) {
   if (recorder?.state === 'recording') throw new Error('Already recording');
   const stream = await navigator.mediaDevices.getUserMedia({
     audio: { mandatory: { chromeMediaSource: 'tab', chromeMediaSourceId: streamId } },
@@ -72,7 +71,7 @@ async function record({ streamId, duration, tabTitle, tabUrl, server }) {
   // check is at 10 s). Checks wait for this reply: a request sent while the only instance is still
   // starting would start a second cold instance instead of queueing.
   let warm = false;
-  fetch(`${server.url}/health`).catch(() => {}).finally(() => { warm = true; });
+  fetch(`${SERVER.url}/health`).catch(() => {}).finally(() => { warm = true; });
 
   const chunks = [];
   const page = { title: tabTitle || '', url: tabUrl || '' };
@@ -88,7 +87,7 @@ async function record({ streamId, duration, tabTitle, tabUrl, server }) {
   let nextCheck = FIRST_CHECK;
   const check = async (t) => {
     try {
-      const r = await identify(server, new Blob(chunks, { type: 'audio/webm' }), { ...page, partial: 1 });
+      const r = await identify(new Blob(chunks, { type: 'audio/webm' }), { ...page, partial: 1 });
       // final: a fingerprint confirmation, or a strong rhythm candidate after >= 20 s (server decides).
       // Kept even if the recording stopped meanwhile: it then replaces the final search.
       if (r.final) {
@@ -130,5 +129,5 @@ async function record({ streamId, duration, tabTitle, tabUrl, server }) {
     return;
   }
   send('searching');
-  send('result', { result: await identify(server, new Blob(chunks, { type: 'audio/webm' }), page) });
+  send('result', { result: await identify(new Blob(chunks, { type: 'audio/webm' }), page) });
 }

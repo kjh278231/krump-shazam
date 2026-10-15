@@ -31,8 +31,8 @@ Lambda 단가 (서울):
 - 하루 5회 × 30일 = 150회 → 약 27,000GB-초 → x86 기준 약 $0.45/월.
 - Lambda 상시 무료 한도(월 40만 GB-초, 100만 요청)가 계정에 적용되면 실행비는 0원이다.
 
-참고: 혼자 쓰는 동안은 로컬 PC에서 서버를 돌리는 것도 0원이다. 확장 프로그램의 기본 서버는 Lambda이고,
-**서버 설정**의 주소에 `http://127.0.0.1:8765`를 넣으면 로컬 서버를 쓴다.
+참고: 혼자 쓰는 동안은 로컬 PC에서 서버를 돌리는 것도 0원이다. 확장 프로그램은 Lambda를 쓰고,
+`extension/config.js`의 주소를 `http://127.0.0.1:8765`로 고치면 로컬 서버를 쓴다.
 
 ## 배포된 구성
 
@@ -75,8 +75,9 @@ python server/deploy/aws_setup.py bucket data image function
 - 앨범 목록(`GET /albums`)은 표지를 data URI로 넣은 JSON 하나(약 2MB)로 보낸다. 표지마다 요청하면
   300번 넘게 Lambda를 호출하게 되고 동시 실행 상한(3)에 걸린다.
 - 코드만 바꾸면 `stage.py` → `aws_setup.py image function`. 이미지에서 코드가 마지막 레이어라 몇 MB만 올라간다.
-- 확장 프로그램: Function URL이 기본 서버로 들어 있다(`extension/popup.js`, `library.js`의 `DEFAULT_SERVER`;
-  함수를 다시 만들어 URL이 바뀌면 고친다). 팝업 아래 **서버 설정**에 API 키만 넣고 저장.
+- 확장 프로그램: Function URL과 API 키는 `extension/config.js`(git에 없음)에 고정돼 있고, 팝업에서
+  보거나 바꿀 수 없다. `aws_setup.py function`이 이 파일을 다시 쓰므로 URL·키가 바뀌면 다시 실행하고
+  확장 프로그램을 새로고침한다. 키는 확장 프로그램 파일과 요청 헤더에 그대로 들어 있어 숨겨지지는 않는다.
 - 주소는 공개돼도 된다. 키 없는 요청은 401로 거절되지만 Lambda 실행은 과금되므로, 최악의 경우(동시 실행 3개를
   한 달 내내) 약 $780/월이다. 이상하면 API 키를 바꾸거나(`KF_API_KEY`) 동시 실행 상한을 0으로 내린다.
 
