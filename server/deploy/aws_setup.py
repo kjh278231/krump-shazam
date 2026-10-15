@@ -35,9 +35,11 @@ NAME = "krump-finder"
 BUCKET = f"{NAME}-previews-{ACCOUNT}"
 TAGS = {"Project": NAME}
 ROLE = f"{NAME}-lambda"
-# Rhythm index ~1.5 GB + JVM + the fingerprint DB in the page cache (1.2 GB, prefetched); more
-# memory also means more vCPU (6 GB ~ 3.5 vCPU) for the rhythm search.
-MEMORY_MB = 6144
+# Rhythm index ~1.5 GB + JVM + the fingerprint DB in the page cache (1.2 GB, prefetched). More
+# memory also means more vCPU: 10 GB = 6 vCPU, searched as 6 speeds at once (RHYTHM_THREADS).
+# Measured 2026-10-15: the 21-speed rhythm stage took 4.7 s at 6 GB / 3 threads, 2.9 s at 10 GB / 6.
+MEMORY_MB = 10240
+RHYTHM_THREADS = 6
 TIMEOUT_S = 60
 MAX_CONCURRENCY = 3  # cost cap: at most 3 instances at once
 # The fingerprint DB and rhythm index are downloaded from here into /tmp at every cold start.
@@ -159,7 +161,8 @@ def role_arn() -> str:
 def function() -> None:
     uri_file = ROOT / "build" / "image_uri.txt"
     uri = uri_file.read_text().strip()
-    env = {"Variables": {"KF_BUCKET": BUCKET, "KF_API_KEY": api_key(), "KF_DATA_PREFIX": DATA_PREFIX}}
+    env = {"Variables": {"KF_BUCKET": BUCKET, "KF_API_KEY": api_key(), "KF_DATA_PREFIX": DATA_PREFIX,
+                         "RHYTHM_THREADS": str(RHYTHM_THREADS)}}
     arn = role_arn()
     if exists(lambda: lam.get_function(FunctionName=NAME), "ResourceNotFoundException"):
         lam.update_function_code(FunctionName=NAME, ImageUri=uri)

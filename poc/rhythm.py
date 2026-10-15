@@ -12,6 +12,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 import numpy as np
+import scipy.fft
 
 from common import FFMPEG
 
@@ -87,23 +88,38 @@ class RhythmIndex:
         """Correlation at every global frame position (length = chunks * hop)."""
         Q = np.conj(np.fft.rfft(q, self.N, axis=1)).astype(np.complex64)
         out = np.empty((len(self.F), self.hop), np.float32)
+        # einsum sums the bands without a (64, bands, N/2) temporary, and scipy's inverse FFT is
+        # faster than numpy's on float32: together ~30% off a search (same scores to ~1e-7).
         for i in range(0, len(self.F), 64):  # batches keep memory bounded
-            c = np.fft.irfft((self.F[i:i + 64] * Q[None]).sum(1), self.N, axis=1)
+            c = scipy.fft.irfft(np.einsum("cbk,bk->ck", self.F[i:i + 64], Q), self.N, axis=1)
             out[i:i + 64] = c[:, :self.hop]
         return out.reshape(-1)[:self.total] / (q.shape[0] * q.shape[1])
 
-    def _search_speed(self, q: np.ndarray, s: float) -> tuple[np.ndarray, np.ndarray]:
-        """Best score and its position (frame within the track) per non-empty track at speed s."""
+    def _search_speed(self, q: np.ndarray, s: float, top: int = 0) -> tuple[np.ndarray, np.ndarray]:
+        """Best score per non-empty track at speed s, and its position (frame within the track)
+        for the `top` best usable tracks at this speed (-1 for the others).
+
+        That is enough for search_full's top hits: a track among the overall top N at its best
+        speed has fewer than N usable tracks above it there. Per-track Python loops held the GIL
+        and made up about half of a 21-speed search, however many threads ran."""
         # Query frame k was heard at library time k*s: stretch the query onto the library timeline.
         m = int(round(q.shape[1] * s))
         qs = np.stack([np.interp(np.arange(m) / s, np.arange(q.shape[1]), b) for b in q]).astype(np.float32)
         c = self._corr(qs)
-        # A window must lie inside one track: drop the last m-1 start positions of each track.
+        # A window must lie inside one track: only the first (length - m + 1) start positions of
+        # each track count. One reduceat over [start, last valid + 1) / [.., next start) pairs.
         starts, ends = self.offsets[self.nonempty], self.offsets[self.nonempty + 1]
-        for a, b in zip(starts, ends):
-            c[max(a, b - m + 1):b] = -np.inf
-        mx = np.maximum.reduceat(c, starts)
-        pos = np.array([np.argmax(c[a:b]) for a, b in zip(starts, ends)], np.int64)
+        valid_end = np.maximum(starts, ends - m + 1)
+        bounds = np.empty(2 * len(starts), np.int64)
+        bounds[0::2], bounds[1::2] = starts, valid_end
+        mx = np.maximum.reduceat(c, bounds)[0::2]
+        mx[valid_end == starts] = -np.inf  # track shorter than the query
+        pos = np.full(len(starts), -1, np.int64)
+        k = min(top + int(self.excluded[self.nonempty].sum()), len(mx))
+        if k:
+            for j in np.argpartition(-mx, k - 1)[:k]:
+                if valid_end[j] > starts[j]:
+                    pos[j] = np.argmax(c[starts[j]:valid_end[j]])
         return mx, pos
 
     def search_full(self, q: np.ndarray, speeds=(1.0,), top: int = 10, cohort=None,
@@ -120,9 +136,9 @@ class RhythmIndex:
         best_speed = np.ones(len(self.ids), np.float32)
         if threads > 1:
             with ThreadPoolExecutor(threads) as ex:
-                per_speed = list(ex.map(lambda s: self._search_speed(q, s), speeds))
+                per_speed = list(ex.map(lambda s: self._search_speed(q, s, top), speeds))
         else:
-            per_speed = (self._search_speed(q, s) for s in speeds)
+            per_speed = (self._search_speed(q, s, top) for s in speeds)
         idx = self.nonempty
         for s, (mx, pos) in zip(speeds, per_speed):  # speed order decides ties, as before
             better = mx > best[idx]

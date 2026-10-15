@@ -253,6 +253,7 @@ def identify_audio(body: bytes, title: str, url: str, partial: bool) -> dict:
         wav.unlink(missing_ok=True)
         raise
     elapsed = time.time() - t0
+    timings = {"fingerprint": round(elapsed, 2)}  # seconds per search stage
     for m in matches:
         m.match_path = LIBRARY.key(m.match_path)
     matches = [m for m in matches if m.match_path not in EXCLUDED]
@@ -291,11 +292,15 @@ def identify_audio(body: bytes, title: str, url: str, partial: bool) -> dict:
     if run_rhythm:
         y = resample(pcm, PANAKO_SR, RHYTHM_SR)
         with RHYTHM_SLOTS:  # each speed searched holds ~0.5 GB of temporaries
+            t1 = time.time()
             r = rhythm_identify(RHYTHM, y, same_audio, threads=RHYTHM_THREADS)
+            timings["rhythm"] = round(time.time() - t1, 2)
             # The final search also tries 0.95-1.05x speed (re-uploads played faster or slower).
             # Not mid-recording: it takes several times longer.
             if r is None and not partial:
+                t1 = time.time()
                 r = rhythm_identify(RHYTHM, y, same_audio, wide=True, threads=RHYTHM_THREADS)
+                timings["rhythm_wide"] = round(time.time() - t1, 2)
         # Mid-recording, only strong candidates are shown: weak ones also appeared for 6-10/39
         # songs that are not in the library, and a wrong hint is worse than none.
         if r and (not partial or r["strength"] == "strong"):
@@ -320,7 +325,7 @@ def identify_audio(body: bytes, title: str, url: str, partial: bool) -> dict:
     if not final:  # a hint only; the recording continues and the final request is logged
         wav.unlink()
         return {"id": None, "verdict": result, "reason": reason, "method": method, "final": False,
-                "elapsed": round(elapsed, 2), "songs": out_songs}
+                "elapsed": round(elapsed, 2), "timings": timings, "songs": out_songs}
 
     save_record({"clip": str(wav), "condition": "browser", "expected": "", "offset": "",
                  "match": out_songs[0]["path"] if out_songs else "",
@@ -335,6 +340,7 @@ def identify_audio(body: bytes, title: str, url: str, partial: bool) -> dict:
         "method": method,
         "final": True,
         "elapsed": round(elapsed, 2),
+        "timings": timings,
         "songs": out_songs,
     }
 

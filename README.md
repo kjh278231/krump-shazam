@@ -175,7 +175,8 @@ of the drum hits survives.
 - The library side is precomputed as overlap-save FFT chunks.
 - Build: `python poc/build_rhythm_index.py` → `db/rhythm.npz` (~15 min). Re-run after adding
   music.
-- A search takes ~1 s at 3 speeds with 3 threads, plus ~4 s for the wide stage (this PC).
+- A search takes ~0.3 s at 3 speeds with 3 threads, plus ~2.2 s for the wide stage (this PC;
+  1.6 s with 6 threads). On Lambda (10 GB, 6 threads): ~0.75 s, plus ~2.9 s for the wide stage.
 
 **Results.**
 - Synthetic crowd 0 dB + heavy reverb clips, where Panako finds 0–3%: top-1 correct 71/100.
