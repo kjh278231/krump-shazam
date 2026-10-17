@@ -18,6 +18,9 @@ recordings/
 
 # Downloaded video audio and generated clips
 realtest/audio*/
+realtest/battle100/audio/
+realtest/battle100/tmp/
+realtest/battle100/clips/
 realtest/windows/
 poc/testset/
 poc/diag/
