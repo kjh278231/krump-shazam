@@ -40,7 +40,8 @@ cd tools/Panako && gradlew.bat shadowJar
 
 Not in git (see `.gitignore`): `music/`, the generated DBs (`db/panako/`, `db/rhythm*.npz`;
 rebuild with `build_index.py`, `build_rhythm_index.py`, `rhythm_cohort.py`), the album list
-(`db/albums.json`, `db/covers/`; `server/build_albums.py`), `recordings/`,
+(`db/albums.json`, `db/covers/`; `server/build_albums.py`), the store covers (`db/store_covers/`;
+`server/fetch_store_covers.py`), `recordings/`,
 downloaded video audio and generated test clips. `db/same_audio.csv` and `db/holdout.txt` are
 committed because they are small and slow to rebuild.
 
@@ -72,18 +73,24 @@ song is not in the library), then `python poc/evaluate.py --manifest your.csv`.
    못 찾음. Mid-recording hints and search details are not shown. A find that the server did not
    confirm (추가 확인: a rhythm candidate, low score or close rival) is 찾음 in amber with
    "확실하지 않아요. 미리듣기로 확인해 주세요." The result shows the best song only, with its
-   album and position in the library track.
+   album cover, album, artist and position in the library track, and a button to the album's
+   store page (밴드캠프 / KNKRTWORLD / Gumroad에서 앨범 구매; 아티스트 보기 where only the artist's
+   page was found). The links are in `db/album_links.json`, checked by hand
+   (`docs/album-links.md`); 301 of 319 albums have one. When the found file sits in a bundle
+   folder, the album comes from a copy of the same audio (Panako id or `db/same_audio.csv`).
    **▶ 10초 미리듣기** plays a 10 s MP3 excerpt from that spot, cut by the server's `/preview`.
    Full library files are never served, because of copyright once this is distributed.
    **✔ 맞음 / ✘ 틀림** records ground truth.
 5. **라이브러리** (popup header) opens a tab listing the library's albums: cover, title, artist,
-   track count; click an album for its tracks, search by album, artist or track name. The list
+   track count and a 구매 / 아티스트 link to the store; click an album for its tracks, search by
+   album, artist or track name. The list
    comes from the server's `/albums` (cached in the extension, so it shows at once next time).
    Rebuild it after adding music: `python server/build_albums.py` → `db/albums.json` +
    `db/covers/` (needs `pip install mutagen pillow`). An album is a top-level folder, named by
    the files' album / album-artist tags or else the folder name ("Artist - Album"); a folder of
    loose tracks from several albums (`트랙리스트`) is split by album tag. Covers are the embedded
-   pictures (287 of 319 albums), as 120 px JPEGs.
+   pictures (287 of 319 albums), as 120 px JPEGs. The popup prefers the store's cover:
+   `python server/fetch_store_covers.py` → `db/store_covers/` (144 px, 226 albums).
 
 Candidates are grouped into songs (`poc/grouping.py`):
 - Files containing the same recording (other album copy, a session mix or judge-showcase

@@ -9,6 +9,7 @@ db/rhythm_cohort_wide.npz
 realtest/*_speeds.npz
 db/albums.json
 db/covers/
+db/store_covers/
 
 # Panako source checkout; our changes live in patches/panako.patch
 tools/

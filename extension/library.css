@@ -19,9 +19,13 @@ h1 { font-size: 20px; margin: 0; }
 #albums { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 10px;
           align-items: start; max-width: 1200px; margin: 0 auto; }
 .album { background: var(--card); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
-.album > button { all: unset; box-sizing: border-box; width: 100%; display: flex; gap: 12px; align-items: center;
+.album .row { display: flex; align-items: center; }
+.album .row > button { all: unset; box-sizing: border-box; flex: 1; min-width: 0; display: flex; gap: 12px; align-items: center;
                   padding: 8px; cursor: pointer; }
-.album > button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; border-radius: 10px; }
+.album .row > button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; border-radius: 10px; }
+.store { flex: none; margin-right: 10px; padding: 4px 9px; border-radius: 6px; font-size: 12px; font-weight: 600;
+         background: var(--accent); color: var(--bg); text-decoration: none; white-space: nowrap; }
+.store:hover { filter: brightness(1.08); }
 .cover { width: 60px; height: 60px; flex: none; border-radius: 6px; object-fit: cover; background: var(--line);
          display: grid; place-items: center; color: var(--muted); font-size: 22px; font-weight: 700; }
 .info { min-width: 0; }

@@ -5,7 +5,9 @@ An album is normally one top-level folder of music/. Titles and artists come fro
 (album, album artist), else from the folder name ("Artist - Album"). A folder of loose tracks from
 different albums (tags disagree) is split by album tag, and groups with the same title and artist
 are merged across folders. The cover is the first embedded picture found (or a cover image file in
-the folder), shrunk to a small JPEG.
+the folder), shrunk to a small JPEG. `ids` holds each track's Panako id: the fingerprint DB stores
+byte-identical copies once, so a found song can name another album's copy, and the server looks
+the album up by id.
 
 Needs mutagen and Pillow (build-time only; the server just reads the output).
 """
@@ -24,7 +26,7 @@ import mutagen
 from PIL import Image
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "poc"))
-from common import EXCLUDE_FILE, MUSIC_DIR, ROOT, list_audio  # noqa: E402
+from common import EXCLUDE_FILE, MUSIC_DIR, ROOT, list_audio, panako_id  # noqa: E402
 from grouping import PREVIEW_RE  # noqa: E402
 
 OUT = ROOT / "db" / "albums.json"
@@ -79,7 +81,7 @@ def most_common(values: list[str], share: float = 0.0) -> str:
     return v if n >= share * len(values) else ""
 
 
-def thumbnail(data: bytes) -> bytes | None:
+def thumbnail(data: bytes, px: int = COVER_PX) -> bytes | None:
     try:
         im = Image.open(io.BytesIO(data))
         im = im.convert("RGB")
@@ -87,7 +89,7 @@ def thumbnail(data: bytes) -> bytes | None:
         return None
     w, h = im.size
     s = min(w, h)  # centre square crop
-    im = im.crop(((w - s) // 2, (h - s) // 2, (w + s) // 2, (h + s) // 2)).resize((COVER_PX, COVER_PX), Image.LANCZOS)
+    im = im.crop(((w - s) // 2, (h - s) // 2, (w + s) // 2, (h + s) // 2)).resize((px, px), Image.LANCZOS)
     buf = io.BytesIO()
     im.save(buf, "JPEG", quality=80, optimize=True)
     return buf.getvalue()
@@ -155,7 +157,7 @@ def main() -> None:
         if cover:
             (COVERS / f"{aid}.jpg").write_bytes(cover)
         albums.append({"id": aid, "title": g["title"], "artist": g["artist"], "cover": bool(cover),
-                       "tracks": [k for k, _ in files]})
+                       "tracks": [k for k, _ in files], "ids": [panako_id(MUSIC_DIR / k) for k, _ in files]})
 
     albums.sort(key=lambda a: (not a["artist"], a["artist"].casefold(), a["title"].casefold()))
     OUT.write_text(json.dumps(albums, ensure_ascii=False, indent=0), encoding="utf-8")

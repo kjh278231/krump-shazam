@@ -28,9 +28,17 @@ progress { width: 100%; }
 .reason { color: var(--warn); font-size: 12px; margin-bottom: 4px; }
 .reason.muted { color: var(--muted); }
 .match {border-top: 1px solid var(--line); padding: 7px 0; }
+.match .top { display: flex; gap: 10px; align-items: center; }
+.match .cover { width: 72px; height: 72px; flex: none; border-radius: 6px; object-fit: cover; background: var(--line);
+                display: grid; place-items: center; color: var(--muted); font-size: 26px; }
+.match .text { min-width: 0; }
 .match .name { font-weight: 600; word-break: break-all; }
+.match .album { font-size: 12px; word-break: break-word; }
+.buy { display: block; margin-top: 8px; padding: 6px 9px; border-radius: 6px; text-align: center;
+       background: var(--accent); color: var(--bg); font-weight: 600; text-decoration: none; }
+.buy:hover { filter: brightness(1.08); }
 .match .meta { color: var(--muted); font-size: 12px; }
-.match .actions { display: flex; gap: 6px; margin-top: 4px; }
+.match .actions { display: flex; gap: 6px; margin-top: 6px; }
 .match .actions button { padding: 2px 8px; font-size: 12px; }
 .thanks { color: var(--muted); font-size: 12px; }
 audio { width: 100%; margin-top: 6px; }

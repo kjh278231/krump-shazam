@@ -46,6 +46,21 @@ function highlighted(text, q) {
   return span;
 }
 
+const STORE_NAME = { bandcamp: '밴드캠프', knkrtworld: 'KNKRTWORLD', gumroad: 'Gumroad' };
+
+// The album's purchase page, or the artist's page where the album itself was not found.
+function storeLink(store) {
+  const link = document.createElement('a');
+  link.className = 'store';
+  link.href = store.url;
+  link.target = '_blank';
+  link.rel = 'noopener';
+  const name = STORE_NAME[store.store] || store.store;
+  link.textContent = store.kind === 'album' ? '구매 ↗' : '아티스트 ↗';
+  link.title = store.kind === 'album' ? `${name}에서 앨범 구매` : `${name}의 아티스트 페이지 (앨범 페이지는 못 찾음)`;
+  return link;
+}
+
 function card(a, q, trackHit) {
   const el = document.createElement('section');
   el.className = 'album';
@@ -73,7 +88,11 @@ function card(a, q, trackHit) {
   count.textContent = `${a.tracks.length}곡`;
   info.append(title, artist, count);
   head.append(cover, info);
-  el.append(head);
+  const row = document.createElement('div');
+  row.className = 'row';
+  row.append(head);
+  if (a.store?.url?.startsWith('https://')) row.append(storeLink(a.store));
+  el.append(row);
 
   let list = null;
   // matchesOnly: an album found through track names lists just those (a click shows all).

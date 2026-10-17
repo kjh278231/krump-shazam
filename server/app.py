@@ -155,6 +155,68 @@ PANAKO = PanakoServer(db_dir=DB_PATH,
 startup_log("panako server, ready")
 
 
+# Album, cover and store link of a found song. albums.json: server/build_albums.py;
+# album_links.json: checked by hand (docs/album-links.md); store_covers/: server/fetch_store_covers.py.
+ALBUMS_FILE = ROOT / "db" / "albums.json"
+STORE_FILE = ROOT / "db" / "album_links.json"
+COVERS_DIR = ROOT / "db" / "covers"
+STORE_COVERS_DIR = ROOT / "db" / "store_covers"
+ALBUMS = json.loads(ALBUMS_FILE.read_text(encoding="utf-8")) if ALBUMS_FILE.exists() else []
+STORES = json.loads(STORE_FILE.read_text(encoding="utf-8"))["albums"] if STORE_FILE.exists() else {}
+ALBUM_OF = {t: a for a in ALBUMS for t in a["tracks"]}
+# The fingerprint DB keeps byte-identical copies once, under whichever path came first, so a found
+# file may sit in a bundle folder while the same audio is also in its album: albums by Panako id,
+# and by the ids of re-encoded copies (db/same_audio.csv).
+ALBUMS_OF_ID: dict[int, list] = {}
+for _a in ALBUMS:
+    for _i in _a.get("ids", []):
+        ALBUMS_OF_ID.setdefault(_i, []).append(_a)
+LINKED: dict[int, set] = {}
+for _pair in LINKS:
+    _x, _y = tuple(_pair)
+    LINKED.setdefault(_x, set()).add(_y)
+    LINKED.setdefault(_y, set()).add(_x)
+# Tracks albums.json leaves out (preview snippets) belong to their folder's album when the folder
+# holds only one.
+_folder_albums: dict[str, set] = {}
+for _a in ALBUMS:
+    for _t in _a["tracks"]:
+        _folder_albums.setdefault(_t.rsplit("/", 1)[0] if "/" in _t else "", set()).add(_a["id"])
+_by_id = {a["id"]: a for a in ALBUMS}
+FOLDER_ALBUM = {f: _by_id[next(iter(ids))] for f, ids in _folder_albums.items() if f and len(ids) == 1}
+
+
+def cover_uri(album_id: str, store_first: bool) -> str | None:
+    """A small JPEG as a data URI: one request per cover would each be a Lambda invocation."""
+    import base64
+
+    dirs = (STORE_COVERS_DIR, COVERS_DIR) if store_first else (COVERS_DIR, STORE_COVERS_DIR)
+    for d in dirs:
+        f = d / f"{album_id}.jpg"
+        if f.exists():
+            return "data:image/jpeg;base64," + base64.b64encode(f.read_bytes()).decode()
+    return None
+
+
+def store_link(album_id: str) -> dict | None:
+    s = STORES.get(album_id)
+    return {k: s[k] for k in ("url", "kind", "store")} if s and s.get("url") else None
+
+
+def album_info(keys: list[str], ids: list[int]) -> dict | None:
+    """The album of a found song (its library keys and Panako ids, best first): the first album
+    with a store link, else the first album at all. The song's own file's album comes first, then
+    byte-identical copies, then re-encoded copies."""
+    found = [a for k in keys if (a := ALBUM_OF.get(k) or FOLDER_ALBUM.get(k.rsplit("/", 1)[0] if "/" in k else ""))]
+    found += [a for i in ids for a in ALBUMS_OF_ID.get(i, [])]
+    found += [a for i in ids for j in sorted(LINKED.get(i, ())) for a in ALBUMS_OF_ID.get(j, [])]
+    if not found:
+        return None
+    a = next((a for a in found if a["id"] in STORES), found[0])
+    return {"id": a["id"], "title": a["title"], "artist": a["artist"],
+            "cover": cover_uri(a["id"], store_first=True), "store": store_link(a["id"])}
+
+
 def same_audio(a: int, b: int) -> bool:
     return a == b or frozenset((a, b)) in LINKS
 
@@ -283,6 +345,7 @@ def identify_audio(body: bytes, title: str, url: str, partial: bool) -> dict:
         "also_in": [describe(m) for m in s.members if m is not s.head],
     } for s in songs]
     method = "fingerprint"
+    top_ids = [m.match_id for m in sorted(songs[0].members, key=lambda m: m is not songs[0].head)] if songs else []
 
     dur = len(pcm) / PANAKO_SR
     # Mid-recording checks also run the rhythm search (battle videos almost never confirm by
@@ -311,6 +374,7 @@ def identify_audio(body: bytes, title: str, url: str, partial: bool) -> dict:
         if r and (not partial or r["strength"] == "strong"):
             result, reason, method = "check", "rhythm", "rhythm"
             out_songs = []
+            top_ids = [int(r["songs"][0]["id"])]
             for h in r["songs"]:
                 key = LIBRARY.key(h["path"])
                 out_songs.append({
@@ -332,6 +396,10 @@ def identify_audio(body: bytes, title: str, url: str, partial: bool) -> dict:
         wav.unlink()
         return {"id": None, "verdict": result, "reason": reason, "method": method, "final": False,
                 "elapsed": round(elapsed, 2), "timings": timings, "songs": out_songs}
+
+    if out_songs:  # only the best song is shown
+        top = out_songs[0]
+        top["album"] = album_info([top["path"], *(m["path"] for m in top["also_in"])], top_ids)
 
     save_record({"clip": str(wav), "condition": "browser", "expected": "", "offset": "",
                  "match": out_songs[0]["path"] if out_songs else "",
@@ -423,30 +491,24 @@ def preview(path: str, start: float = 0.0) -> Response:
     return Response(cut_preview(str(MUSIC_DIR / path), start), media_type="audio/mpeg")
 
 
-ALBUMS_FILE = ROOT / "db" / "albums.json"  # server/build_albums.py
 albums_body: bytes | None = None
 
 
 @app.get("/albums", dependencies=[Depends(check_key)])
 def albums() -> Response:
-    """The library's albums for the extension's library page. Covers are inlined as data URIs
-    (~4 KB each) so the page needs one request: one per cover would each be a Lambda invocation."""
+    """The library's albums for the extension's library page, with store links. Covers are inlined
+    as data URIs (~4 KB each) so the page needs one request."""
     global albums_body
     if albums_body is None:
-        import base64
-
         if not ALBUMS_FILE.exists():
             raise HTTPException(404, "앨범 목록이 없습니다 (server/build_albums.py를 실행하세요).")
         out = []
-        for a in json.loads(ALBUMS_FILE.read_text(encoding="utf-8")):
+        for a in ALBUMS:
             tracks = [t for t in a["tracks"] if LIBRARY.keys.get(t.lower()) == t and t not in EXCLUDED]
             if not tracks:
                 continue
-            cover = ALBUMS_FILE.parent / "covers" / f"{a['id']}.jpg"
-            uri = None
-            if a["cover"] and cover.exists():
-                uri = "data:image/jpeg;base64," + base64.b64encode(cover.read_bytes()).decode()
-            out.append({**a, "tracks": tracks, "cover": uri})
+            out.append({**{k: v for k, v in a.items() if k != "ids"}, "tracks": tracks, "cover": cover_uri(a["id"], store_first=False),
+                        "store": store_link(a["id"])})
         albums_body = json.dumps({"albums": out}, ensure_ascii=False).encode()
     return Response(albums_body, media_type="application/json")
 

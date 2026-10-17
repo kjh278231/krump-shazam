@@ -10,6 +10,37 @@ const VERDICT_TEXT = {
 // check = a rhythm or low-score fingerprint candidate: right most of the time, but not always.
 const CHECK_NOTE = '확실하지 않아요. 미리듣기로 확인해 주세요.';
 const FAIL_NOTE = '음악이 잘 들리는 구간에서 다시 시도해 보세요.';
+const STORE_NAME = { bandcamp: '밴드캠프', knkrtworld: 'KNKRTWORLD', gumroad: 'Gumroad' };
+
+// The album's purchase page, or the artist's page where the album itself was not found.
+function storeLink(store) {
+  const a = document.createElement('a');
+  a.className = 'buy';
+  a.href = store.url;
+  a.target = '_blank';
+  a.rel = 'noopener';
+  const name = STORE_NAME[store.store] || store.store;
+  a.textContent = store.kind === 'album' ? `${name}에서 앨범 구매 ↗` : `${name}에서 아티스트 보기 ↗`;
+  a.onclick = (e) => {
+    e.preventDefault();
+    chrome.tabs.create({ url: store.url });
+  };
+  return a;
+}
+
+function coverOf(album) {
+  if (album?.cover) {
+    const img = document.createElement('img');
+    img.src = album.cover;
+    img.alt = '';
+    img.className = 'cover';
+    return img;
+  }
+  const el = document.createElement('div');
+  el.className = 'cover';
+  el.textContent = '♪';
+  return el;
+}
 
 function fmt(sec) {
   const s = Math.max(0, Math.round(sec));
@@ -87,15 +118,25 @@ function renderResult(r, state) {
     const el = document.createElement('div');
     el.className = 'match';
     el.innerHTML = `
-      <div class="name"></div>
-      <div class="meta"></div>
+      <div class="top">
+        <div class="text"><div class="name"></div><div class="album"></div><div class="meta"></div></div>
+      </div>
       <div class="actions">
         <button data-act="play">▶ 10초 미리듣기</button>
         <button data-act="yes">✔ 맞음</button>
         <button data-act="no">✘ 틀림</button>
       </div>`;
-    el.querySelector('.name').textContent = m.file;
-    el.querySelector('.meta').textContent = `${m.folder} · 곡의 ${fmt(m.match_start)}부터`;
+    const album = m.album;
+    el.querySelector('.top').prepend(coverOf(album));
+    // "Artist - Album - 02 Song" -> "02 Song": the album line below names the album.
+    let name = m.file.replace(/\.[^.]+$/, '');
+    const cut = album ? name.lastIndexOf(`${album.title} - `) : -1;
+    if (cut >= 0 && cut + album.title.length + 3 < name.length) name = name.slice(cut + album.title.length + 3);
+    el.querySelector('.name').textContent = name;
+    el.querySelector('.album').textContent = album
+      ? [album.title, album.artist].filter(Boolean).join(' · ') : m.folder;
+    el.querySelector('.meta').textContent = `곡의 ${fmt(m.match_start)}부터`;
+    if (album?.store?.url?.startsWith('https://')) el.querySelector('.top').after(storeLink(album.store));
     el.querySelector('[data-act=play]').onclick = (e) => play(m, e.currentTarget);
     el.querySelector('[data-act=yes]').onclick = () => feedback(r.id, true, m.path, el);
     el.querySelector('[data-act=no]').onclick = () => feedback(r.id, false, m.path, el);

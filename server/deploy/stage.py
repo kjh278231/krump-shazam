@@ -6,6 +6,7 @@ Image (no music files):
   app/db/rhythm_cohort.npz, rhythm_cohort_wide.npz, same_audio.csv, exclude.txt
   app/db/catalog.json                     library keys (music/ is not in the image)
   app/db/albums.json, covers/             album list (server/build_albums.py, run it first)
+  app/db/album_links.json, store_covers/  store links and art (server/fetch_store_covers.py)
   app/tools/Panako/build/libs/*.jar
 build/runtime/ (S3 runtime/):
   data.mdb.parts/                         fingerprint DB, copied without the Windows map-size
@@ -64,9 +65,11 @@ def main() -> None:
 
     db = app / "db"
     db.mkdir()
-    for name in ("rhythm_cohort.npz", "rhythm_cohort_wide.npz", "same_audio.csv", "exclude.txt", "albums.json"):
+    for name in ("rhythm_cohort.npz", "rhythm_cohort_wide.npz", "same_audio.csv", "exclude.txt", "albums.json",
+                 "album_links.json"):
         shutil.copy2(ROOT / "db" / name, db / name)
     shutil.copytree(ROOT / "db" / "covers", db / "covers")
+    shutil.copytree(ROOT / "db" / "store_covers", db / "store_covers")
     catalog = {"indexed_root": str(MUSIC_DIR),
                "files": [p.relative_to(MUSIC_DIR).as_posix() for p in list_audio()]}
     (db / "catalog.json").write_text(json.dumps(catalog, ensure_ascii=False), encoding="utf-8")

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Krump Track Finder",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "description": "Captures the current tab's audio and finds the track in the krump library.",
   "permissions": [
     "tabCapture",

@@ -1,0 +1,2153 @@
+{
+ "_about": "Store links per album id of db/albums.json, checked by hand on 2026-10-16 (docs/album-links.md). kind=album: the album's own page; kind=artist: the artist's page (album not found). store: bandcamp, knkrtworld (KNKRT/Konkrete's own shop) or gumroad (Soulfabex). title: the album title on the store. cover: the store's art (Bandcamp: _10 = 1200 px, _9 = 210 px, _16 = 700 px; knkrtworld: 600 px).",
+ "checked": "2026-10-16",
+ "albums": {
+  "0126a5c058e0": {
+   "url": "https://morfrulez.bandcamp.com/album/overdose-2",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "OVERDOSE",
+   "cover": "https://f4.bcbits.com/img/a3108625614_10.jpg"
+  },
+  "01282e4bcbb6": {
+   "url": "https://bigrulez.bandcamp.com/album/the-pandemic",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "The Pandemic",
+   "cover": "https://f4.bcbits.com/img/a0384667537_10.jpg"
+  },
+  "01b01253e840": {
+   "url": "https://morfmuziik.bandcamp.com/album/g-muzik",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "G-MUZIK",
+   "cover": "https://f4.bcbits.com/img/a1156376522_10.jpg"
+  },
+  "052444ae0b02": {
+   "url": "https://morfmuziik.bandcamp.com/album/you-didnt-expect-that-one-neither-did-i",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "YOU DIDNT EXPECT THAT ONE , NEITHER DID I",
+   "cover": "https://f4.bcbits.com/img/a2844093737_10.jpg"
+  },
+  "054a11c1cc45": {
+   "url": "https://bravodomo.bandcamp.com/album/what-if-i-dropped-this-too",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "WHAT IF I DROPPED THIS TOO!?",
+   "cover": "https://f4.bcbits.com/img/a3228871366_10.jpg"
+  },
+  "062bf455fffb": {
+   "url": "https://ru2raw.bandcamp.com/album/the-red-tower",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "THE RED TOWER",
+   "cover": "https://f4.bcbits.com/img/a1805819052_10.jpg"
+  },
+  "0823915197e6": {
+   "url": "https://tighteyex.bandcamp.com/album/bvckloops-3",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "BVCKLOOPS 3",
+   "cover": "https://f4.bcbits.com/img/a3766561093_10.jpg"
+  },
+  "08fa20957b67": {
+   "url": "https://officialtighteyex.bandcamp.com/album/the-kulture-vol-2-battle",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "The Kulture Vol. 2 - Battle",
+   "cover": null
+  },
+  "099b18572873": {
+   "url": "https://playabeats.bandcamp.com/",
+   "kind": "artist",
+   "store": "bandcamp",
+   "title": null,
+   "cover": null,
+   "note": "album page not found; links to the artist's Bandcamp"
+  },
+  "09aabbdf7963": {
+   "url": "https://morfmuziik.bandcamp.com/album/for-the-street-mozarf",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "FOR THE STREET - MOZARF",
+   "cover": "https://f4.bcbits.com/img/a1915333887_10.jpg"
+  },
+  "09e99b2e9f8b": {
+   "url": "https://eestmusic.bandcamp.com/album/xrewface-pak-12",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "XREWFACE PAK 12",
+   "cover": "https://f4.bcbits.com/img/a1545717884_10.jpg"
+  },
+  "0a0525bda1d9": {
+   "url": "https://jo-snpzmusic.bandcamp.com/album/street-gaze",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "Street Gaze",
+   "cover": "https://f4.bcbits.com/img/a3176578081_10.jpg"
+  },
+  "0aaa6cf496f3": {
+   "url": "https://bravodomo.bandcamp.com/album/crash-the-system",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "CRASH THE SYSTEM",
+   "cover": "https://f4.bcbits.com/img/a0847459947_10.jpg"
+  },
+  "0ad158608856": {
+   "url": "https://dimitracks.bandcamp.com/album/absolute-platinum",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "Absolute -platinum-",
+   "cover": "https://f4.bcbits.com/img/a0584506374_10.jpg"
+  },
+  "0c76b709e891": {
+   "url": "https://gonmusic6.bandcamp.com/album/mf-paris",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "MF PARIS",
+   "cover": "https://f4.bcbits.com/img/a0771956249_10.jpg"
+  },
+  "0cd81a0f1127": {
+   "url": "https://morfmuziik.bandcamp.com/album/outsiderz-vol-2",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "OUTSIDERZ VOL 2",
+   "cover": "https://f4.bcbits.com/img/a2042741533_10.jpg"
+  },
+  "0dff41da5371": {
+   "url": "https://playabeats.bandcamp.com/album/m-a-n-t-r-a",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "मंत्र MANTRA 1 मंत्र",
+   "cover": "https://f4.bcbits.com/img/a4221116429_10.jpg"
+  },
+  "0efc0eedacee": {
+   "url": "https://bravodomo.bandcamp.com/album/invasion",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "INVASION",
+   "cover": "https://f4.bcbits.com/img/a2204904485_10.jpg"
+  },
+  "0fe96457cffd": {
+   "url": "https://mowglibeatz.bandcamp.com/album/back-to-buckness-vol-2",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "Back to Buckness Vol. 2",
+   "cover": "https://f4.bcbits.com/img/a0863017284_10.jpg"
+  },
+  "119c988930a0": {
+   "url": "https://thanoizz.bandcamp.com/album/futur-buck",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "FUTUR BUCK",
+   "cover": "https://f4.bcbits.com/img/a3630713416_10.jpg"
+  },
+  "134402acd375": {
+   "url": "https://bravodomo.bandcamp.com/album/menace",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "MENACE",
+   "cover": "https://f4.bcbits.com/img/a1056706742_10.jpg"
+  },
+  "1358a8df623e": {
+   "url": "https://fcdkrump.bandcamp.com/album/fcd-kidz-worldwide",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "FCD Kidz Worldwide",
+   "cover": "https://f4.bcbits.com/img/a3052267347_10.jpg"
+  },
+  "144245187aa7": {
+   "url": "https://cart97.bandcamp.com/album/u-r-beatted",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "U.R.BeatTED",
+   "cover": "https://f4.bcbits.com/img/a2063909674_10.jpg"
+  },
+  "14a642cadb12": {
+   "url": "https://prodbypluton.bandcamp.com/album/boi-gameover-part-1",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "GAME IS OVER (VOL.1)",
+   "cover": "https://f4.bcbits.com/img/a2225919407_10.jpg",
+   "note": "renamed on Bandcamp (was Boi Gameover Part 1)"
+  },
+  "1527d3df39c2": {
+   "url": "https://thundershock500.bandcamp.com/",
+   "kind": "artist",
+   "store": "bandcamp",
+   "cover": null,
+   "note": "album page not found; links to the artist's Bandcamp"
+  },
+  "161bdabb1bd3": {
+   "url": "https://playabeats.bandcamp.com/",
+   "kind": "artist",
+   "store": "bandcamp",
+   "title": null,
+   "cover": null,
+   "note": "album page not found; links to the artist's Bandcamp"
+  },
+  "1623920e5c96": {
+   "url": "https://bravodomo.bandcamp.com/album/just-to-say-i-did",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "Just To Say I Did",
+   "cover": "https://f4.bcbits.com/img/a0479478444_10.jpg"
+  },
+  "164f6dca2de7": {
+   "url": "https://playabeats.bandcamp.com/album/krump-rock-3",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "KRUMP ROCK 3",
+   "cover": "https://f4.bcbits.com/img/a2478283826_10.jpg"
+  },
+  "17dde18b3362": {
+   "url": "https://ironfist-1.bandcamp.com/album/equinoxe",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "EQUINOXE",
+   "cover": "https://f4.bcbits.com/img/a0879465083_10.jpg"
+  },
+  "183c13364518": {
+   "url": "https://officialtighteyex.bandcamp.com/album/life-of-a-ny",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "Life Of A NY",
+   "cover": "https://f4.bcbits.com/img/a0835126524_10.jpg"
+  },
+  "1ad40680c2b8": {
+   "url": "https://bigrulez.bandcamp.com/album/retribution",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "RetributioN",
+   "cover": null
+  },
+  "1c95427e1f69": {
+   "url": "https://mmp-kidny.bandcamp.com/album/2018-moz-x-noscipt-x-kid-ny",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "2018 - MOZ X NOSCIPT X KID NY",
+   "cover": "https://f4.bcbits.com/img/a3030421933_10.jpg"
+  },
+  "1d656c97baa8": {
+   "url": "https://razorface.bandcamp.com/album/you-need",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "YOU NEED",
+   "cover": "https://f4.bcbits.com/img/a0612789721_10.jpg"
+  },
+  "1d7a80a18626": {
+   "url": "https://whipheadx.bandcamp.com/",
+   "kind": "artist",
+   "store": "bandcamp",
+   "title": null,
+   "cover": null,
+   "note": "album page not found; links to the artist's Bandcamp"
+  },
+  "1db994aa6895": {
+   "url": "https://kob-ent.bandcamp.com/album/king-of-buck-16-mixtape",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "KING OF BUCK 16 MIXTAPE",
+   "cover": "https://f4.bcbits.com/img/a2684484544_10.jpg"
+  },
+  "1e7bea6e1a81": {
+   "url": "https://morfrulez.bandcamp.com/album/overdose-3",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "OVERDOSE",
+   "cover": "https://f4.bcbits.com/img/a2636808743_10.jpg"
+  },
+  "1ea2f10ed897": {
+   "url": "https://lukaaustin.bandcamp.com/album/buck-the-system-2",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "Buck The System 2",
+   "cover": "https://f4.bcbits.com/img/a1115545038_10.jpg"
+  },
+  "1fabe894ba05": {
+   "url": "https://tighteyex.bandcamp.com/album/the-shift",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "The SHIFT",
+   "cover": "https://f4.bcbits.com/img/a1336895277_10.jpg"
+  },
+  "2280b6275ec5": {
+   "url": "https://bigrulez.bandcamp.com/album/payback",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "Payback",
+   "cover": "https://f4.bcbits.com/img/a4197732964_10.jpg"
+  },
+  "238571a78c9b": {
+   "url": "https://bigrulez.bandcamp.com/",
+   "kind": "artist",
+   "store": "bandcamp",
+   "cover": null,
+   "note": "album page not found; links to the artist's Bandcamp"
+  },
+  "2460321f1276": {
+   "url": "https://playabeats.bandcamp.com/",
+   "kind": "artist",
+   "store": "bandcamp",
+   "title": null,
+   "cover": null,
+   "note": "album page not found; links to the artist's Bandcamp"
+  },
+  "2636b96ad4d5": {
+   "url": "https://kob-ent.bandcamp.com/album/king-of-buck-mixtape-album-2k19",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "KING OF BUCK Ⅹ MIXTAPE ALBUM 2K19",
+   "cover": "https://f4.bcbits.com/img/a3378144374_10.jpg"
+  },
+  "26509086093a": {
+   "url": "https://proofthexrook.bandcamp.com/",
+   "kind": "artist",
+   "store": "bandcamp",
+   "title": null,
+   "cover": null,
+   "note": "album page not found; links to the artist's Bandcamp"
+  },
+  "2694ac1ba118": {
+   "url": "https://kingvoltmusic.bandcamp.com/",
+   "kind": "artist",
+   "store": "bandcamp",
+   "title": null,
+   "cover": null,
+   "note": "album page not found; links to the artist's Bandcamp"
+  },
+  "26fd617c74c7": {
+   "url": "https://cart97.bandcamp.com/album/r-r-f",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "R.R.F",
+   "cover": "https://f4.bcbits.com/img/a0226351516_10.jpg",
+   "note": "2 of the folder's 3 tracks are on this album (Monsta Konrete Anthem, CrimeScene); Spiderman is not on Bandcamp"
+  },
+  "289ac9b60b17": {
+   "url": "https://knkrtworld.com/album/3897849/the-risen",
+   "kind": "album",
+   "store": "knkrtworld",
+   "title": "The Risen",
+   "cover": "https://images.zoogletools.com/s:bzglfiles/u/738543/34a875a064ce60cba7ac03adf6f2c5fb6c1b0b7e/original/copy-f1d64c24-0851-46e9-8613-b938de3a2ce5.jpeg/!!/b%3AW1sicmVzaXplIixbNjAwLG51bGwseyJ3aXRob3V0RW5sYXJnZW1lbnQiOnRydWUsImZpdCI6Im91dHNpZGUifV1dXQ%3D%3D/meta%3AeyJzcmNCdWNrZXQiOiJiemdsZmlsZXMifQ%3D%3D.jpg"
+  },
+  "28bc35a0ec7b": {
+   "url": "https://cart97.bandcamp.com/album/r-r-f",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "R.R.F",
+   "cover": "https://f4.bcbits.com/img/a0226351516_10.jpg"
+  },
+  "29137c4b4ad9": {
+   "url": "https://ironfist-1.bandcamp.com/album/tha-corporation",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "THA CORPORATION",
+   "cover": "https://f4.bcbits.com/img/a3184292074_10.jpg"
+  },
+  "2b53a2f1ac0d": {
+   "url": "https://eestmusic.bandcamp.com/album/leaks",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "LEAKS",
+   "cover": "https://f4.bcbits.com/img/a2002016513_10.jpg"
+  },
+  "2b652e7cfe09": {
+   "url": "https://playabeats.bandcamp.com/",
+   "kind": "artist",
+   "store": "bandcamp",
+   "cover": null,
+   "note": "album page not found; links to the artist's Bandcamp"
+  },
+  "2c5af11136b0": {
+   "url": "https://jajavankova.bandcamp.com/album/r-u-r-213",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "R.U.R.213",
+   "cover": "https://f4.bcbits.com/img/a1148809509_10.jpg"
+  },
+  "2c8d896d9b95": {
+   "url": "https://lukaaustin.bandcamp.com/album/rugged-shxt",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "RUGGED SHXT",
+   "cover": "https://f4.bcbits.com/img/a3488176125_10.jpg"
+  },
+  "2cd1c0eebf47": {
+   "url": "https://playabeats.bandcamp.com/album/infinity-deluxe-edition",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "INFINITY",
+   "cover": "https://f4.bcbits.com/img/a2911088899_10.jpg"
+  },
+  "2cff6c57fd67": {
+   "url": "https://sleek.bandcamp.com/album/krump-vs-everybody",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "KRUMP VS EVERYBODY",
+   "cover": "https://f4.bcbits.com/img/a3258552575_10.jpg"
+  },
+  "2d3874325fe2": {
+   "url": "https://knkrtworld.com/music",
+   "kind": "artist",
+   "store": "knkrtworld",
+   "title": null,
+   "cover": null,
+   "note": "not listed on knkrtworld.com; links to its music page"
+  },
+  "2d91e2b38ca4": {
+   "url": "https://razorface.bandcamp.com/album/we-are-asia",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "WE ARE ASIA",
+   "cover": "https://f4.bcbits.com/img/a4023313672_10.jpg"
+  },
+  "2e0975f8d313": {
+   "url": "https://fcdkrump.bandcamp.com/album/the-session",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "THE SESSION",
+   "cover": "https://f4.bcbits.com/img/a1088179025_10.jpg"
+  },
+  "2f62dccbdf14": {
+   "url": "https://realraw1.bandcamp.com/album/pure-raw-2",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "PURE RAW 2",
+   "cover": "https://f4.bcbits.com/img/a0510402022_10.jpg"
+  },
+  "2fb7eaa00f4e": {
+   "url": "https://savagekulture.bandcamp.com/album/no-smoke-1",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "No Smoke 1",
+   "cover": "https://f4.bcbits.com/img/a3011032204_10.jpg"
+  },
+  "2fff3e7d5004": {
+   "url": "https://playabeats.bandcamp.com/album/deadly-j-ke",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "DEADLY JøKE",
+   "cover": "https://f4.bcbits.com/img/a3796319545_10.jpg"
+  },
+  "3032d801865f": {
+   "url": "https://bigrulez.bandcamp.com/album/hokage",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "火影Hokage",
+   "cover": "https://f4.bcbits.com/img/a2871359625_10.jpg"
+  },
+  "3215e6144e84": {
+   "url": "https://knkrtworld.com/album/3987624/krump-is-life-vol-buck",
+   "kind": "album",
+   "store": "knkrtworld",
+   "title": "KRUMP IS LIFE vol. Buck",
+   "cover": "https://images.zoogletools.com/s:bzglfiles/u/738543/e46be3b6deb886a5628a2950d00ebd6e2ea961bc/original/bazaart-ce6589e3-a677-4d03-b0f6-fbd931cf12c3.jpeg/!!/b%3AW1sicmVzaXplIixbNjAwLG51bGwseyJ3aXRob3V0RW5sYXJnZW1lbnQiOnRydWUsImZpdCI6Im91dHNpZGUifV1dXQ%3D%3D/meta%3AeyJzcmNCdWNrZXQiOiJiemdsZmlsZXMifQ%3D%3D.jpg"
+  },
+  "3221a8033264": {
+   "url": "https://hypestereo2.bandcamp.com/album/ebs-beat-tape-2k18",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "EBS BEAT TAPE 2K18",
+   "cover": "https://f4.bcbits.com/img/a2652102731_10.jpg"
+  },
+  "32a889db6872": {
+   "url": "https://eestmusic.bandcamp.com/album/before-the-storm-savage-kulture-prequel-beattape",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "Before the Storm (Savage Kulture Prequel BeatTape)",
+   "cover": "https://f4.bcbits.com/img/a4293960825_10.jpg"
+  },
+  "335a53f0f16a": {
+   "url": "https://mozarfxvl.bandcamp.com/album/unleashed-rawness",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "UNLEASHED RAWNESS",
+   "cover": "https://f4.bcbits.com/img/a0936458820_10.jpg"
+  },
+  "366085fdda20": {
+   "url": "https://officialtighteyex.bandcamp.com/album/bvckstr-4",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "BVCKSTR 4",
+   "cover": "https://f4.bcbits.com/img/a0827736925_10.jpg"
+  },
+  "36c618ed6831": {
+   "url": "https://prodbypluton.bandcamp.com/album/hypeclub-krump-speaks-volumes",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "Hypeclub : Krump Speaks Volumes",
+   "cover": "https://f4.bcbits.com/img/a1653839031_10.jpg"
+  },
+  "3820c9825925": {
+   "url": "https://jo-snpzmusic.bandcamp.com/album/utopia",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "UTOPIA",
+   "cover": "https://f4.bcbits.com/img/a1422638524_10.jpg"
+  },
+  "384d84de3524": {
+   "url": "https://kob-ent.bandcamp.com/album/kobeatz-collection-2k21",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "KOBeatz Collection 2k21",
+   "cover": "https://f4.bcbits.com/img/a2430062575_10.jpg"
+  },
+  "38d9dd209af7": {
+   "url": "https://hbeatz.bandcamp.com/album/outrage-battle-anthems-2017-ark-event",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "Outrage battle anthems (2017 Ark event)",
+   "cover": "https://f4.bcbits.com/img/a3826279432_10.jpg"
+  },
+  "3d335a4c0ba3": {
+   "url": "https://eestmusic.bandcamp.com/album/lost-files-vol-15",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "Lost Files Vol. 1.5",
+   "cover": "https://f4.bcbits.com/img/a2564295385_10.jpg"
+  },
+  "3f2b3e3f6871": {
+   "url": "https://razorface.bandcamp.com/album/gangz-hype-volume2",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "GANGZ HYPE[VOLUME2]",
+   "cover": "https://f4.bcbits.com/img/a4072977385_10.jpg"
+  },
+  "41451eb3d248": {
+   "url": "https://realraw1.bandcamp.com/album/raw-really",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "RAW REALLY",
+   "cover": "https://f4.bcbits.com/img/a3755878833_10.jpg"
+  },
+  "414bf169a2dc": {
+   "url": "https://lukaaustin.bandcamp.com/album/unknown-10",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "Unknown 10",
+   "cover": "https://f4.bcbits.com/img/a2166465642_10.jpg"
+  },
+  "41b46df3fbd6": {
+   "url": "https://morfmuziik.bandcamp.com/",
+   "kind": "artist",
+   "store": "bandcamp",
+   "title": null,
+   "cover": null,
+   "note": "album page not found; links to the artist's Bandcamp"
+  },
+  "41d858876ddf": {
+   "url": "https://morfrulez.bandcamp.com/album/the-massacre",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "THE MASSACRE",
+   "cover": "https://f4.bcbits.com/img/a2169338278_10.jpg"
+  },
+  "422b872fa150": {
+   "url": "https://ru2raw.bandcamp.com/album/crimes-against-humanity-ruga-x-soju",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "Crimes against humanity (ruga x soju)",
+   "cover": "https://f4.bcbits.com/img/a1303366563_10.jpg"
+  },
+  "4436275bd613": {
+   "url": "https://officialtighteyex.bandcamp.com/album/dj-mercii-bvck-vol-1",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "DJ Mercii \"BVCK VOL.1",
+   "cover": null
+  },
+  "443a466cea3b": {
+   "url": "https://fcdkrump.bandcamp.com/album/road-to-illest",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "ROAD TO ILLEST",
+   "cover": "https://f4.bcbits.com/img/a3174086878_10.jpg"
+  },
+  "44d93a098782": {
+   "url": "https://banga02.bandcamp.com/album/mind-of-a-madman",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "Mind Of A MADMAN",
+   "cover": "https://f4.bcbits.com/img/a0072244413_10.jpg"
+  },
+  "44fa8bed3515": {
+   "url": "https://eestmusic.bandcamp.com/album/xrewface-pak-xi",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "XREWFACE PAK XI",
+   "cover": "https://f4.bcbits.com/img/a3477606495_10.jpg"
+  },
+  "451a33ec5fdd": {
+   "url": "https://eestmusic.bandcamp.com/",
+   "kind": "artist",
+   "store": "bandcamp",
+   "title": null,
+   "cover": null,
+   "note": "album page not found; links to the artist's Bandcamp"
+  },
+  "45500ab41f58": {
+   "url": "https://bigrulez.bandcamp.com/album/karnage",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "Karnage",
+   "cover": "https://f4.bcbits.com/img/a4272377477_10.jpg"
+  },
+  "4641cd43f48f": {
+   "url": "https://playabeats.bandcamp.com/",
+   "kind": "artist",
+   "store": "bandcamp",
+   "cover": null,
+   "note": "album page not found; links to the artist's Bandcamp"
+  },
+  "473716dc6453": {
+   "url": "https://morfmuziik.bandcamp.com/album/the-krumpire",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "THE KRUMPIRE",
+   "cover": "https://f4.bcbits.com/img/a0851670544_10.jpg"
+  },
+  "48047d5efead": {
+   "url": "https://eestmusic.bandcamp.com/album/10k",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "10K",
+   "cover": "https://f4.bcbits.com/img/a3970191660_10.jpg"
+  },
+  "4870aa7b512f": {
+   "url": "https://dimitracks.bandcamp.com/album/dvrkside",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "DVRKSIDE",
+   "cover": "https://f4.bcbits.com/img/a2804695113_10.jpg"
+  },
+  "48d5b493087e": {
+   "url": "https://bteck.bandcamp.com/album/gritty-alley",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "GRITTY ALLEY",
+   "cover": "https://f4.bcbits.com/img/a0441411821_10.jpg"
+  },
+  "496c410d0eff": {
+   "url": "https://ru2raw.bandcamp.com/album/2xko-ruga-x-soju",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "2XKO RUGA x SOJU",
+   "cover": "https://f4.bcbits.com/img/a1108948795_10.jpg"
+  },
+  "4c5f23b4d7a7": {
+   "url": "https://playabeats.bandcamp.com/",
+   "kind": "artist",
+   "store": "bandcamp",
+   "title": null,
+   "cover": null,
+   "note": "album page not found; links to the artist's Bandcamp"
+  },
+  "4ce537395607": {
+   "url": "https://playabeats.bandcamp.com/",
+   "kind": "artist",
+   "store": "bandcamp",
+   "title": null,
+   "cover": null,
+   "note": "album page not found; links to the artist's Bandcamp"
+  },
+  "4d27e9c9825c": {
+   "url": "https://lukaaustin.bandcamp.com/album/most-illest-shxt",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "MOST ILLEST SHXT",
+   "cover": "https://f4.bcbits.com/img/a3440750479_10.jpg"
+  },
+  "4ecddf7c31a8": {
+   "url": "https://morfmuziik.bandcamp.com/album/moz-on-the-keys",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "MOZ ON THE KEYS",
+   "cover": "https://f4.bcbits.com/img/a3005945752_10.jpg"
+  },
+  "4f0ba1e3d86b": {
+   "url": "https://rucboi.bandcamp.com/album/death-before-dishonor",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "Death Before Dishonor",
+   "cover": "https://f4.bcbits.com/img/a2488392814_10.jpg"
+  },
+  "4f58fe0f5085": {
+   "url": "https://rucboi.bandcamp.com/album/the-undercity",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "THE UNDERCITY",
+   "cover": "https://f4.bcbits.com/img/a1173516986_10.jpg"
+  },
+  "5084ea39aa30": {
+   "url": "https://morfmuziik.bandcamp.com/album/open-filez",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "OPEN FILEZ",
+   "cover": null
+  },
+  "51a553bf1a11": {
+   "url": "https://soulfabexmusic.gumroad.com/",
+   "kind": "artist",
+   "store": "gumroad",
+   "cover": null,
+   "note": "not sold on the store (2026-10-16); links to Soulfabex's Gumroad"
+  },
+  "5274bf3cde14": {
+   "url": "https://playabeats.bandcamp.com/",
+   "kind": "artist",
+   "store": "bandcamp",
+   "title": null,
+   "cover": null,
+   "note": "album page not found; links to the artist's Bandcamp"
+  },
+  "53d205ff0b43": {
+   "url": "https://hbeatz.bandcamp.com/album/shvpe-sh1ft-bvck",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "SHVPE SH1FT BVCK",
+   "cover": "https://f4.bcbits.com/img/a0901274027_10.jpg"
+  },
+  "53fd7b727df2": {
+   "url": "https://rucboi.bandcamp.com/",
+   "kind": "artist",
+   "store": "bandcamp",
+   "cover": null,
+   "note": "album page not found; links to the artist's Bandcamp"
+  },
+  "54ac5cb80c54": {
+   "url": "https://playabeats.bandcamp.com/album/active",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "ACTIVE",
+   "cover": "https://f4.bcbits.com/img/a2314668884_10.jpg"
+  },
+  "55dbfb819223": {
+   "url": "https://soulfabexmusic.gumroad.com/",
+   "kind": "artist",
+   "store": "gumroad",
+   "cover": null,
+   "note": "not sold on the store (2026-10-16); links to Soulfabex's Gumroad"
+  },
+  "56191be28920": {
+   "url": "https://eestmusic.bandcamp.com/album/20k",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "20K",
+   "cover": "https://f4.bcbits.com/img/a1257475695_10.jpg"
+  },
+  "562cdaa3caee": {
+   "url": "https://eestmusic.bandcamp.com/album/xrewface-pak-7",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "XREWFACE PAK 7",
+   "cover": "https://f4.bcbits.com/img/a3319716798_10.jpg"
+  },
+  "57ae0f3f92fd": {
+   "url": "https://legacykrumpmusic.bandcamp.com/album/legacy-krump-mixtape",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "LEGACY KRUMP MIXTAPE",
+   "cover": "https://f4.bcbits.com/img/a1753119490_10.jpg"
+  },
+  "5920931cfdf9": {
+   "url": "https://playabeats.bandcamp.com/",
+   "kind": "artist",
+   "store": "bandcamp",
+   "title": null,
+   "cover": null,
+   "note": "album page not found; links to the artist's Bandcamp"
+  },
+  "5ba01365683d": {
+   "url": "https://officialtighteyex.bandcamp.com/",
+   "kind": "artist",
+   "store": "bandcamp",
+   "cover": null,
+   "note": "album page not found; links to the artist's Bandcamp"
+  },
+  "5bee19cae2b1": {
+   "url": "https://officialtighteyex.bandcamp.com/album/savage-kulture-collective-artist-mixtape-vol-1",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "Savage Kulture Collective Artist Mixtape vol.1",
+   "cover": "https://f4.bcbits.com/img/a4025385347_10.jpg"
+  },
+  "5f49d56e95ad": {
+   "url": "https://flipsidemadrootz.bandcamp.com/album/fcd-krump-buckin",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "FCD KRUMP BUCKIN",
+   "cover": "https://f4.bcbits.com/img/a0578258399_10.jpg"
+  },
+  "5f8346e402f7": {
+   "url": "https://eestmusic.bandcamp.com/album/xrewface-pak-1",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "Xrewface Pak 1",
+   "cover": null
+  },
+  "604fb31ffbcd": {
+   "url": "https://lukebangerz.bandcamp.com/album/the-birth",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "THE BIRTH",
+   "cover": "https://f4.bcbits.com/img/a1314812671_10.jpg"
+  },
+  "6066fe6fc515": {
+   "url": "https://morfrulez.bandcamp.com/album/overdose-4",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "OVERDOSE 4",
+   "cover": "https://f4.bcbits.com/img/a1793145187_10.jpg"
+  },
+  "61bd27260de1": {
+   "url": "https://knkrtworld.com/music",
+   "kind": "artist",
+   "store": "knkrtworld",
+   "title": null,
+   "cover": null,
+   "note": "not listed on knkrtworld.com; links to its music page"
+  },
+  "63307702ea80": {
+   "url": "https://mowglibeatz.bandcamp.com/album/the-end-of-trust",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "The End Of Trust",
+   "cover": "https://f4.bcbits.com/img/a1415124072_10.jpg"
+  },
+  "640842ce1b60": {
+   "url": "https://lukaaustin.bandcamp.com/album/buck-the-system",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "Buck The System",
+   "cover": "https://f4.bcbits.com/img/a3260379442_10.jpg"
+  },
+  "6451bfa20103": {
+   "url": "https://10xgully.bandcamp.com/album/god-like-iv",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "GOD LIKE IV",
+   "cover": "https://f4.bcbits.com/img/a2586217811_10.jpg"
+  },
+  "646704645fe9": {
+   "url": "https://phobiashxxt.bandcamp.com/album/bday-tape",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "BDAY TAPE",
+   "cover": "https://f4.bcbits.com/img/a1245667480_10.jpg"
+  },
+  "6519382d0ef8": {
+   "url": "https://morfmuziik.bandcamp.com/album/trinity",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "TRINITY",
+   "cover": null
+  },
+  "685fe3db7c3f": {
+   "url": "https://savagekulture.bandcamp.com/album/warning",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "Warning",
+   "cover": "https://f4.bcbits.com/img/a3390775918_10.jpg"
+  },
+  "6874bc4c57ff": {
+   "url": "https://thundershock500.bandcamp.com/album/out-for-blood-album",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "OUT FOR BLOOD ALBUM",
+   "cover": "https://f4.bcbits.com/img/a1276361854_10.jpg"
+  },
+  "68d7ca4ee753": {
+   "url": "https://tighteyex.bandcamp.com/album/k-r-u-m-p",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "K.R.U.M.P",
+   "cover": "https://f4.bcbits.com/img/a3223990551_10.jpg"
+  },
+  "68e1f1318066": {
+   "url": "https://playabeats.bandcamp.com/album/0323-free",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "#0323 FREE",
+   "cover": "https://f4.bcbits.com/img/a2590603906_10.jpg"
+  },
+  "6d0539825d82": {
+   "url": "https://playabeats.bandcamp.com/",
+   "kind": "artist",
+   "store": "bandcamp",
+   "title": null,
+   "cover": null,
+   "note": "album page not found; links to the artist's Bandcamp"
+  },
+  "6d4e4561dc83": {
+   "url": "https://prodbypluton.bandcamp.com/",
+   "kind": "artist",
+   "store": "bandcamp",
+   "title": null,
+   "cover": null,
+   "note": "album page not found; links to the artist's Bandcamp"
+  },
+  "6d68083355c5": {
+   "url": "https://officialtighteyex.bandcamp.com/album/new-krump-order-deluxe-edition",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "New Krump Order (Deluxe Edition)",
+   "cover": "https://f4.bcbits.com/img/a1268448017_10.jpg"
+  },
+  "6d9d4ad81dd3": {
+   "url": "https://hbeatz.bandcamp.com/album/nfrno",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "NFRNO",
+   "cover": "https://f4.bcbits.com/img/a2712488179_10.jpg"
+  },
+  "6daeafe9f301": {
+   "url": "https://lukebangerz.bandcamp.com/album/atmosfear",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "ATMOSFEAR",
+   "cover": "https://f4.bcbits.com/img/a2417856208_10.jpg"
+  },
+  "6e1c35f775a5": {
+   "url": "https://officialtighteyex.bandcamp.com/album/bvckstr-2",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "BVCKSTR #2",
+   "cover": "https://f4.bcbits.com/img/a1356003455_10.jpg"
+  },
+  "6fb1095aed26": {
+   "url": "https://eestmusic.bandcamp.com/album/xrewface-pak-8",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "XREWFACE PAK 8",
+   "cover": "https://f4.bcbits.com/img/a0709279435_10.jpg"
+  },
+  "70aa584f934e": {
+   "url": "https://kingvoltmusic.bandcamp.com/",
+   "kind": "artist",
+   "store": "bandcamp",
+   "title": null,
+   "cover": null,
+   "note": "album page not found; links to the artist's Bandcamp"
+  },
+  "715a50397f8a": {
+   "url": "https://playabeats.bandcamp.com/album/crisis",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "CRISIS",
+   "cover": "https://f4.bcbits.com/img/a0027836279_10.jpg"
+  },
+  "724048bc746b": {
+   "url": "https://officialtighteyex.bandcamp.com/album/dj-merci-presents-hardcore-3-4",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "Dj Merci presents HARDCORE 3-4",
+   "cover": "https://f4.bcbits.com/img/a2388732103_10.jpg"
+  },
+  "727ab7489e46": {
+   "url": "https://kob-ent.bandcamp.com/album/king-of-buck-14-mix-tape-2k23",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "KING OF BUCK 14 MIX TAPE 2K23",
+   "cover": "https://f4.bcbits.com/img/a1885358992_10.jpg"
+  },
+  "74412d5dcabf": {
+   "url": "https://kob-ent.bandcamp.com/album/king-of-buck-13-mix-tape-2k22",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "KING OF BUCK 13 MIX TAPE 2K22",
+   "cover": "https://f4.bcbits.com/img/a0287013222_10.jpg"
+  },
+  "7453f958fdf3": {
+   "url": "https://bigrulez.bandcamp.com/album/distortion",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "DISTORTION",
+   "cover": "https://f4.bcbits.com/img/a0340661641_10.jpg"
+  },
+  "74d37f7fa310": {
+   "url": "https://sleek.bandcamp.com/album/tanwam-vol-2",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "TANWAM VOL. 2",
+   "cover": "https://f4.bcbits.com/img/a3233595692_10.jpg"
+  },
+  "761f0d40f569": {
+   "url": "https://playabeats.bandcamp.com/",
+   "kind": "artist",
+   "store": "bandcamp",
+   "cover": null,
+   "note": "album page not found; links to the artist's Bandcamp"
+  },
+  "77b13ec9741a": {
+   "url": "https://eestmusic.bandcamp.com/",
+   "kind": "artist",
+   "store": "bandcamp",
+   "cover": null,
+   "note": "album page not found; links to the artist's Bandcamp"
+  },
+  "7876122bb2c0": {
+   "url": "https://morfmuziik.bandcamp.com/album/galaxy-the-war",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "GALAXY - THE WAR",
+   "cover": "https://f4.bcbits.com/img/a2919316675_10.jpg"
+  },
+  "78bfdc611f3e": {
+   "url": "https://bigrulez.bandcamp.com/album/afro-samurai",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "π Afro Samurai π",
+   "cover": "https://f4.bcbits.com/img/a1031207628_10.jpg"
+  },
+  "7916b42ccb1e": {
+   "url": "https://ssojuu.bandcamp.com/",
+   "kind": "artist",
+   "store": "bandcamp",
+   "cover": null,
+   "note": "album page not found; links to the artist's Bandcamp"
+  },
+  "7919aaeeb3ed": {
+   "url": "https://playabeats.bandcamp.com/",
+   "kind": "artist",
+   "store": "bandcamp",
+   "title": null,
+   "cover": null,
+   "note": "album page not found; links to the artist's Bandcamp"
+  },
+  "794d8effa96d": {
+   "url": "https://lukaaustin.bandcamp.com/album/the-playground",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "The Playground",
+   "cover": "https://f4.bcbits.com/img/a2347296067_10.jpg"
+  },
+  "799e77f3360d": {
+   "url": "https://bteck.bandcamp.com/album/bvck-noize-vol-3",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "BVCK NOIZE VOL. 3",
+   "cover": "https://f4.bcbits.com/img/a0315686408_10.jpg"
+  },
+  "7a0582933285": {
+   "url": "https://gonmusic6.bandcamp.com/album/gon-war-cry",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "GON - WAR CRY",
+   "cover": "https://f4.bcbits.com/img/a2056903243_10.jpg"
+  },
+  "7a7a07582728": {
+   "url": "https://bigrulez.bandcamp.com/album/e-x-itium",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "E|X|ITIUM",
+   "cover": "https://f4.bcbits.com/img/a0659655297_10.jpg"
+  },
+  "7b569b1df963": {
+   "url": "https://bravodomo.bandcamp.com/album/beauty-within-chaos",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "Beauty within Chaos",
+   "cover": "https://f4.bcbits.com/img/a2775680165_10.jpg"
+  },
+  "7c0887c995ea": {
+   "url": "https://mowglibeatz.bandcamp.com/album/life-2-life",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "LIFE 2 LIFE",
+   "cover": "https://f4.bcbits.com/img/a4278775624_10.jpg"
+  },
+  "7d0cfd038193": {
+   "url": "https://eestmusic.bandcamp.com/album/lost-files-ep",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "Lost Files EP",
+   "cover": "https://f4.bcbits.com/img/a2339742091_10.jpg"
+  },
+  "7e861e793982": {
+   "url": "https://lukaaustin.bandcamp.com/album/warm-up-4-2019",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "WARM UP 4 2019",
+   "cover": "https://f4.bcbits.com/img/a3156281445_10.jpg"
+  },
+  "7f681de5d909": {
+   "url": "https://lukebangerz.bandcamp.com/album/atmosfear-vol-ii",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "ATMOSFEAR VOL . II",
+   "cover": "https://f4.bcbits.com/img/a4106528869_10.jpg"
+  },
+  "809a064ad619": {
+   "url": "https://fcdkrump.bandcamp.com/album/worldwide-part-ii",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "Worldwide Part II",
+   "cover": "https://f4.bcbits.com/img/a1398257832_10.jpg"
+  },
+  "80facdfb6a31": {
+   "url": "https://lukaaustin.bandcamp.com/album/street-ish-2",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "Street Ish 2",
+   "cover": "https://f4.bcbits.com/img/a3040779933_10.jpg"
+  },
+  "8180279f1749": {
+   "url": "https://soulfabexmusic.gumroad.com/",
+   "kind": "artist",
+   "store": "gumroad",
+   "cover": null,
+   "note": "not sold on the store (2026-10-16); links to Soulfabex's Gumroad"
+  },
+  "82ee9224ed8e": {
+   "url": "https://proofthexrook.bandcamp.com/album/master-of-the-goon-talk-vol-z",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "Master Of The Goon Talk Vol. Z",
+   "cover": "https://f4.bcbits.com/img/a0702624572_10.jpg"
+  },
+  "830b2a306e7d": {
+   "url": "https://ssojuu.bandcamp.com/album/new-era",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "NEW ERA",
+   "cover": null,
+   "note": "confirmed by the user in a browser; returns 404 to our fetcher"
+  },
+  "8476be8f601f": {
+   "url": "https://playabeats.bandcamp.com/",
+   "kind": "artist",
+   "store": "bandcamp",
+   "title": null,
+   "cover": null,
+   "note": "album page not found; links to the artist's Bandcamp"
+  },
+  "84981cbbd32b": {
+   "url": "https://eestmusic.bandcamp.com/album/chaos-theory-2-there-will-be-casualties-deluxe",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "Chaos Theory 2 : THERE WILL BE CASUALTIES (DELUXE)",
+   "cover": "https://f4.bcbits.com/img/a1335245758_10.jpg"
+  },
+  "86612887bb7c": {
+   "url": "https://morfmuziik.bandcamp.com/",
+   "kind": "artist",
+   "store": "bandcamp",
+   "title": null,
+   "cover": null,
+   "note": "album page not found; links to the artist's Bandcamp"
+  },
+  "892b5600fae2": {
+   "url": "https://10xgully.bandcamp.com/album/plus-maddness-tap3",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "Plus MADDNESS Tap3",
+   "cover": "https://f4.bcbits.com/img/a0152756618_10.jpg"
+  },
+  "893ecef58edb": {
+   "url": "https://knkrtworld.com/album/2878607/timeless",
+   "kind": "album",
+   "store": "knkrtworld",
+   "title": "TIMELESS",
+   "cover": "https://images.zoogletools.com/s:bzglfiles/u/738543/88d79eca724071a864fe04d08b3b519987e7036b/original/img-5778.jpeg/!!/b%3AW1sicmVzaXplIixbNjAwLG51bGwseyJ3aXRob3V0RW5sYXJnZW1lbnQiOnRydWUsImZpdCI6Im91dHNpZGUifV1dXQ%3D%3D/meta%3AeyJzcmNCdWNrZXQiOiJiemdsZmlsZXMifQ%3D%3D.jpg"
+  },
+  "89890dec4284": {
+   "url": "https://morfmuziik.bandcamp.com/album/2020",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "2020",
+   "cover": "https://f4.bcbits.com/img/a3729599354_10.jpg"
+  },
+  "89edc170f51b": {
+   "url": "https://morfmuziik.bandcamp.com/album/m-o-r-f-o-l-o-g-y-vol-1-majestic-hype",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "M.O.R.F.O.L.O.G.Y VOL 1 - MAJESTIC HYPE",
+   "cover": null
+  },
+  "8a8860296d5b": {
+   "url": "https://knkrtworld.com/album/2814447/itz-just-buck",
+   "kind": "album",
+   "store": "knkrtworld",
+   "title": "ITZ JUST BUCK",
+   "cover": "https://images.zoogletools.com/s:bzglfiles/u/738543/55d4c099102da822e929dbb58125c42ce2bb1ace/original/img-5025.jpg/!!/b%3AW1sicmVzaXplIixbNjAwLG51bGwseyJ3aXRob3V0RW5sYXJnZW1lbnQiOnRydWUsImZpdCI6Im91dHNpZGUifV1dXQ%3D%3D/meta%3AeyJzcmNCdWNrZXQiOiJiemdsZmlsZXMifQ%3D%3D.jpg"
+  },
+  "8b0155c57337": {
+   "url": "https://playabeats.bandcamp.com/album/d-msday",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "DØØMSDAY",
+   "cover": "https://f4.bcbits.com/img/a2409690269_10.jpg"
+  },
+  "8b287bf5ae78": {
+   "url": "https://officialtighteyex.bandcamp.com/album/dj-mercii-bvck-vol-2",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "DJ Mercii BVCK vol.2",
+   "cover": null
+  },
+  "8c42fb1cebf4": {
+   "url": "https://hbeatz.bandcamp.com/album/statik-ebs23-eyex-x-beast-x-badnewz-x-rexx",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "STATIK EBS23 ( Eyex x Beast x BadNewz x Rexx )",
+   "cover": "https://f4.bcbits.com/img/a0993539539_10.jpg"
+  },
+  "8d0f23a34f0e": {
+   "url": "https://eestmusic.bandcamp.com/album/strictly-bangn-bts2",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "Strictly BangN - BTS2",
+   "cover": "https://f4.bcbits.com/img/a0016321283_10.jpg"
+  },
+  "8e18639e0741": {
+   "url": "https://jo-snpzmusic.bandcamp.com/album/2-s-4-u",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "2.S.4.U",
+   "cover": "https://f4.bcbits.com/img/a0929926035_10.jpg"
+  },
+  "8f4af2660b13": {
+   "url": "https://lukaaustin.bandcamp.com/album/scriptures",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "SCRIPTURES",
+   "cover": "https://f4.bcbits.com/img/a1730763123_10.jpg"
+  },
+  "8fda85378f0d": {
+   "url": "https://lukaaustin.bandcamp.com/album/the-target",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "THE TARGET",
+   "cover": "https://f4.bcbits.com/img/a3871403007_10.jpg"
+  },
+  "91ca04baa2d2": {
+   "url": "https://jajavankova.bandcamp.com/album/rawbots",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "RAWBOTS",
+   "cover": "https://f4.bcbits.com/img/a0644755088_10.jpg"
+  },
+  "92988d1561c0": {
+   "url": "https://lukebangerz.bandcamp.com/album/kismet",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "KISMET",
+   "cover": "https://f4.bcbits.com/img/a2730559651_10.jpg"
+  },
+  "93cee39e8aeb": {
+   "url": "https://morfmuziik.bandcamp.com/album/morf-against-mmp-vol-3",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "MORF AGAINST MMP VOL 3",
+   "cover": "https://f4.bcbits.com/img/a1634578250_10.jpg"
+  },
+  "954522a1545e": {
+   "url": "https://thundershock500.bandcamp.com/album/the-mussiah-album-vol-1",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "THE MUSsiah ALBUM vol.1",
+   "cover": "https://f4.bcbits.com/img/a3856849077_10.jpg"
+  },
+  "95647dd6a67b": {
+   "url": "https://phobiashxxt.bandcamp.com/album/liam",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "LIAM",
+   "cover": "https://f4.bcbits.com/img/a0443744679_10.jpg"
+  },
+  "9653d35b8671": {
+   "url": "https://lukaaustin.bandcamp.com/album/hws-heavyweightsession",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "HWS (HeavyWeightSession)",
+   "cover": "https://f4.bcbits.com/img/a4017540073_10.jpg"
+  },
+  "9671b7fa8f08": {
+   "url": "https://flipsidemadrootz.bandcamp.com/album/the-rebirth",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "The Rebirth",
+   "cover": "https://f4.bcbits.com/img/a3398995123_10.jpg"
+  },
+  "96cb165b312f": {
+   "url": "https://sleek.bandcamp.com/",
+   "kind": "artist",
+   "store": "bandcamp",
+   "title": null,
+   "cover": null,
+   "note": "album page not found; links to the artist's Bandcamp"
+  },
+  "97ae541efd02": {
+   "url": "https://morfmuziik.bandcamp.com/album/mozarf-against-mmp-vol-5",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "MOZARF AGAINST MMP VOL 5",
+   "cover": null
+  },
+  "97c57f884f2d": {
+   "url": "https://tighteyex.bandcamp.com/album/bvcktape",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "BVCKTAPE",
+   "cover": "https://f4.bcbits.com/img/a2286939743_10.jpg"
+  },
+  "97da50b6e6ed": {
+   "url": "https://knkrtworld.com/album/2964342/buck-is-life",
+   "kind": "album",
+   "store": "knkrtworld",
+   "title": "BUCK IS LIFE",
+   "cover": "https://images.zoogletools.com/s:bzglfiles/u/738543/61f1e51ab0df5b221883b06757629429d43bfa0f/original/img-6878.jpg/!!/b%3AW1sicmVzaXplIixbNjAwLG51bGwseyJ3aXRob3V0RW5sYXJnZW1lbnQiOnRydWUsImZpdCI6Im91dHNpZGUifV1dXQ%3D%3D/meta%3AeyJzcmNCdWNrZXQiOiJiemdsZmlsZXMifQ%3D%3D.jpg"
+  },
+  "98c5c3e30713": {
+   "url": "https://fcdkrump.bandcamp.com/album/fcd-krump-worldwide",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "FCD Krump Worldwide",
+   "cover": "https://f4.bcbits.com/img/a1544119661_10.jpg"
+  },
+  "98c63ef97e0d": {
+   "url": "https://eestmusic.bandcamp.com/album/the-call-out-pak",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "The Call Out Pak",
+   "cover": "https://f4.bcbits.com/img/a0423160452_10.jpg"
+  },
+  "99042b2415cf": {
+   "url": "https://playabeats.bandcamp.com/",
+   "kind": "artist",
+   "store": "bandcamp",
+   "title": null,
+   "cover": null,
+   "note": "album page not found; links to the artist's Bandcamp"
+  },
+  "99388c33e274": {
+   "url": "https://soulfabexmusic.gumroad.com/",
+   "kind": "artist",
+   "store": "gumroad",
+   "cover": null,
+   "note": "not sold on the store (2026-10-16); links to Soulfabex's Gumroad"
+  },
+  "9a043c51265b": {
+   "url": "https://kob-ent.bandcamp.com/album/king-of-buck-mix-tape-album-2k18",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "KING OF BUCK Ⅸ MIX TAPE ALBUM 2K18",
+   "cover": "https://f4.bcbits.com/img/a0723809750_10.jpg"
+  },
+  "9a4437dcd5f1": {
+   "url": "https://playabeats.bandcamp.com/album/the-pop-out",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "THE POP OUT (PLAYA aka GAMEOVER)",
+   "cover": null
+  },
+  "9ae40d215657": {
+   "url": "https://bigrulez.bandcamp.com/album/buck-at-5-vol-2",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "Buck At 5 (Vol. 2)",
+   "cover": "https://f4.bcbits.com/img/a2902080607_10.jpg"
+  },
+  "9af5cadbeadd": {
+   "url": "https://eestmusic.bandcamp.com/album/vengeance-side-b",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "VENGEANCE: SIDE B",
+   "cover": "https://f4.bcbits.com/img/a2949630874_10.jpg"
+  },
+  "9b231b7d42bf": {
+   "url": "https://soulfabexmusic.gumroad.com/",
+   "kind": "artist",
+   "store": "gumroad",
+   "cover": null,
+   "note": "not sold on the store (2026-10-16); links to Soulfabex's Gumroad"
+  },
+  "9b847311df73": {
+   "url": "https://bigrulez.bandcamp.com/album/krump",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "Krump",
+   "cover": "https://f4.bcbits.com/img/a1712137483_10.jpg"
+  },
+  "9c3c08a2983a": {
+   "url": "https://bigrulez.bandcamp.com/album/buck-at-5-vol-1",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "Buck At 5 (Vol. 1)",
+   "cover": "https://f4.bcbits.com/img/a3414646985_10.jpg"
+  },
+  "9cb1d6facfc2": {
+   "url": "https://bigrulez.bandcamp.com/album/og-buck-vol-1-ep",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "OG BUCK Vol.1 (EP)",
+   "cover": "https://f4.bcbits.com/img/a2214378506_10.jpg"
+  },
+  "9f65dc5429cb": {
+   "url": "https://bravodomo.bandcamp.com/album/surprise-mothafxxkas",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "Surprise Mothafxxkas",
+   "cover": "https://f4.bcbits.com/img/a0235646667_10.jpg"
+  },
+  "9fb7c5b6fe6f": {
+   "url": "https://eestmusic.bandcamp.com/album/300-blokkz-of-konkrete-2",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "300 BLOKKZ OF KONKRETE 2",
+   "cover": "https://f4.bcbits.com/img/a4134589505_10.jpg"
+  },
+  "9fc57b30491a": {
+   "url": "https://tighteyex.bandcamp.com/album/5417923",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "5417923",
+   "cover": "https://f4.bcbits.com/img/a1996076450_10.jpg"
+  },
+  "9fd17009f2d0": {
+   "url": "https://trouble-music.bandcamp.com/album/bucktown",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "BUCKTOWN",
+   "cover": "https://f4.bcbits.com/img/a1094752859_10.jpg"
+  },
+  "a043800e0868": {
+   "url": "https://razorface.bandcamp.com/album/zero-of-the-upper-moon",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "ZERO OF THE UPPER MOON-上弦の零-",
+   "cover": "https://f4.bcbits.com/img/a2434053872_10.jpg"
+  },
+  "a2fb7c880669": {
+   "url": "https://playabeats.bandcamp.com/",
+   "kind": "artist",
+   "store": "bandcamp",
+   "title": null,
+   "cover": null,
+   "note": "album page not found; links to the artist's Bandcamp"
+  },
+  "a46f16907e79": {
+   "url": "https://playabeats.bandcamp.com/album/drama",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "DRAMA",
+   "cover": "https://f4.bcbits.com/img/a1479208323_10.jpg"
+  },
+  "a46f26af9897": {
+   "url": "https://morfmuziik.bandcamp.com/album/maelstr-m",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "MAELSTRÖM",
+   "cover": null
+  },
+  "a4fb1a0a8725": {
+   "url": "https://soulfabexmusic.gumroad.com/l/TESTYOURMIGHT",
+   "kind": "album",
+   "store": "gumroad",
+   "title": "TEST YOUR MIGHT",
+   "cover": "https://public-files.gumroad.com/kal7ff2wnmx8o8o2nu6018d4gt7f"
+  },
+  "a67bfcd76dd2": {
+   "url": "https://lukaaustin.bandcamp.com/album/worldwide",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "WORLDWIDE",
+   "cover": "https://f4.bcbits.com/img/a0894373121_10.jpg"
+  },
+  "a6d6240f669f": {
+   "url": "https://eestmusic.bandcamp.com/album/3019",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "3019",
+   "cover": "https://f4.bcbits.com/img/a3139971626_10.jpg"
+  },
+  "a7d24222f3d9": {
+   "url": "https://playabeats.bandcamp.com/album/the-krumpire-asia",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "THE KRUMPIRE ASIA",
+   "cover": "https://f4.bcbits.com/img/a3165688311_10.jpg"
+  },
+  "a8c5ac65dd9b": {
+   "url": "https://eestmusic.bandcamp.com/album/xrewface-pak-x",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "XREWFACE PAK X",
+   "cover": null
+  },
+  "a94aeeae45cf": {
+   "url": "https://playabeats.bandcamp.com/album/buckality",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "BUCKALITY",
+   "cover": "https://f4.bcbits.com/img/a1549934235_10.jpg"
+  },
+  "a94c7b7a1631": {
+   "url": "https://morfmuziik.bandcamp.com/album/no-games",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "NO GAMES",
+   "cover": "https://f4.bcbits.com/img/a0133209739_10.jpg"
+  },
+  "a9eedc3ae5ea": {
+   "url": "https://dimitracks.bandcamp.com/",
+   "kind": "artist",
+   "store": "bandcamp",
+   "title": null,
+   "cover": null,
+   "note": "album page not found; links to the artist's Bandcamp"
+  },
+  "ab0a781fc2cc": {
+   "url": "https://playabeats.bandcamp.com/",
+   "kind": "artist",
+   "store": "bandcamp",
+   "title": null,
+   "cover": null,
+   "note": "album page not found; links to the artist's Bandcamp"
+  },
+  "ab4140efba67": {
+   "url": "https://mindlezz.bandcamp.com/album/the-w-o-r-l-d-tape",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "The W.O.R.L.D Tape",
+   "cover": "https://f4.bcbits.com/img/a2399798756_10.jpg"
+  },
+  "ac4673af7745": {
+   "url": "https://killablokk.bandcamp.com/album/reborn",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "REBORN",
+   "cover": "https://f4.bcbits.com/img/a1401166782_10.jpg"
+  },
+  "acd0eca24c1c": {
+   "url": "https://whipheadx.bandcamp.com/album/hate-season",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "Hate Season",
+   "cover": "https://f4.bcbits.com/img/a2959561948_10.jpg"
+  },
+  "ad729e74e21c": {
+   "url": "https://playabeats.bandcamp.com/",
+   "kind": "artist",
+   "store": "bandcamp",
+   "title": null,
+   "cover": null,
+   "note": "album page not found; links to the artist's Bandcamp"
+  },
+  "ae3ceb1407f6": {
+   "url": "https://lukaaustin.bandcamp.com/",
+   "kind": "artist",
+   "store": "bandcamp",
+   "cover": null,
+   "note": "album page not found; links to the artist's Bandcamp"
+  },
+  "af9452da4d50": {
+   "url": "https://prodbypluton.bandcamp.com/",
+   "kind": "artist",
+   "store": "bandcamp",
+   "title": null,
+   "cover": null,
+   "note": "album page not found; links to the artist's Bandcamp"
+  },
+  "af9a58fec6db": {
+   "url": "https://lukaaustin.bandcamp.com/album/street-ish",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "Street Ish",
+   "cover": "https://f4.bcbits.com/img/a2584195119_10.jpg"
+  },
+  "afc4832bb025": {
+   "url": "https://fcdkrump.bandcamp.com/album/fcd-nation-worldcup-mixtape",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "FCD NATION WORLDCUP MIXTAPE",
+   "cover": "https://f4.bcbits.com/img/a1003962736_10.jpg"
+  },
+  "b2d1aaf02dda": {
+   "url": "https://realraw1.bandcamp.com/album/fight-klub-2",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "FIGHT KLUB 2",
+   "cover": "https://f4.bcbits.com/img/a1007290289_10.jpg"
+  },
+  "b2e9d39aa70c": {
+   "url": "https://rucboi.bandcamp.com/album/not-your-savior",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "Not your Savior",
+   "cover": "https://f4.bcbits.com/img/a2710493958_10.jpg"
+  },
+  "b2fb521bb0bf": {
+   "url": "https://morethanaveragebeatz.bandcamp.com/album/ghan",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "GHAN",
+   "cover": "https://f4.bcbits.com/img/a2609893873_10.jpg"
+  },
+  "b381701830fd": {
+   "url": "https://officialtighteyex.bandcamp.com/album/certified",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "Certified",
+   "cover": null
+  },
+  "b6a1ec6fd30a": {
+   "url": "https://morfmuziik.bandcamp.com/album/opera",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "OPERA",
+   "cover": "https://f4.bcbits.com/img/a0353776052_10.jpg"
+  },
+  "b742c8161dcc": {
+   "url": "https://lukaaustin.bandcamp.com/album/new-era-shxt-vol-2",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "NEW ERA SHXT VOL 2",
+   "cover": null
+  },
+  "b79dbcd4501a": {
+   "url": "https://soulfabexmusic.gumroad.com/",
+   "kind": "artist",
+   "store": "gumroad",
+   "cover": null,
+   "note": "not sold on the store (2026-10-16); links to Soulfabex's Gumroad"
+  },
+  "b88bec527f39": {
+   "url": "https://tighteyex.bandcamp.com/album/vengeance",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "Vengeance",
+   "cover": "https://f4.bcbits.com/img/a1368511060_10.jpg"
+  },
+  "b8a97449a857": {
+   "url": "https://razorface.bandcamp.com/album/rowdy-blossom",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "ROWDY BLOSSOM",
+   "cover": "https://f4.bcbits.com/img/a0882615108_10.jpg"
+  },
+  "b8fbb9450a7d": {
+   "url": "https://playabeats.bandcamp.com/",
+   "kind": "artist",
+   "store": "bandcamp",
+   "title": null,
+   "cover": null,
+   "note": "album page not found; links to the artist's Bandcamp"
+  },
+  "bae9ea45ffc6": {
+   "url": "https://bigrulezkidny.bandcamp.com/album/g-y-r-n",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "G Y R N",
+   "cover": "https://f4.bcbits.com/img/a0463530869_10.jpg"
+  },
+  "baec73280375": {
+   "url": "https://morfmuziik.bandcamp.com/album/dirty-bagz-with-buck-muzik",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "DIRTY BAGZ WITH BUCK MUZIK",
+   "cover": null
+  },
+  "bb613f8d27c9": {
+   "url": "https://sleek.bandcamp.com/",
+   "kind": "artist",
+   "store": "bandcamp",
+   "title": null,
+   "cover": null,
+   "note": "album page not found; links to the artist's Bandcamp"
+  },
+  "be6f3a335ea2": {
+   "url": "https://morfmuziik.bandcamp.com/album/world-most-wanted",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "WORLD MOST WANTED",
+   "cover": null
+  },
+  "bf43f4277f7b": {
+   "url": "https://lukaaustin.bandcamp.com/album/i-d-g-a-buck",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "I.D.G.A Buck",
+   "cover": "https://f4.bcbits.com/img/a0907280862_10.jpg"
+  },
+  "bfb3b4e9a4fc": {
+   "url": "https://morfmuziik.bandcamp.com/album/paname",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "PANAME",
+   "cover": "https://f4.bcbits.com/img/a3274297587_10.jpg"
+  },
+  "c060c317530f": {
+   "url": "https://bteck.bandcamp.com/album/undeniable",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "Void Hopper",
+   "cover": "https://f4.bcbits.com/img/a1496293442_10.jpg",
+   "note": "renamed on Bandcamp (was UNDENIABLE)"
+  },
+  "c0d6e76957d8": {
+   "url": "https://officialtighteyex.bandcamp.com/album/making-a-mxrderer",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "Making A Mxrderer",
+   "cover": "https://f4.bcbits.com/img/a2690993069_10.jpg"
+  },
+  "c0e79d39be29": {
+   "url": "https://roxxdabeathovn.bandcamp.com/album/hidden-lost-tape1",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "HIDDEN (Lost Tape1)",
+   "cover": "https://f4.bcbits.com/img/a4229270789_10.jpg"
+  },
+  "c10d4cb555f6": {
+   "url": "https://tighteyex.bandcamp.com/",
+   "kind": "artist",
+   "store": "bandcamp",
+   "title": null,
+   "cover": null,
+   "note": "album page not found; links to the artist's Bandcamp"
+  },
+  "c207d5c288ff": {
+   "url": "https://morfmuziik.bandcamp.com/album/street-wakanda",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "STREET WAKANDA",
+   "cover": "https://f4.bcbits.com/img/a3441287878_10.jpg"
+  },
+  "c21a5f66dc33": {
+   "url": "https://playabeats.bandcamp.com/album/bangerz-nly",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "BANGERZ ØNLY",
+   "cover": "https://f4.bcbits.com/img/a2858714737_10.jpg"
+  },
+  "c2e6278cba17": {
+   "url": "https://thundershock500.bandcamp.com/album/desert-storm-3-soundtrack-by-lil-roxxdamus-shazam-tracks-l-thrilla",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "DESERT STORM 3 Soundtrack by: lil RoxxDaMus, Shazam Tracks & L-Thrilla",
+   "cover": "https://f4.bcbits.com/img/a2826106484_10.jpg"
+  },
+  "c30312a3074b": {
+   "url": "https://morfmuziik.bandcamp.com/album/until-the-end-of-time",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "UNTIL THE END OF TIME",
+   "cover": "https://f4.bcbits.com/img/a1481939150_10.jpg"
+  },
+  "c332eb3171f7": {
+   "url": "https://noscript.bandcamp.com/album/buckzone",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "//BUCKZONE//",
+   "cover": "https://f4.bcbits.com/img/a2010230563_10.jpg"
+  },
+  "c37786dcfc3a": {
+   "url": "https://playabeats.bandcamp.com/",
+   "kind": "artist",
+   "store": "bandcamp",
+   "cover": null,
+   "note": "album page not found; links to the artist's Bandcamp"
+  },
+  "c59bcc05da01": {
+   "url": "https://knkrtworld.com/album/2695009/self-destruk",
+   "kind": "album",
+   "store": "knkrtworld",
+   "title": "SELF DESTRUK",
+   "cover": "https://images.zoogletools.com/s:bzglfiles/u/738543/9d4317736962becfc1da446935365793a5a90c9b/original/self-destruk-3000-x-3000-px.png/!!/b%3AW1sicmVzaXplIixbNjAwLG51bGwseyJ3aXRob3V0RW5sYXJnZW1lbnQiOnRydWUsImZpdCI6Im91dHNpZGUifV1dXQ%3D%3D/meta%3AeyJzcmNCdWNrZXQiOiJiemdsZmlsZXMifQ%3D%3D.png",
+   "note": "4 of the folder's 8 tracks are on this album (2Loud, BuckNowBuckLater, NewBuck, WushBuck)"
+  },
+  "c5c25cc2f355": {
+   "url": "https://eestmusic.bandcamp.com/album/killaave-mixtape",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "KillaAve Mixtape",
+   "cover": "https://f4.bcbits.com/img/a1765478046_10.jpg"
+  },
+  "c62c4dcff895": {
+   "url": "https://eestmusic.bandcamp.com/album/blk-friday-19",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "BLK FRIDAY '19",
+   "cover": "https://f4.bcbits.com/img/a4221877919_10.jpg"
+  },
+  "c657869848a5": {
+   "url": "https://flipsidemadrootz.bandcamp.com/album/krumpire",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "Krumpire",
+   "cover": "https://f4.bcbits.com/img/a1467576692_10.jpg"
+  },
+  "c7f25d74d577": {
+   "url": "https://playabeats.bandcamp.com/",
+   "kind": "artist",
+   "store": "bandcamp",
+   "title": null,
+   "cover": null,
+   "note": "album page not found; links to the artist's Bandcamp"
+  },
+  "ca7449dd9567": {
+   "url": "https://eestmusic.bandcamp.com/album/n-r-a-no-rookies-allowed-vol-1",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "N.R.A (No Rookies Allowed) Vol. 1",
+   "cover": "https://f4.bcbits.com/img/a0582342702_10.jpg"
+  },
+  "cbb913fd33bd": {
+   "url": "https://morfmuziik.bandcamp.com/album/outsiderz-3-mozarf",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "OUTSIDERZ 3 - MOZARF",
+   "cover": "https://f4.bcbits.com/img/a0897369662_10.jpg"
+  },
+  "cc0c3c726a3b": {
+   "url": "https://maniactracksnp.bandcamp.com/album/buck-talk",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "BUCK TALK",
+   "cover": "https://f4.bcbits.com/img/a2693756780_10.jpg"
+  },
+  "cf04407ec363": {
+   "url": "https://knkrtworld.com/music",
+   "kind": "artist",
+   "store": "knkrtworld",
+   "cover": null,
+   "note": "not listed on knkrtworld.com; links to its music page"
+  },
+  "cf864de0d783": {
+   "url": "https://playabeats.bandcamp.com/",
+   "kind": "artist",
+   "store": "bandcamp",
+   "title": null,
+   "cover": null,
+   "note": "album page not found; links to the artist's Bandcamp"
+  },
+  "d21892a4890c": {
+   "url": "https://flipsidemadrootz.bandcamp.com/album/8-buckz",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "8 Buckz",
+   "cover": "https://f4.bcbits.com/img/a2550026713_10.jpg"
+  },
+  "d25a0d913351": {
+   "url": "https://playabeats.bandcamp.com/album/animal-bounce",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "ANIMAL BOUNCE",
+   "cover": "https://f4.bcbits.com/img/a0279555676_10.jpg"
+  },
+  "d292c55f4cda": {
+   "url": "https://officialtighteyex.bandcamp.com/album/dj-merci-bvck-vol-5",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "DJ Merci BVCK Vol.5",
+   "cover": "https://f4.bcbits.com/img/a0295593931_10.jpg"
+  },
+  "d2ccd2da19e1": {
+   "url": "https://knkrtworld.com/album/3680866/maxxvolume",
+   "kind": "album",
+   "store": "knkrtworld",
+   "title": "MAXXVOLUME",
+   "cover": "https://images.zoogletools.com/s:bzglfiles/u/738543/f0b5fd90ce9c19753f3e6be744d8bb31072df46a/original/3dad1597-8697-4a30-80ca-94c895cd3b1e.png/!!/b%3AW1sicmVzaXplIixbNjAwLG51bGwseyJ3aXRob3V0RW5sYXJnZW1lbnQiOnRydWUsImZpdCI6Im91dHNpZGUifV1dXQ%3D%3D/meta%3AeyJzcmNCdWNrZXQiOiJiemdsZmlsZXMifQ%3D%3D.png"
+  },
+  "d32f929d9258": {
+   "url": "https://playabeats.bandcamp.com/",
+   "kind": "artist",
+   "store": "bandcamp",
+   "title": null,
+   "cover": null,
+   "note": "album page not found; links to the artist's Bandcamp"
+  },
+  "d38e44ec9988": {
+   "url": "https://officialtighteyex.bandcamp.com/album/x-files",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "X-Files",
+   "cover": "https://f4.bcbits.com/img/a1261638862_10.jpg"
+  },
+  "d5677e6300ce": {
+   "url": "https://lukaaustin.bandcamp.com/album/buck-7",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "BUCK 7",
+   "cover": "https://f4.bcbits.com/img/a0068270507_10.jpg"
+  },
+  "d5e30b580ae2": {
+   "url": "https://officialtighteyex.bandcamp.com/album/ylnxyz",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "YLNxYZ",
+   "cover": "https://f4.bcbits.com/img/a1677360269_10.jpg"
+  },
+  "d666c75d0685": {
+   "url": "https://officialtighteyex.bandcamp.com/album/dj-merci-presents-4-bvck-nyggaz",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "Dj Merci presents \"4 BVCK nyggaz\"",
+   "cover": "https://f4.bcbits.com/img/a2566184795_10.jpg"
+  },
+  "d691ec09c2dc": {
+   "url": "https://bigrulez.bandcamp.com/album/finalem-capitulum",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "FINALEM CAPITULUM",
+   "cover": "https://f4.bcbits.com/img/a2947682428_10.jpg"
+  },
+  "d6f4bc5ad264": {
+   "url": "https://thundershock500.bandcamp.com/album/only-gonna-say-this-once",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "Only Gonna Say This Once",
+   "cover": "https://f4.bcbits.com/img/a2150277306_10.jpg"
+  },
+  "d7067ad8605c": {
+   "url": "https://kob-ent.bandcamp.com/album/rord-to-kob15-mixtape",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "Rord to KOB15 MIXTAPE",
+   "cover": "https://f4.bcbits.com/img/a3492537057_10.jpg"
+  },
+  "d7737c5b3cca": {
+   "url": "https://knkrtworld.com/music",
+   "kind": "artist",
+   "store": "knkrtworld",
+   "title": null,
+   "cover": null,
+   "note": "not listed on knkrtworld.com; links to its music page"
+  },
+  "d797bd8ccd32": {
+   "url": "https://knkrtworld.com/album/3333648/wldlf",
+   "kind": "album",
+   "store": "knkrtworld",
+   "title": "WLDLF",
+   "cover": "https://images.zoogletools.com/s:bzglfiles/u/738543/8d779a7660f2bcbe0bafe3f3bf83d820f65c172c/original/img-0127.jpg/!!/b%3AW1sicmVzaXplIixbNjAwLG51bGwseyJ3aXRob3V0RW5sYXJnZW1lbnQiOnRydWUsImZpdCI6Im91dHNpZGUifV1dXQ%3D%3D/meta%3AeyJzcmNCdWNrZXQiOiJiemdsZmlsZXMifQ%3D%3D.jpg"
+  },
+  "d885bd2ff3f4": {
+   "url": "https://eestmusic.bandcamp.com/album/n-r-a-volume-3",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "N.R.A. Volume 3",
+   "cover": "https://f4.bcbits.com/img/a1565241635_10.jpg"
+  },
+  "da94b6e47bfb": {
+   "url": "https://knkrtworld.com/album/3105453/krump-forever",
+   "kind": "album",
+   "store": "knkrtworld",
+   "title": "KRUMP FOREVER",
+   "cover": "https://images.zoogletools.com/s:bzglfiles/u/738543/9e5213d05c5bd86c862ee9db50077a6f0445b754/original/black-and-grey-bold-heartbreak-love-songs-playlist-cover.png/!!/b%3AW1sicmVzaXplIixbNjAwLG51bGwseyJ3aXRob3V0RW5sYXJnZW1lbnQiOnRydWUsImZpdCI6Im91dHNpZGUifV1dXQ%3D%3D/meta%3AeyJzcmNCdWNrZXQiOiJiemdsZmlsZXMifQ%3D%3D.png"
+  },
+  "dc89dfea91a9": {
+   "url": "https://bravodomo.bandcamp.com/album/greenlight-the-chaos",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "Greenlight The Chaos",
+   "cover": "https://f4.bcbits.com/img/a0028455551_10.jpg"
+  },
+  "dea9d8b93e3e": {
+   "url": "https://20killz.bandcamp.com/album/sounds-of-krump",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "SOUNDS OF KRUMP",
+   "cover": "https://f4.bcbits.com/img/a0897413269_10.jpg"
+  },
+  "df29a15780b4": {
+   "url": "https://proofthexrook.bandcamp.com/album/master-of-the-goon-talk-volume-y",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "Master of the Goon Talk: Volume Y",
+   "cover": "https://f4.bcbits.com/img/a2223688732_10.jpg"
+  },
+  "dffc29c83ea5": {
+   "url": "https://kata107.bandcamp.com/album/different-kind-of-buck",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "DIFFERENT KIND OF BUCK",
+   "cover": "https://f4.bcbits.com/img/a1599608775_10.jpg"
+  },
+  "e0d8e423f023": {
+   "url": "https://jo-snpzmusic.bandcamp.com/album/world-iz-yours",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "WORLD IZ YOURS",
+   "cover": "https://f4.bcbits.com/img/a2839774391_10.jpg"
+  },
+  "e2bfc967ab5d": {
+   "url": "https://kingvoltmusic.bandcamp.com/",
+   "kind": "artist",
+   "store": "bandcamp",
+   "title": null,
+   "cover": null,
+   "note": "album page not found; links to the artist's Bandcamp"
+  },
+  "e2dabafaba4e": {
+   "url": "https://bravodomo.bandcamp.com/album/what-if-i-dropped-this-vol-3",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "What If I Dropped This Vol. 3",
+   "cover": "https://f4.bcbits.com/img/a1024034211_10.jpg"
+  },
+  "e4e0f0b3db4b": {
+   "url": "https://mozarfxdabl2ody.bandcamp.com/album/kmd",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "KMD",
+   "cover": "https://f4.bcbits.com/img/a2209240350_10.jpg"
+  },
+  "e5f736be417d": {
+   "url": "https://lajoconde.bandcamp.com/album/the-new-mvp",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "THE NEW MVP",
+   "cover": "https://f4.bcbits.com/img/a2547326470_10.jpg"
+  },
+  "e633ffad9963": {
+   "url": "https://mozarfxdabl2ody.bandcamp.com/album/k-m-d-vol-2",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "K.M.D VOL 2",
+   "cover": "https://f4.bcbits.com/img/a1320631543_10.jpg"
+  },
+  "e7a1e4b1df20": {
+   "url": "https://flipsidemadrootz.bandcamp.com/album/bangerz-only",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "Bangerz Only",
+   "cover": "https://f4.bcbits.com/img/a3303966910_10.jpg"
+  },
+  "e9a9c0895d4c": {
+   "url": "https://hbeatz.bandcamp.com/album/the-document",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "THE DOCUMENT",
+   "cover": "https://f4.bcbits.com/img/a1641323235_10.jpg"
+  },
+  "e9ce3d23f45e": {
+   "url": "https://soulfabexmusic.gumroad.com/",
+   "kind": "artist",
+   "store": "gumroad",
+   "cover": null,
+   "note": "not sold on the store (2026-10-16); links to Soulfabex's Gumroad"
+  },
+  "ec51c592957b": {
+   "url": "https://playabeats.bandcamp.com/album/krumpire-2018",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "KRUMPIRE 2018",
+   "cover": "https://f4.bcbits.com/img/a1251041991_10.jpg"
+  },
+  "ec561a1b0e1f": {
+   "url": "https://officialtighteyex.bandcamp.com/album/the-othxrz",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "The Othxrz",
+   "cover": "https://f4.bcbits.com/img/a1836000366_10.jpg"
+  },
+  "ee68d3b8430c": {
+   "url": "https://morfmuziik.bandcamp.com/album/trinity-the-reeditions-remastered",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "TRINITY - THE REEDITIONS - REMASTERED",
+   "cover": null
+  },
+  "f0b3697dd04c": {
+   "url": "https://eestmusic.bandcamp.com/album/blk-friday-s-album-pre-release-beat-tape",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "BLK FRIDAY (S****** ALBUM PRE-RELEASE BEAT TAPE)",
+   "cover": "https://f4.bcbits.com/img/a2935741496_10.jpg"
+  },
+  "f1173404c5f7": {
+   "url": "https://jo-snpzmusic.bandcamp.com/album/krump-geek",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "KRUMP GEEK",
+   "cover": "https://f4.bcbits.com/img/a1342742348_10.jpg"
+  },
+  "f13b1a028ad1": {
+   "url": "https://eestmusic.bandcamp.com/album/dark-times",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "Dark Times",
+   "cover": "https://f4.bcbits.com/img/a2976495218_10.jpg"
+  },
+  "f1fcc653d695": {
+   "url": "https://noscript.bandcamp.com/album/street-f",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "Street F",
+   "cover": "https://f4.bcbits.com/img/a1247865196_10.jpg"
+  },
+  "f54b85087ee5": {
+   "url": "https://playabeats.bandcamp.com/",
+   "kind": "artist",
+   "store": "bandcamp",
+   "cover": null,
+   "note": "album page not found; links to the artist's Bandcamp"
+  },
+  "f5c0eb05f27d": {
+   "url": "https://lukaaustin.bandcamp.com/album/summer-buck-shxt",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "SUMMER BUCK SHXT",
+   "cover": null
+  },
+  "f8383d6c84cd": {
+   "url": "https://lukaaustin.bandcamp.com/album/buck-that",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "BUCK THAT",
+   "cover": "https://f4.bcbits.com/img/a0956867108_10.jpg"
+  },
+  "f94f787b30ae": {
+   "url": "https://morfmuziik.bandcamp.com/album/from-the-street-clik-the-link-inside-to-download-via-my-website",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "FROM THE STREET CLIK THE LINK INSIDE TO DOWNLOAD VIA MY WEBSITE",
+   "cover": "https://f4.bcbits.com/img/a3251140598_10.jpg"
+  },
+  "f96c03be5041": {
+   "url": "https://10xgully.bandcamp.com/album/gunz-n-rxoses",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "GUNZ N RXOSES",
+   "cover": "https://f4.bcbits.com/img/a1325587994_10.jpg"
+  },
+  "f9fa8aee71bb": {
+   "url": "https://bravodomo.bandcamp.com/album/elite-vol-1-the-brui5er-way",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "ELITE VOL. 1 (THE BRUI5ER WAY)",
+   "cover": "https://f4.bcbits.com/img/a1895970159_10.jpg"
+  },
+  "fa4787f74b11": {
+   "url": "https://lukaaustin.bandcamp.com/album/street-ish-3",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "Street Ish 3",
+   "cover": "https://f4.bcbits.com/img/a1402175608_10.jpg"
+  },
+  "fa6d7e301ef9": {
+   "url": "https://rucboi.bandcamp.com/album/the-buckin-ghost",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "The Buckin Ghost",
+   "cover": "https://f4.bcbits.com/img/a4109037882_10.jpg"
+  },
+  "fb81c38f78f4": {
+   "url": "https://savagekulture.bandcamp.com/album/savage-volume-iii",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "SAVAGE VOLUME III",
+   "cover": "https://f4.bcbits.com/img/a3862078543_10.jpg"
+  },
+  "fe5b9fae0a8e": {
+   "url": "https://eestmusic.bandcamp.com/",
+   "kind": "artist",
+   "store": "bandcamp",
+   "cover": null,
+   "note": "album page not found; links to the artist's Bandcamp"
+  }
+ }
+}
