@@ -1,25 +1,15 @@
 // SERVER ({ url, apiKey } of the deployed Lambda) comes from config.js; there is no settings UI.
 const $ = (id) => document.getElementById(id);
 const authHeaders = () => ({ 'X-Api-Key': SERVER.apiKey });
+// Only the outcome is shown (찾는 중 → 찾음 / 못 찾음), not how the search got there.
 const VERDICT_TEXT = {
-  confirmed: '확정',
-  check: '추가 확인 필요',
-  fail: '찾지 못함',
+  confirmed: '찾음',
+  check: '찾음',
+  fail: '못 찾음',
 };
-// Real failures so far were almost all in-library songs smeared by hall reverb, crowd and MC.
-const FAIL_HELP = '현장 녹음이라 잔향·함성·MC 소리에 음악이 묻혔을 가능성이 큽니다. '
-  + '음악이 크게 들리는 구간에서 다시 시도하거나 녹음 길이를 30~45초로 늘려보세요. '
-  + '(라이브러리에 없는 곡일 수도 있습니다)';
-const REASON_TEXT = {
-  low: '점수가 낮습니다. 조금 더 길게 다시 들어보세요.',
-  rival: '다른 곡도 비슷한 점수로 잡혔습니다 (루프·샘플 공유 가능). 들어보고 골라주세요.',
-  rhythm_strong: '유력 후보 — fingerprint 검색으로는 못 찾아서 리듬 패턴으로 찾았습니다 (잔향 큰 현장 녹음). '
-    + '▶ 10초 미리듣기로 확인해 주세요.',
-  rhythm_weak: '약한 후보 — 리듬 패턴이 조금 더 비슷한 정도라 틀릴 수 있습니다. '
-    + '꼭 들어보고 확인하거나, 음악이 잘 들리는 구간에서 다시 시도해 주세요.',
-};
-
-let tick = null;
+// check = a rhythm or low-score fingerprint candidate: right most of the time, but not always.
+const CHECK_NOTE = '확실하지 않아요. 미리듣기로 확인해 주세요.';
+const FAIL_NOTE = '음악이 잘 들리는 구간에서 다시 시도해 보세요.';
 
 function fmt(sec) {
   const s = Math.max(0, Math.round(sec));
@@ -60,7 +50,6 @@ function showError(text) {
 }
 
 function render(state = {}) {
-  clearInterval(tick);
   const busy = state.status === 'recording' || state.status === 'searching';
   $('start').hidden = busy;
   $('stop').hidden = state.status !== 'recording';
@@ -69,25 +58,8 @@ function render(state = {}) {
   $('status').textContent = '';
   $('result').textContent = '';
 
-  if (state.status === 'recording') {
-    const update = () => {
-      const left = state.duration - (Date.now() - state.startedAt) / 1000;
-      $('status').textContent = `듣는 중… 최대 ${fmt(left)} 남음 (확정되면 바로 멈춥니다 · 팝업을 닫아도 계속됩니다)`;
-    };
-    update();
-    tick = setInterval(update, 500);
-    const p = state.partial;
-    if (p) {
-      const hint = document.createElement('div');
-      hint.className = 'reason';
-      const by = p.method === 'rhythm' ? '리듬 패턴상' : '';
-      hint.textContent = p.songs?.length
-        ? `${p.seconds}초까지 들은 결과 ${by} 가장 유력: ${p.songs[0].file} — 더 듣는 중`
-        : `${p.seconds}초까지는 아직 후보 없음 — 더 듣는 중`;
-      $('result').append(hint);
-    }
-  } else if (state.status === 'searching') {
-    $('status').textContent = '마지막 정밀 검색 중… (리듬 검색까지 하면 10~20초 걸립니다)';
+  if (busy) {
+    $('status').textContent = '찾는 중…';
   } else if (state.status === 'error') {
     showError(state.error);
   } else if (state.status === 'done' && state.result) {
@@ -101,21 +73,19 @@ function renderResult(r, state) {
   v.className = `verdict ${r.verdict}`;
   v.textContent = VERDICT_TEXT[r.verdict];
   box.append(v);
-  const reason = r.reason === 'rhythm' ? `rhythm_${r.songs[0]?.strength || 'weak'}` : r.reason;
-  const help = r.verdict === 'fail' ? FAIL_HELP : REASON_TEXT[reason];
+  const help = r.verdict === 'fail' ? FAIL_NOTE : r.verdict === 'check' ? CHECK_NOTE : '';
   if (help) {
     const why = document.createElement('div');
-    why.className = 'reason';
+    why.className = r.verdict === 'fail' ? 'reason muted' : 'reason';
     why.textContent = help;
     box.append(why);
   }
-  $('status').textContent = `${state.tabTitle || ''} · 검색 ${r.elapsed}s`;
+  $('status').textContent = state.tabTitle || '';
 
   // Only the best song is shown; the rest of the candidate list stays server-side.
   r.songs.slice(0, 1).forEach((m) => {
     const el = document.createElement('div');
     el.className = 'match';
-    const speed = m.time_factor && m.time_factor !== 1 ? ` · 속도 ${(m.time_factor * 100).toFixed(1)}%` : '';
     el.innerHTML = `
       <div class="name"></div>
       <div class="meta"></div>
@@ -125,19 +95,7 @@ function renderResult(r, state) {
         <button data-act="no">✘ 틀림</button>
       </div>`;
     el.querySelector('.name').textContent = m.file;
-    const scoreText = r.method === 'rhythm' ? `리듬 유사도 ${m.score}` : `점수 ${m.score}`;
-    el.querySelector('.meta').textContent =
-      `${m.folder} · ${scoreText} · 곡의 ${fmt(m.match_start)}–${fmt(m.match_stop)}${speed}`;
-    const notes = [];
-    if (m.ratio) notes.push(`다른 곡보다 ${m.ratio}배 높음`);
-    if (m.preview_only) notes.push('미리보기 파일에서만 발견됨 — 같은 앨범의 곡입니다');
-    if (m.also_in.length) notes.push(`같은 음원: ${m.also_in.map((x) => x.file).join(', ')}`);
-    if (notes.length) {
-      const n = document.createElement('div');
-      n.className = 'meta';
-      n.textContent = notes.join(' · ');
-      el.querySelector('.meta').after(n);
-    }
+    el.querySelector('.meta').textContent = `${m.folder} · 곡의 ${fmt(m.match_start)}부터`;
     el.querySelector('[data-act=play]').onclick = (e) => play(m, e.currentTarget);
     el.querySelector('[data-act=yes]').onclick = () => feedback(r.id, true, m.path, el);
     el.querySelector('[data-act=no]').onclick = () => feedback(r.id, false, m.path, el);

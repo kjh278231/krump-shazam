@@ -60,8 +60,8 @@ chrome.runtime.onMessage.addListener((msg) => {
       case 'result': {
         await setState({ status: 'done', result: msg.result });
         const v = msg.result.verdict;
-        badge(v === 'confirmed' ? 'OK' : v === 'check' ? '?' : 'X',
-          v === 'confirmed' ? '#188038' : v === 'check' ? '#e37400' : '#5f6368');
+        // Found / not found only; an unconfirmed find keeps the amber colour.
+        badge(v === 'fail' ? 'X' : 'OK', v === 'confirmed' ? '#188038' : v === 'check' ? '#e37400' : '#5f6368');
         break;
       }
       case 'error':

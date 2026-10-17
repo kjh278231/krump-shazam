@@ -26,6 +26,7 @@ progress { width: 100%; }
 .verdict { font-size: 14px; font-weight: 700; margin: 6px 0; }
 .verdict.confirmed { color: var(--ok); } .verdict.check { color: var(--warn); } .verdict.fail { color: var(--muted); }
 .reason { color: var(--warn); font-size: 12px; margin-bottom: 4px; }
+.reason.muted { color: var(--muted); }
 .match {border-top: 1px solid var(--line); padding: 7px 0; }
 .match .name { font-weight: 600; word-break: break-all; }
 .match .meta { color: var(--muted); font-size: 12px; }
