@@ -1,17 +1,19 @@
 // Records the captured tab audio and sends it to the local server.
 //
 // Like Shazam, it doesn't wait for the full duration: from FIRST_CHECK seconds on, the audio
-// recorded so far is searched every CHECK_EVERY seconds (fingerprint; from 15 s also rhythm).
-// When the server marks a check final (fingerprint confirmed, or a strong rhythm candidate after
-// 20 s) the recording stops right away; otherwise the best candidate so far is shown as a hint
-// and, at the end, the full recording gets the complete search.
+// recorded so far is searched every CHECK_EVERY seconds (fingerprint and rhythm). When the server
+// marks a check final (fingerprint confirmed, or a rhythm candidate clear enough for the length
+// recorded) the recording stops right away; otherwise, at the end, the full recording gets the
+// complete search.
 
 // Server address and API key: SERVER from config.js (fixed at build time, aws_setup.py).
 const MIN_SECONDS = 5;
-// Panako needs ~10 s: on clean clips 5-6 s confirmed 0/10, 8 s 2/10, 10 s 10/10.
-const FIRST_CHECK = 10;
+// Panako needs ~10 s: on clean clips 5-6 s confirmed 0/10, 8 s 2/10, 10 s 10/10. The extra
+// 0.5 s makes sure the 10th 1 s chunk has arrived.
+const FIRST_CHECK = 10.5;
 const CHECK_EVERY = 4;
-const RHYTHM_EARLY = 20;  // server/app.py RHYTHM_EARLY_SECONDS
+// Audio lengths at which the server lowers its bar for stopping early (server/app.py RHYTHM_EARLY).
+const RHYTHM_STEPS = [15, 20];
 
 let recorder = null;
 let stopTimer = null;
@@ -88,7 +90,7 @@ async function record({ streamId, duration, tabTitle, tabUrl }) {
   const check = async (t) => {
     try {
       const r = await identify(new Blob(chunks, { type: 'audio/webm' }), { ...page, partial: 1 });
-      // final: a fingerprint confirmation, or a strong rhythm candidate after >= 20 s (server decides).
+      // final: a fingerprint confirmation, or a clear rhythm candidate (server decides).
       // Kept even if the recording stopped meanwhile: it then replaces the final search.
       if (r.final) {
         early = r;
@@ -102,9 +104,11 @@ async function record({ streamId, duration, tabTitle, tabUrl }) {
     } finally {
       inflight = null;
       nextCheck = (Date.now() - recorder.startedAt) / 1000 + CHECK_EVERY;
-      // A check just short of 20 s can't end the recording (the server stops early on a strong
-      // rhythm candidate only from 20 s of audio), so wait for 20 s instead.
-      if (nextCheck > RHYTHM_EARLY - 2 && nextCheck < RHYTHM_EARLY) nextCheck = RHYTHM_EARLY + 0.5;
+      // A check just short of 15 or 20 s is held to the stricter bar of the shorter length;
+      // waiting a moment for the step gives it the lower one.
+      for (const step of RHYTHM_STEPS) {
+        if (nextCheck > step - 2 && nextCheck < step + 0.5) nextCheck = step + 0.5;
+      }
     }
   };
   const checker = setInterval(() => {

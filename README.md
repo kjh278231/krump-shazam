@@ -67,8 +67,12 @@ song is not in the library), then `python poc/evaluate.py --manifest your.csv`.
 2. Chrome → `chrome://extensions` → enable *Developer mode* → *Load unpacked* → pick `extension/`.
    Pin the extension.
 3. On a tab playing a video, click the extension icon → **현재 탭에서 찾기**. The popup can be
-   closed while recording; the badge shows REC → ... → OK / ? / X.
-4. The result shows the best song only, with its score and position in the library track.
+   closed while recording; the badge shows REC → ... → OK / X.
+4. The popup shows only the outcome: 찾는 중… while it listens and searches, then 찾음 or
+   못 찾음. Mid-recording hints and search details are not shown. A find that the server did not
+   confirm (추가 확인: a rhythm candidate, low score or close rival) is 찾음 in amber with
+   "확실하지 않아요. 미리듣기로 확인해 주세요." The result shows the best song only, with its
+   album and position in the library track.
    **▶ 10초 미리듣기** plays a 10 s MP3 excerpt from that spot, cut by the server's `/preview`.
    Full library files are never served, because of copyright once this is distributed.
    **✔ 맞음 / ✘ 틀림** records ground truth.
@@ -224,26 +228,25 @@ stricter thresholds: 유력 at ratio ≥ 1.25 and agree, 약한 at ratio ≥ 1.3
 | Unknown songs (39 at 1.0, 39 off speed) | +1 | – |
 | User captures | WLDLF 07 (유력) | yes |
 
-**During recording** (`poc/eval_rhythm_prefix.py` → `realtest/rhythm_prefix.jsonl`). Real hall
-recordings almost never confirm by fingerprint, so mid-recording checks also run the rhythm
-search from 15 s on.
+**During recording** (`poc/eval_rhythm_early.py` → `realtest/rhythm_early.jsonl`). Battle videos
+almost never confirm by fingerprint (41 of 2,344 battle-100 windows), so mid-recording checks also
+run the rhythm search, from 10 s on. A 유력 candidate ends the recording when its ratio clears the
+bar for the length recorded: 1.5 at 10 s, 1.3 at 15 s, 1.2 from 20 s (`RHYTHM_EARLY` in
+`server/app.py`). The checks run at 10.5 s, then every 4 s, held back to 15.5 / 20.5 s when they
+would land just short of a step.
 
-| Prefix | Room clips: 유력 shown / right | Unknown songs: 유력 |
-|---|---|---|
-| 15 s | 5 / 4 | 4 |
-| 20 s | 13 / 13 | 3 |
-| 25 s | 26 / 26 | 3 |
-| 30 s | 43 / 42 | 3 |
+| Stop rule | Battle songs (409 found at 30 s): stop at 10 / 15 / 20 s, wrong | Nothing found at 30 s (1,618): stops | Songs not in the library (356): wrong |
+|---|---|---|---|
+| 20 s at 1.2 (before) | 0 / 0 / 270, 0 | 15 | 29 |
+| **10 s at 1.5, 15 s at 1.3** | **30 / 135 / 106, 1** | **27** | **31** |
+| 10, 15, 20 s all at 1.2 | 106 / 91 / 77, 5 | 50 | 43 |
 
-Stopping at the first 유력 at ≥ 20 s gives the same result as waiting for 30 s (room clips
-43/42, DARK video 6/6, user captures 3/3, unknown songs 3/39), with a median stop at 25 s.
-So a 유력 candidate at ≥ 20 s ends the recording, and from 15 s a 유력 candidate is shown only
-as a hint. 약한 candidates are never shown mid-recording, because they appeared for 6–10 of
-39 unknown songs.
+"Wrong" for songs not in the library includes unlinked copies of the same song elsewhere in the
+library (e.g. the same beat on two albums). 약한 candidates are never shown mid-recording, because
+they appeared for 6–10 of 39 unknown songs.
 
-Simulated through the extension against the server: DARK shows a hint at 15 s and the result
-at 26 s (was 33 s). A clean clip is confirmed at 11 s. An unknown song gets no hint and fails
-at the end.
+Simulated through the extension against the server: DARK shows its result at 26 s (was 33 s). A
+clean clip is confirmed at 11 s. An unknown song fails at the end.
 
 **Battle videos.** The rhythm search also proposes consistent matches in battle videos that
 Panako missed. The same track shows up over several windows, with track positions advancing

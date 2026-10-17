@@ -133,8 +133,12 @@ RHYTHM = (RhythmIndex(RHYTHM_FILE, exclude=lambda p: LIBRARY.key(p) in EXCLUDED,
 startup_log("rhythm index")
 RHYTHM_SLOTS = threading.BoundedSemaphore(int(os.environ.get("RHYTHM_WORKERS", "3")))
 RHYTHM_THREADS = int(os.environ.get("RHYTHM_THREADS", "3"))  # speeds searched at once per request
-RHYTHM_HINT_SECONDS = 15   # partial checks run the rhythm search from here on (hint only)
-RHYTHM_EARLY_SECONDS = 20  # ... and a strong candidate from here on ends the recording
+# Partial checks run the rhythm search from RHYTHM_HINT_SECONDS of audio on. A strong candidate
+# ends the recording when its ratio reaches the bar for the audio's length: shorter audio needs
+# a clearer winner. (seconds, ratio), longest first; the extension times its checks to match.
+RHYTHM_HINT_SECONDS = 10
+RHYTHM_EARLY = ((20, 1.2), (15, 1.3), (10, 1.5))
+RHYTHM_SLACK = 0.5  # the extension's 1 s chunks: a check at 10.5 s holds 10 s, decoded a hair short
 PANAKO_SR = 16000  # Panako's PANAKO_SAMPLE_RATE
 if db_download is not None:
     db_download.result()
@@ -281,12 +285,13 @@ def identify_audio(body: bytes, title: str, url: str, partial: bool) -> dict:
     method = "fingerprint"
 
     dur = len(pcm) / PANAKO_SR
-    # Mid-recording checks also run the rhythm search once there is enough audio (real hall
-    # recordings almost never confirm by fingerprint). Measured on realtest/rhythm_prefix.jsonl:
-    # a "strong" rhythm candidate at >= 20 s is as reliable as at 30 s (room clips 43 shown/42
-    # right, unknown songs 3/39 in both cases), so it ends the recording early; from 15 s it is
-    # only shown as a hint.
-    run_rhythm = result == "fail" and RHYTHM is not None and (not partial or dur >= RHYTHM_HINT_SECONDS)
+    # Mid-recording checks also run the rhythm search (battle videos almost never confirm by
+    # fingerprint: 41 of 2,344 battle-100 windows). RHYTHM_EARLY, measured on 10/15/20 s
+    # prefixes (poc/eval_rhythm_early.py): of 409 battle windows found at 30 s, 30 stop at 10 s
+    # and 135 more at 15 s (1 wrong); of 1,618 windows where the final search finds nothing,
+    # 27 stop on a candidate (20 s only: 15).
+    run_rhythm = (result == "fail" and RHYTHM is not None
+                  and (not partial or dur >= RHYTHM_HINT_SECONDS - RHYTHM_SLACK))
     final = not partial or result == "confirmed"
 
     if run_rhythm:
@@ -318,7 +323,8 @@ def identify_audio(body: bytes, title: str, url: str, partial: bool) -> dict:
                 })
             out_songs[0]["ratio"] = round(r["ratio"], 2)
             out_songs[0]["strength"] = r["strength"]
-            if partial and r["strength"] == "strong" and dur >= RHYTHM_EARLY_SECONDS:
+            if partial and r["strength"] == "strong" and any(
+                    dur >= sec - RHYTHM_SLACK and r["ratio"] >= ratio for sec, ratio in RHYTHM_EARLY):
                 final = True
         elapsed = time.time() - t0
 
