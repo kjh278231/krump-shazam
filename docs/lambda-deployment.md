@@ -66,6 +66,10 @@ AWS Budgets 경보를 추가했다: `KF_BUDGET_EMAIL=… KF_BUDGET_USD=10 python
 
 ## 배포·갱신 방법
 
+배포는 origin에 push된 main만 기준으로 한다(`CLAUDE.md`). 메인 체크아웃이 `origin/main`과 같고 추적 파일에
+미커밋 변경이 없어야 `stage.py`와 `aws_setup.py data image function`이 돈다(`server/deploy/release.py`).
+워크트리나 다른 브랜치에서는 거절된다. 이미지 태그 끝에 커밋 해시가 붙는다.
+
 ```bash
 python server/build_albums.py                    # 앨범 목록·표지 → db/albums.json, db/covers/ (이미지에 포함)
 python server/fetch_store_covers.py              # 판매처 커버 → db/store_covers/ (db/album_links.json, 이미지에 포함)

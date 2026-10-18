@@ -14,6 +14,9 @@ build/runtime/ (S3 runtime/):
   rhythm.npz                              rhythm index
   pair.npz.parts/                         pair-hash index (poc/pairfp.py build, 0.2 GB), as zstd parts
 Lambda reads rarely used image files at ~7 MB/s, so these are not in the image.
+
+Runs only in the main checkout at origin/main (release.py, CLAUDE.md) and records that commit in
+build/commit.txt, which aws_setup.py checks before uploading.
 """
 from __future__ import annotations
 
@@ -24,6 +27,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "poc"))
 from common import DB_DIR, MUSIC_DIR, PANAKO_JAR, ROOT, list_audio  # noqa: E402
+from release import STAGED, pushed_main  # noqa: E402
 
 HERE = Path(__file__).resolve().parent
 OUT = ROOT / "build" / "lambda"
@@ -53,6 +57,8 @@ def split_compress(src: Path, out: Path) -> None:
 def main() -> None:
     import lmdb
 
+    commit = pushed_main()
+    STAGED.unlink(missing_ok=True)  # set again only once staging succeeds
     app = OUT / "app"
     for sub in ("poc", "server", "db"):
         shutil.rmtree(app / sub, ignore_errors=True)
@@ -98,6 +104,8 @@ def main() -> None:
         size = sum(p.stat().st_size for p in d.rglob("*") if p.is_file())
         print(f"{d}: {size / 1e9:.2f} GB")
     print(f"{len(catalog['files'])} library keys")
+    STAGED.write_text(commit)
+    print("staged from", commit[:7])
 
 
 if __name__ == "__main__":

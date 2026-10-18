@@ -12,6 +12,9 @@ budget step adds an e-mail alert on this project's costs only: it activates the 
 allocation tag (a billing setting; it changes no resource) and filters the budget on
 Project=krump-finder, so the account's other resources are not counted. Not part of `all`.
 
+data, image and function run only from main as pushed to origin, on a build staged from that commit
+(release.py, CLAUDE.md); the image tag ends with the commit.
+
 Every step only creates what is missing (or updates the function's code/config), never touches
 resources it did not create, and tags everything Project=krump-finder. The API key is generated
 once into build/api_key.txt (not in git) and set as the function's KF_API_KEY.
@@ -28,6 +31,8 @@ from pathlib import Path
 
 import boto3
 from botocore.exceptions import ClientError
+
+from release import require_staged
 
 ROOT = Path(__file__).resolve().parents[2]
 REGION = "ap-northeast-2"
@@ -80,6 +85,7 @@ def bucket() -> None:
 def data() -> None:
     """Upload build/runtime/ (stage.py) to s3://BUCKET/runtime/, skipping unchanged files
     (same MD5 for single-part objects, same size for multipart ones)."""
+    require_staged()
     import hashlib
     from boto3.s3.transfer import TransferConfig
     config = TransferConfig(max_concurrency=4, multipart_threshold=64 << 20)
@@ -114,7 +120,7 @@ def image() -> str:
         "rulePriority": 1, "description": "keep the last 3 images",
         "selection": {"tagStatus": "any", "countType": "imageCountMoreThan", "countNumber": 3},
         "action": {"type": "expire"}}]}))
-    tag = time.strftime("%Y%m%d-%H%M%S")
+    tag = time.strftime("%Y%m%d-%H%M%S") + "-" + require_staged()[:7]
     uri = f"{repo_uri()}:{tag}"
     subprocess.run(["docker", "build", "--platform", "linux/amd64", "--provenance=false", "-t", uri,
                     str(ROOT / "build" / "lambda")], check=True)
@@ -163,6 +169,9 @@ def role_arn() -> str:
 def function() -> None:
     uri_file = ROOT / "build" / "image_uri.txt"
     uri = uri_file.read_text().strip()
+    head = require_staged()
+    if not uri.endswith("-" + head[:7]):
+        sys.exit(f"Refusing to deploy: {uri.rsplit(':', 1)[-1]} was not built from origin/main {head[:7]}. Run the image step first.")
     env = {"Variables": {"KF_BUCKET": BUCKET, "KF_API_KEY": api_key(), "KF_DATA_PREFIX": DATA_PREFIX,
                          "RHYTHM_THREADS": str(RHYTHM_THREADS)}}
     arn = role_arn()
@@ -260,5 +269,8 @@ STEPS = {"bucket": bucket, "data": data, "image": image, "function": function, "
 ALL = ("bucket", "data", "image", "function")
 
 if __name__ == "__main__":
-    for step in (ALL if sys.argv[1:] == ["all"] else sys.argv[1:]):
+    steps = ALL if sys.argv[1:] == ["all"] else sys.argv[1:]
+    if {"data", "image", "function"} & set(steps):
+        require_staged()  # deploys come only from main as pushed to origin (release.py)
+    for step in steps:
         STEPS[step]()
