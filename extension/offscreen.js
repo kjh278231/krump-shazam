@@ -60,7 +60,7 @@ async function identify(blob, params) {
   return res.json();
 }
 
-async function record({ streamId, duration, tabTitle, tabUrl }) {
+async function record({ streamId, duration, tabTitle, tabUrl, share }) {
   if (recorder?.state === 'recording') throw new Error('Already recording');
   const stream = await navigator.mediaDevices.getUserMedia({
     audio: { mandatory: { chromeMediaSource: 'tab', chromeMediaSourceId: streamId } },
@@ -76,7 +76,9 @@ async function record({ streamId, duration, tabTitle, tabUrl }) {
   fetch(`${SERVER.url}/health`).catch(() => {}).finally(() => { warm = true; });
 
   const chunks = [];
-  const page = { title: tabTitle || '', url: tabUrl || '' };
+  // The tab's title and URL go with the audio only when the user agreed to share recordings
+  // (the server then keeps them; otherwise it deletes the audio after the search).
+  const page = share ? { title: tabTitle || '', url: tabUrl || '', share: 1 } : {};
   recorder = new MediaRecorder(stream, { mimeType: 'audio/webm;codecs=opus', audioBitsPerSecond: 160000 });
   recorder.startedAt = Date.now();
   recorder.ondataavailable = (e) => e.data.size && chunks.push(e.data);

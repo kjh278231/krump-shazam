@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>개인정보처리방침</title>
+<link rel="icon" href="icons/icon32.png">
+<style>
+:root {
+  --bg: #f7f5f1; --fg: #1a1817; --muted: #5c5650; --line: #ddd7cf; --accent: #c2410c;
+  --font: 'IBM Plex Sans KR', 'Malgun Gothic', 'Apple SD Gothic Neo', system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --bg: #111010; --fg: #f2eee8; --muted: #a39c94; --line: #2a2725; --accent: #ff7a45; }
+}
+:root[data-theme="dark"] { --bg: #111010; --fg: #f2eee8; --muted: #a39c94; --line: #2a2725; --accent: #ff7a45; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.7 var(--font); }
+main { max-width: 760px; margin: 0 auto; padding: 40px 16px 64px; }
+h1 { font-size: 30px; line-height: 1.2; margin: 0 0 6px; }
+h2 { font-size: 18px; margin: 32px 0 8px; padding-top: 20px; border-top: 1px solid var(--line); }
+p, li { margin: 6px 0; }
+ul { padding-left: 20px; }
+.meta { color: var(--muted); font-size: 13px; }
+a { color: var(--accent); }
+table { width: 100%; border-collapse: collapse; font-size: 14px; margin: 8px 0; }
+th, td { text-align: left; vertical-align: top; padding: 8px; border-bottom: 1px solid var(--line); }
+th { color: var(--muted); font-weight: 600; white-space: nowrap; }
+.scroll { overflow-x: auto; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Krump Track Finder 개인정보처리방침</h1>
+  <p class="meta">시행일 2026년 10월 17일</p>
+
+  <p>Krump Track Finder(이하 “익스텐션”)는 브라우저 탭에서 재생 중인 음악을 듣고 크럼프 음악 라이브러리에서
+    같은 곡을 찾아 주는 Chrome 익스텐션입니다. 이 문서는 익스텐션이 어떤 정보를 서버로 보내고, 어떻게 쓰고
+    보관하는지 설명합니다. 익스텐션은 이 방침에 동의한 뒤에만 쓸 수 있습니다.</p>
+
+  <h2>1. 서버로 보내고 저장하는 정보</h2>
+  <p>사용자가 “현재 탭에서 찾기”를 누를 때만 아래 정보를 보냅니다. 그 밖에는 탭의 소리나 방문 기록을 읽지 않습니다.</p>
+  <div class="scroll">
+  <table>
+    <tr><th>정보</th><th>내용</th></tr>
+    <tr><td>탭 오디오 녹음</td><td>찾기를 누른 탭의 소리, 최대 45초</td></tr>
+    <tr><td>탭 제목과 주소(URL)</td><td>찾기를 누른 탭의 제목과 주소</td></tr>
+    <tr><td>검색 결과</td><td>찾은 곡, 점수, 검색 방식, 시각</td></tr>
+    <tr><td>결과 평가</td><td>“결과가 맞나요?”에 맞음/틀림을 누른 경우 그 응답</td></tr>
+  </table>
+  </div>
+  <p>이름, 이메일, 계정, 쿠키, 위치 같은 정보는 받지 않습니다. 저장된 녹음은 어떤 사람의 것인지 연결되지 않습니다.</p>
+
+  <h2>2. 쓰는 목적</h2>
+  <ul>
+    <li>녹음에서 곡을 찾아 결과를 보여 주기 위해</li>
+    <li>곡 찾기의 정확도를 높이기 위해(검색 기준 조정, 시험용 데이터)</li>
+  </ul>
+  <p>광고, 판매, 신용 평가 등 다른 목적으로 쓰지 않고, 다른 회사나 개인에게 팔거나 넘기지 않습니다.</p>
+
+  <h2>3. 저장 위치와 보관 기간</h2>
+  <ul>
+    <li>Amazon Web Services(AWS) 서울 리전의 비공개 저장소에 암호화해 저장합니다.</li>
+    <li>정확도 개선에 필요한 동안 보관하고, 필요 없어지면 지웁니다.</li>
+    <li>삭제를 원하면 아래 연락처로 녹음한 날짜·시각과 영상 주소를 알려 주세요. 해당 녹음을 찾아 지웁니다.</li>
+  </ul>
+
+  <h2>4. 브라우저에만 저장하는 정보</h2>
+  <p>동의 여부, 고른 녹음 길이, 진행 중인 찾기 상태, 라이브러리 앨범 목록은 사용자 브라우저(Chrome 저장소)에만 저장되고 서버로 보내지 않습니다.</p>
+
+  <h2>5. 외부 서비스</h2>
+  <ul>
+    <li>글꼴은 Google Fonts에서, 라이브러리 페이지의 앨범 커버는 판매처(Bandcamp 등)의 이미지 서버에서 불러옵니다. 이 서비스들은 일반 웹 요청처럼 IP 주소 등을 받을 수 있습니다.</li>
+    <li>“앨범 구매”나 “아티스트 보기”를 누르면 판매처 사이트가 열립니다. 그 사이트에서는 해당 사이트의 방침이 적용됩니다.</li>
+  </ul>
+
+  <h2>6. 권한</h2>
+  <ul>
+    <li><b>tabCapture</b>, <b>activeTab</b>, <b>offscreen</b>: 찾기를 누른 탭의 소리를 녹음합니다(녹음하는 동안에도 소리는 계속 들립니다).</li>
+    <li><b>storage</b>: 4번의 정보를 브라우저에 저장합니다.</li>
+    <li>서버 주소 접근: 녹음을 검색 서버로 보내고 결과를 받습니다.</li>
+  </ul>
+
+  <h2>7. 동의 철회</h2>
+  <p>팝업 아래의 “동의 철회”를 누르면 철회되고, 다시 동의하기 전까지 찾기를 쓸 수 없습니다. 이미 저장된 녹음의 삭제는 3번의 방법으로 요청해 주세요.</p>
+
+  <h2>8. 연락처와 변경</h2>
+  <p>문의와 삭제 요청: <a href="mailto:kjh960912@gmail.com">kjh960912@gmail.com</a></p>
+  <p>이 방침이 바뀌면 이 페이지에 시행일과 함께 알립니다.</p>
+</main>
+</body>
+</html>

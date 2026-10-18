@@ -3,7 +3,13 @@
 // ~10 s to answer the refresh.
 // SERVER ({ url, apiKey } of the deployed Lambda) comes from config.js.
 const $ = (id) => document.getElementById(id);
+const STORE_NAME = { bandcamp: '밴드캠프', knkrtworld: 'KNKRTWORLD', gumroad: 'Gumroad' };
+const OUT_ICON = '<svg aria-hidden="true" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M9 7h8v8"/></svg>';
+// Tiles for albums without cover art: [background, text].
+const TONES = [['#2b2320', '#e9d9c8'], ['#e6e1d6', '#111010'], ['#3a1712', '#ffb59b'],
+  ['#1f2a2e', '#cfe6ee'], ['#f2eee8', '#2a1410'], ['#2a2725', '#f2eee8']];
 let albums = [];
+let filter = 'all';  // all | buy | none
 const expanded = new Set();  // ids of albums the user opened
 
 const trackName = (key) => key.split('/').pop().replace(/\.[^.]+$/, '');
@@ -27,93 +33,119 @@ function status(text, error = false) {
 }
 
 // Text with every occurrence of q wrapped in <mark>.
-function highlighted(text, q) {
-  const span = document.createElement('span');
+function highlighted(tag, text, q) {
+  const el = document.createElement(tag);
   if (!q) {
-    span.textContent = text;
-    return span;
+    el.textContent = text;
+    return el;
   }
   const low = text.toLowerCase();
   let i = 0;
   for (let j = low.indexOf(q); j >= 0; j = low.indexOf(q, i)) {
-    span.append(text.slice(i, j));
+    el.append(text.slice(i, j));
     const m = document.createElement('mark');
     m.textContent = text.slice(j, j + q.length);
-    span.append(m);
+    el.append(m);
     i = j + q.length;
   }
-  span.append(text.slice(i));
-  return span;
+  el.append(text.slice(i));
+  return el;
 }
 
-const STORE_NAME = { bandcamp: '밴드캠프', knkrtworld: 'KNKRTWORLD', gumroad: 'Gumroad' };
+function tile(a) {
+  const t = document.createElement('div');
+  t.className = 'art';
+  t.setAttribute('role', 'img');
+  t.setAttribute('aria-label', `앨범 커버 없음: ${a.title}`);
+  let h = 0;
+  for (const c of a.id) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+  [t.style.background, t.style.color] = TONES[h % TONES.length];
+  t.textContent = a.title || '?';
+  return t;
+}
 
-// The album's purchase page, or the artist's page where the album itself was not found.
+// The store's large cover (loaded from its image CDN), else the small inlined one, else a tile.
+function art(a) {
+  const sources = [a.art, a.cover].filter(Boolean);
+  if (!sources.length) return tile(a);
+  const img = document.createElement('img');
+  img.className = 'art';
+  img.alt = `앨범 커버: ${a.title}`;
+  img.loading = 'lazy';
+  img.decoding = 'async';
+  let i = 0;
+  img.src = sources[0];
+  img.onerror = () => {
+    if (++i < sources.length) img.src = sources[i];
+    else img.replaceWith(tile(a));
+  };
+  return img;
+}
+
 function storeLink(store) {
   const link = document.createElement('a');
-  link.className = 'store';
+  const isAlbum = store.kind === 'album';
+  const name = STORE_NAME[store.store] || store.store;
+  link.className = `store ${isAlbum ? 'buy' : 'artist'}`;
   link.href = store.url;
   link.target = '_blank';
   link.rel = 'noopener';
-  const name = STORE_NAME[store.store] || store.store;
-  link.textContent = store.kind === 'album' ? '구매 ↗' : '아티스트 ↗';
-  link.title = store.kind === 'album' ? `${name}에서 앨범 구매` : `${name}의 아티스트 페이지 (앨범 페이지는 못 찾음)`;
+  link.title = isAlbum ? `${name}에서 앨범 구매` : `${name}의 아티스트 페이지 (앨범 판매 페이지는 못 찾음)`;
+  link.innerHTML = OUT_ICON;
+  link.prepend(isAlbum ? '구매' : '아티스트');
   return link;
 }
 
 function card(a, q, trackHit) {
-  const el = document.createElement('section');
+  const el = document.createElement('article');
   el.className = 'album';
-  const head = document.createElement('button');
-  head.setAttribute('aria-expanded', 'false');
-  let cover;
-  if (a.cover) {
-    cover = document.createElement('img');
-    cover.src = a.cover;
-    cover.alt = '';
-  } else {
-    cover = document.createElement('div');
-    cover.textContent = (a.title || '?').trim().charAt(0).toUpperCase();
-  }
-  cover.className = 'cover';
-  const info = document.createElement('div');
-  info.className = 'info';
-  const title = highlighted(a.title, q);
-  title.className = 'title';
+  const meta = document.createElement('div');
+  meta.className = 'meta';
+  const title = highlighted('h2', a.title, q);
   title.title = a.title;
-  const artist = highlighted(a.artist || '아티스트 정보 없음', a.artist ? q : '');
-  artist.className = 'artist';
-  const count = document.createElement('div');
-  count.className = 'count';
-  count.textContent = `${a.tracks.length}곡`;
-  info.append(title, artist, count);
-  head.append(cover, info);
-  const row = document.createElement('div');
-  row.className = 'row';
-  row.append(head);
-  if (a.store?.url?.startsWith('https://')) row.append(storeLink(a.store));
-  el.append(row);
+  const sub = document.createElement('div');
+  sub.className = 'sub';
+  sub.append(highlighted('span', a.artist || '아티스트 정보 없음', a.artist ? q : ''), ` · ${a.tracks.length}곡`);
+  meta.append(title, sub);
+
+  const actions = document.createElement('div');
+  actions.className = 'actions';
+  const more = document.createElement('button');
+  more.type = 'button';
+  more.textContent = '곡 목록';
+  more.setAttribute('aria-expanded', 'false');
+  actions.append(more);
+  if (a.store?.url?.startsWith('https://')) {
+    actions.append(storeLink(a.store));
+  } else {
+    const none = document.createElement('span');
+    none.className = 'no-store';
+    none.textContent = '판매처 없음';
+    actions.append(none);
+  }
+  el.append(art(a), meta, actions);
 
   let list = null;
   // matchesOnly: an album found through track names lists just those (a click shows all).
   const toggle = (show, matchesOnly = false) => {
-    head.setAttribute('aria-expanded', String(show && !matchesOnly));
+    more.setAttribute('aria-expanded', String(show && !matchesOnly));
+    more.textContent = show && !matchesOnly ? '접기' : '곡 목록';
+    el.classList.toggle('open', show && !matchesOnly);
     list?.remove();
     list = null;
     if (!show) return;
-    list = document.createElement('ul');  // file names mostly carry their own track numbers
+    list = document.createElement('ol');  // file names mostly carry their own track numbers
     list.className = 'tracks';
     trackNames(a).forEach((name, i) => {
       if (matchesOnly && !name.toLowerCase().includes(q)) return;
-      const li = document.createElement('li');
-      li.append(highlighted(name, q));
+      const li = highlighted('li', name, q);
       li.title = a.tracks[i];
       list.append(li);
     });
     el.append(list);
   };
-  head.onclick = () => {
-    const show = head.getAttribute('aria-expanded') !== 'true';
+  more.onclick = () => {
+    const show = more.getAttribute('aria-expanded') !== 'true';
     show ? expanded.add(a.id) : expanded.delete(a.id);
     toggle(show);
   };
@@ -128,6 +160,8 @@ function render() {
   box.textContent = '';
   let shown = 0;
   for (const a of albums) {
+    if (filter === 'buy' && !a.store) continue;
+    if (filter === 'none' && a.store) continue;
     const own = !q || a.title.toLowerCase().includes(q) || a.artist.toLowerCase().includes(q);
     const trackHit = !own && trackNames(a).some((n) => n.toLowerCase().includes(q));
     if (!own && !trackHit) continue;
@@ -140,10 +174,20 @@ function render() {
     p.textContent = '검색 결과가 없습니다.';
     box.append(p);
   }
-  const tracks = albums.reduce((n, a) => n + a.tracks.length, 0);
-  $('summary').textContent = albums.length
-    ? `앨범 ${albums.length.toLocaleString()}개 · ${tracks.toLocaleString()}곡${q ? ` · ${shown}개 표시` : ''}`
-    : '';
+  const stats = $('summary');
+  stats.textContent = '';
+  if (albums.length) {
+    const tracks = albums.reduce((n, a) => n + a.tracks.length, 0);
+    const linked = albums.filter((a) => a.store).length;
+    for (const [n, label] of [[albums.length, '앨범'], [tracks, '곡'], [linked, '구매 링크']]) {
+      const s = document.createElement('span');
+      const b = document.createElement('strong');
+      b.textContent = n.toLocaleString();
+      s.append(b, label);
+      stats.append(s);
+    }
+  }
+  $('shown').textContent = albums.length ? `${shown.toLocaleString()}개 표시` : '';
 }
 
 async function load() {
@@ -176,4 +220,11 @@ async function load() {
 }
 
 $('search').addEventListener('input', render);
+for (const b of $('filters').querySelectorAll('button')) {
+  b.onclick = () => {
+    filter = b.dataset.f;
+    for (const o of $('filters').querySelectorAll('button')) o.setAttribute('aria-pressed', String(o === b));
+    render();
+  };
+}
 load();

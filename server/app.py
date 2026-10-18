@@ -3,9 +3,10 @@
 Run locally:  python server/app.py            (listens on http://127.0.0.1:8765)
 On AWS Lambda the same app runs in a container (server/deploy/, docs/lambda-deployment.md).
 
-Every final query is kept: locally under recordings/ (WAV + row in recordings/log.csv, a valid
+A final query is kept only when the user agreed to share recordings (the extension sends share=1;
+docs/privacy-policy.md): locally under recordings/ (WAV + row in recordings/log.csv, a valid
 poc/evaluate.py manifest once the popup's feedback fills in `expected`); with KF_BUCKET set, in
-S3 under recordings/ (WAV + one JSON per query).
+S3 under recordings/ (WAV + one JSON per query). Otherwise the audio is deleted after the search.
 
 Environment (all optional; unset = local behaviour):
   KF_BUCKET       S3 bucket for recordings and the preview MP3s (previews/<library key>.mp3)
@@ -203,6 +204,15 @@ def store_link(album_id: str) -> dict | None:
     return {k: s[k] for k in ("url", "kind", "store")} if s and s.get("url") else None
 
 
+def store_art(album_id: str) -> str | None:
+    """The store's cover at a size for the library page's large tiles (Bandcamp _16 = 700 px), loaded
+    by the page from the store's image CDN; the inlined thumbnails are 120 px."""
+    url = (STORES.get(album_id) or {}).get("cover")
+    if url and "bcbits.com" in url:
+        url = url.rsplit("_", 1)[0] + "_16.jpg"
+    return url or None
+
+
 def album_info(keys: list[str], ids: list[int]) -> dict | None:
     """The album of a found song (its library keys and Panako ids, best first): the first album
     with a store link, else the first album at all. The song's own file's album comes first, then
@@ -279,17 +289,19 @@ def resample(x: np.ndarray, sr_in: int, sr_out: int) -> np.ndarray:
 
 
 @app.post("/identify", dependencies=[Depends(check_key)])
-async def identify(request: Request, title: str = "", url: str = "", partial: bool = False) -> dict:
-    """partial=1: a mid-recording check from the extension. Fingerprint only (fast); the
-    recording is kept and logged only when it is confirmed, since then it is the final answer.
+async def identify(request: Request, title: str = "", url: str = "", partial: bool = False,
+                   share: bool = False) -> dict:
+    """partial=1: a mid-recording check from the extension; the recording continues unless the
+    answer is final. share=1: the user agreed to share recordings, so the final query is kept
+    with the tab's title and URL (title and url are sent only then); else nothing is stored.
 
     The work runs on the thread pool so concurrent requests from several users overlap: the
     Panako server handles queries on its own Java threads and numpy releases the GIL."""
     body = await request.body()
-    return await run_in_threadpool(identify_audio, body, title, url, partial)
+    return await run_in_threadpool(identify_audio, body, title, url, partial, share)
 
 
-def identify_audio(body: bytes, title: str, url: str, partial: bool) -> dict:
+def identify_audio(body: bytes, title: str, url: str, partial: bool, share: bool = False) -> dict:
     if len(body) < 1000:
         raise HTTPException(400, "recording is empty (is the tab playing audio?)")
     TMP_DIR.mkdir(parents=True, exist_ok=True)
@@ -401,14 +413,17 @@ def identify_audio(body: bytes, title: str, url: str, partial: bool) -> dict:
         top = out_songs[0]
         top["album"] = album_info([top["path"], *(m["path"] for m in top["also_in"])], top_ids)
 
-    save_record({"clip": str(wav), "condition": "browser", "expected": "", "offset": "",
-                 "match": out_songs[0]["path"] if out_songs else "",
-                 "score": out_songs[0]["score"] if out_songs else 0,
-                 "second": out_songs[1]["score"] if len(out_songs) > 1 else 0, "method": method,
-                 "feedback": "", "page_title": title, "page_url": url, "time": stamp}, wav)
+    if share:
+        save_record({"clip": str(wav), "condition": "browser", "expected": "", "offset": "",
+                     "match": out_songs[0]["path"] if out_songs else "",
+                     "score": out_songs[0]["score"] if out_songs else 0,
+                     "second": out_songs[1]["score"] if len(out_songs) > 1 else 0, "method": method,
+                     "feedback": "", "page_title": title, "page_url": url, "time": stamp}, wav)
+    else:
+        wav.unlink()
 
     return {
-        "id": stamp,
+        "id": stamp if share else None,  # feedback needs a stored query
         "verdict": result,
         "reason": reason,
         "method": method,
@@ -508,10 +523,12 @@ def albums() -> Response:
             if not tracks:
                 continue
             out.append({**{k: v for k, v in a.items() if k != "ids"}, "tracks": tracks, "cover": cover_uri(a["id"], store_first=False),
-                        "store": store_link(a["id"])})
+                        "store": store_link(a["id"]), "art": store_art(a["id"])})
         albums_body = json.dumps({"albums": out}, ensure_ascii=False).encode()
     return Response(albums_body, media_type="application/json")
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host=os.environ.get("HOST", "127.0.0.1"), port=int(os.environ.get("PORT", "8765")))
+    # No access log: request URLs carry the tab's title and URL (docs/privacy-policy.md).
+    uvicorn.run(app, host=os.environ.get("HOST", "127.0.0.1"), port=int(os.environ.get("PORT", "8765")),
+                access_log=False)

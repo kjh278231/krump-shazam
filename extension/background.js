@@ -21,12 +21,14 @@ async function setState(patch) {
 
 async function fail(error) {
   await setState({ status: 'error', error });
-  badge('ERR', '#d93025');
+  badge('ERR', '#ff5a1f');
 }
 
 function badge(text, color) {
   chrome.action.setBadgeText({ text });
   if (color) chrome.action.setBadgeBackgroundColor({ color });
+  // Dark text on the orange and amber badges, light on the grey ones.
+  if (color) chrome.action.setBadgeTextColor?.({ color: ['#ff5a1f', '#f2b33d'].includes(color) ? '#111010' : '#f2eee8' });
 }
 
 chrome.runtime.onMessage.addListener((msg) => {
@@ -39,7 +41,7 @@ chrome.runtime.onMessage.addListener((msg) => {
           status: 'recording', startedAt: Date.now(), duration: msg.duration,
           tabTitle: msg.tabTitle, tabUrl: msg.tabUrl, result: null, error: null, partial: null,
         });
-        badge('REC', '#d93025');
+        badge('REC', '#ff5a1f');
         // msg's own target/type must not override these, so spread it first.
         const ack = await chrome.runtime.sendMessage({ ...msg, target: 'offscreen', type: 'record' }).catch(() => null);
         if (!ack?.ok) await fail('녹음을 시작하지 못했습니다. 다시 시도해 주세요.');
@@ -55,13 +57,13 @@ chrome.runtime.onMessage.addListener((msg) => {
         break;
       case 'searching':
         await setState({ status: 'searching' });
-        badge('...', '#5f6368');
+        badge('...', '#3a3532');
         break;
       case 'result': {
         await setState({ status: 'done', result: msg.result });
         const v = msg.result.verdict;
         // Found / not found only; an unconfirmed find keeps the amber colour.
-        badge(v === 'fail' ? 'X' : 'OK', v === 'confirmed' ? '#188038' : v === 'check' ? '#e37400' : '#5f6368');
+        badge(v === 'fail' ? 'X' : 'OK', v === 'confirmed' ? '#ff5a1f' : v === 'check' ? '#f2b33d' : '#3a3532');
         break;
       }
       case 'error':

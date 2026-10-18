@@ -1,46 +1,43 @@
 // SERVER ({ url, apiKey } of the deployed Lambda) comes from config.js; there is no settings UI.
+// One screen per state: 대기 → 찾는 중 → 찾음 / 찾음(확실하지 않음) / 못 찾음. The state lives in
+// chrome.storage.session (background.js), because the popup closes whenever it loses focus.
+// Searching needs the user's consent to the privacy policy (privacy.html): recordings are kept
+// on the server to improve accuracy. Without it only the consent screen is shown.
 const $ = (id) => document.getElementById(id);
 const authHeaders = () => ({ 'X-Api-Key': SERVER.apiKey });
-// Only the outcome is shown (찾는 중 → 찾음 / 못 찾음), not how the search got there.
-const VERDICT_TEXT = {
-  confirmed: '찾음',
-  check: '찾음',
-  fail: '못 찾음',
-};
-// check = a rhythm or low-score fingerprint candidate: right most of the time, but not always.
-const CHECK_NOTE = '확실하지 않아요. 미리듣기로 확인해 주세요.';
-const FAIL_NOTE = '음악이 잘 들리는 구간에서 다시 시도해 보세요.';
+const LENGTHS = [10, 20, 30, 45];
 const STORE_NAME = { bandcamp: '밴드캠프', knkrtworld: 'KNKRTWORLD', gumroad: 'Gumroad' };
+const ICON = {
+  listen: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M6.3 6.3a8 8 0 0 0 0 11.4M17.7 6.3a8 8 0 0 1 0 11.4"/></svg>',
+  stop: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12" rx="1.5"/></svg>',
+  again: '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>',
+  check: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+  warn: '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><path d="M12 7v6"/><path d="M12 17h.01"/></svg>',
+  play: '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l10.5-6.5z"/></svg>',
+  pause: '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>',
+  out: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M9 7h8v8"/></svg>',
+};
 
-// The album's purchase page, or the artist's page where the album itself was not found.
-function storeLink(store) {
-  const a = document.createElement('a');
-  a.className = 'buy';
-  a.href = store.url;
-  a.target = '_blank';
-  a.rel = 'noopener';
-  const name = STORE_NAME[store.store] || store.store;
-  a.textContent = store.kind === 'album' ? `${name}에서 앨범 구매 ↗` : `${name}에서 아티스트 보기 ↗`;
-  a.onclick = (e) => {
-    e.preventDefault();
-    chrome.tabs.create({ url: store.url });
-  };
-  return a;
-}
+let duration = 30;
+let consent = false;  // chrome.storage.local 'consent'
+const openPage = (file) => chrome.tabs.create({ url: chrome.runtime.getURL(file) });
+let tick = null;
+let serverDot = '';  // '', 'on' or 'off' (checkServer)
 
-function coverOf(album) {
-  if (album?.cover) {
-    const img = document.createElement('img');
-    img.src = album.cover;
-    img.alt = '';
-    img.className = 'cover';
-    return img;
+// h('div', { class: 'x', onclick: f }, child, 'text', ...): a DOM element. `html` sets a static
+// icon; everything else is text.
+function h(tag, attrs = {}, ...children) {
+  const el = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (v == null || v === false) continue;
+    if (k === 'html') el.innerHTML = v;
+    else if (k.startsWith('on')) el.addEventListener(k.slice(2), v);
+    else el.setAttribute(k, v === true ? '' : v);
   }
-  const el = document.createElement('div');
-  el.className = 'cover';
-  el.textContent = '♪';
+  el.append(...children.flat().filter((c) => c != null && c !== false));
   return el;
 }
+const icon = (name) => h('span', { html: ICON[name], 'aria-hidden': 'true', style: 'display:contents' });
 
 function fmt(sec) {
   const s = Math.max(0, Math.round(sec));
@@ -48,146 +45,283 @@ function fmt(sec) {
 }
 
 async function checkServer() {
-  // Also wakes a cold Lambda while the user is still picking a duration.
-  $('server').className = 'dot';
+  // Also wakes a cold Lambda while the user is still picking a length.
   try {
-    const r = await fetch(`${SERVER.url}/health`);
-    $('server').className = r.ok ? 'dot on' : 'dot off';
-    $('server').title = r.ok ? '서버 연결됨' : '서버 응답 오류';
+    serverDot = (await fetch(`${SERVER.url}/health`)).ok ? 'on' : 'off';
   } catch {
-    $('server').className = 'dot off';
-    $('server').title = '서버 연결 안 됨';
+    serverDot = 'off';
+  }
+  const dot = document.querySelector('.dot');
+  if (dot) {
+    dot.className = `dot ${serverDot}`;
+    dot.parentElement.title = serverDot === 'on' ? '서버 연결됨' : '서버에 연결할 수 없음';
   }
 }
 
 async function start() {
+  if (!consent) return;
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   let streamId;
   try {
     streamId = await chrome.tabCapture.getMediaStreamId({ targetTabId: tab.id });
   } catch (e) {
-    showError(`탭 오디오를 캡처할 수 없습니다: ${e.message}`);
+    render({ status: 'error', error: `탭 오디오를 캡처할 수 없습니다: ${e.message}` });
     return;
   }
   chrome.runtime.sendMessage({
-    target: 'background', type: 'start', streamId,
-    duration: Number($('duration').value), tabTitle: tab.title, tabUrl: tab.url,
+    target: 'background', type: 'start', streamId, duration, tabTitle: tab.title, tabUrl: tab.url, share: true,
   });
 }
 
-function showError(text) {
-  $('status').className = 'error';
-  $('status').textContent = text;
+function toIdle() {
+  chrome.action.setBadgeText({ text: '' });
+  chrome.storage.session.set({ state: { status: 'idle' } });
+}
+
+// Header right side: library (with the server dot), REC, or back to the start.
+function headAction(state) {
+  const box = $('head-action');
+  box.textContent = '';
+  if (state.status === 'recording' || state.status === 'searching') {
+    box.append(h('span', { class: 'rec' }, 'REC'));
+  } else if (state.status === 'done' && state.result?.verdict !== 'fail') {
+    box.append(h('button', { class: 'chip-btn', onclick: toIdle }, icon('again'), '다시 찾기'));
+  } else {
+    box.append(h('button', {
+      class: 'chip-btn', title: '라이브러리에 있는 앨범 보기',
+      onclick: () => openPage('library.html'),
+    }, h('span', { class: `dot ${serverDot}`, 'aria-hidden': 'true' }), '라이브러리'));
+  }
 }
 
 function render(state = {}) {
-  const busy = state.status === 'recording' || state.status === 'searching';
-  $('start').hidden = busy;
-  $('stop').hidden = state.status !== 'recording';
-  $('duration').disabled = busy;
-  $('status').className = '';
-  $('status').textContent = '';
-  $('result').textContent = '';
-
-  if (busy) {
-    $('status').textContent = '찾는 중…';
-  } else if (state.status === 'error') {
-    showError(state.error);
-  } else if (state.status === 'done' && state.result) {
-    renderResult(state.result, state);
-  }
+  clearInterval(tick);
+  headAction(state);
+  const view = $('view');
+  view.textContent = '';
+  const parts = state.status === 'recording' || state.status === 'searching' ? listening(state)
+    : state.status === 'done' && state.result ? result(state.result, state)
+      : consent ? idle(state.status === 'error' ? state.error : '') : consentScreen();
+  view.append(...parts.filter(Boolean));
 }
 
-function renderResult(r, state) {
-  const box = $('result');
-  const v = document.createElement('div');
-  v.className = `verdict ${r.verdict}`;
-  v.textContent = VERDICT_TEXT[r.verdict];
-  box.append(v);
-  const help = r.verdict === 'fail' ? FAIL_NOTE : r.verdict === 'check' ? CHECK_NOTE : '';
-  if (help) {
-    const why = document.createElement('div');
-    why.className = r.verdict === 'fail' ? 'reason muted' : 'reason';
-    why.textContent = help;
-    box.append(why);
-  }
-  $('status').textContent = state.tabTitle || '';
-
-  // Only the best song is shown; the rest of the candidate list stays server-side.
-  r.songs.slice(0, 1).forEach((m) => {
-    const el = document.createElement('div');
-    el.className = 'match';
-    el.innerHTML = `
-      <div class="top">
-        <div class="text"><div class="name"></div><div class="album"></div><div class="meta"></div></div>
-      </div>
-      <div class="actions">
-        <button data-act="play">▶ 10초 미리듣기</button>
-        <button data-act="yes">✔ 맞음</button>
-        <button data-act="no">✘ 틀림</button>
-      </div>`;
-    const album = m.album;
-    el.querySelector('.top').prepend(coverOf(album));
-    // "Artist - Album - 02 Song" -> "02 Song": the album line below names the album.
-    let name = m.file.replace(/\.[^.]+$/, '');
-    const cut = album ? name.lastIndexOf(`${album.title} - `) : -1;
-    if (cut >= 0 && cut + album.title.length + 3 < name.length) name = name.slice(cut + album.title.length + 3);
-    el.querySelector('.name').textContent = name;
-    el.querySelector('.album').textContent = album
-      ? [album.title, album.artist].filter(Boolean).join(' · ') : m.folder;
-    el.querySelector('.meta').textContent = `곡의 ${fmt(m.match_start)}부터`;
-    if (album?.store?.url?.startsWith('https://')) el.querySelector('.top').after(storeLink(album.store));
-    el.querySelector('[data-act=play]').onclick = (e) => play(m, e.currentTarget);
-    el.querySelector('[data-act=yes]').onclick = () => feedback(r.id, true, m.path, el);
-    el.querySelector('[data-act=no]').onclick = () => feedback(r.id, false, m.path, el);
-    box.append(el);
-  });
+async function setConsent(value) {
+  consent = value;
+  try { await chrome.storage.local.set({ consent: value }); } catch {}
+  const { state } = await chrome.storage.session.get('state');
+  render(state);
 }
 
-async function play(m, button) {
-  // The server cuts a 10 s excerpt from the matched spot; full files are never sent.
-  // Fetched rather than set as <audio src> because the request needs the API key header.
-  const label = button.textContent;
-  button.disabled = true;
-  button.textContent = '불러오는 중…';
-  try {
-    const r = await fetch(
-      `${SERVER.url}/preview?path=${encodeURIComponent(m.path)}&start=${Math.max(0, m.match_start).toFixed(1)}`,
-      { headers: authHeaders() });
-    if (!r.ok) throw new Error(r.status);
-    const p = $('player');
-    if (p.src.startsWith('blob:')) URL.revokeObjectURL(p.src);
-    p.src = URL.createObjectURL(await r.blob());
-    p.hidden = false;
+function consentScreen() {
+  return [
+    h('div', {}, h('h1', { class: 'headline' }, '시작하기 전에'),
+      h('div', { class: 'sub' }, '곡을 찾으려면 아래 내용에 동의해 주세요.')),
+    h('ul', { class: 'tips' },
+      h('li', {}, '찾기를 누르면 이 탭의 소리(최대 45초)와 탭 제목·주소를 서버로 보내요.'),
+      h('li', {}, '보낸 녹음은 서버에 저장해 곡 찾기 정확도를 높이는 데 써요. 팔거나 다른 곳에 넘기지 않아요.'),
+      h('li', {}, '이름·이메일·계정 같은 정보는 받지 않아요.')),
+    h('button', { class: 'linkish', onclick: () => openPage('privacy.html') }, '개인정보처리방침 전체 보기'),
+    h('button', { class: 'primary', onclick: () => setConsent(true) }, icon('check'), '동의하고 시작'),
+    h('div', { class: 'hint' }, '동의하지 않으면 찾기를 쓸 수 없어요.'),
+  ];
+}
+
+function idle(error) {
+  const lengths = h('div', { class: 'lengths' });
+  const pick = (s) => {
+    duration = s;
+    try { chrome.storage.local.set({ duration: s }); } catch {}
+    for (const b of lengths.children) b.setAttribute('aria-pressed', String(Number(b.dataset.s) === s));
+  };
+  for (const s of LENGTHS) {
+    lengths.append(h('button', { 'data-s': s, 'aria-pressed': String(s === duration), onclick: () => pick(s) }, `${s}초`));
+  }
+  return [
+    h('div', {}, h('h1', { class: 'headline' }, '지금 나오는 트랙'),
+      h('div', { class: 'sub' }, '이 탭의 소리를 듣고 크럼프 라이브러리에서 찾아요.')),
+    h('div', { role: 'group', 'aria-label': '최대 녹음 길이' }, h('div', { class: 'label' }, '최대 녹음 길이'), lengths),
+    error && h('div', { class: 'error', role: 'alert' }, error),
+    h('button', { class: 'primary', onclick: start }, icon('listen'), '현재 탭에서 찾기'),
+    h('div', { class: 'hint' }, '곡이 확실해지면 바로 멈춰요 · 팝업을 닫아도 계속 들어요'),
+    h('div', { class: 'foot' },
+      h('button', { class: 'linkish', onclick: () => openPage('privacy.html') }, '개인정보처리방침'),
+      h('span', { 'aria-hidden': 'true' }, '·'),
+      h('button', { class: 'linkish', onclick: () => setConsent(false) }, '동의 철회')),
+  ];
+}
+
+function listening(state) {
+  const searching = state.status === 'searching';
+  const time = h('span', { class: 'num' });
+  const fill = h('div');
+  const update = () => {
+    const total = state.duration || 30;
+    const t = searching ? total : Math.min(total, (Date.now() - (state.startedAt || Date.now())) / 1000);
+    time.textContent = searching ? '검색 중' : `${fmt(t)} / ${fmt(total)}`;
+    fill.style.width = `${(t / total) * 100}%`;
+  };
+  update();
+  if (!searching) tick = setInterval(update, 500);
+  const eq = h('div', { class: 'eq', 'aria-hidden': 'true' }, ...Array.from({ length: 7 }, () => h('span')));
+  return [
+    h('div', { class: 'listen-head' },
+      h('div', {}, h('h1', { class: 'headline' }, '찾는 중…'),
+        h('div', { class: 'sub' }, searching ? '들은 소리 전체로 마지막 검색을 하고 있어요.' : '곡이 확실해지면 바로 멈춰요.')),
+      eq),
+    h('div', { class: 'panel' },
+      h('div', { class: 'panel-row' }, h('span', {}, '듣는 탭'), time),
+      h('div', { class: 'tab-title', title: state.tabTitle || '' }, state.tabTitle || '현재 탭'),
+      h('div', { class: 'bar', 'aria-hidden': 'true' }, fill)),
+    searching
+      ? h('button', { class: 'secondary', disabled: true }, '검색 중…')
+      : h('button', { class: 'secondary', onclick: () => chrome.runtime.sendMessage({ target: 'background', type: 'stop' }) },
+        icon('stop'), '지금 멈추고 검색'),
+  ];
+}
+
+function verdictRow(kind, text, state) {
+  return h('div', { class: 'verdict' },
+    h('span', { class: `badge ${kind}` }, kind === 'found' ? icon('check') : kind === 'unsure' ? icon('warn') : null, text),
+    h('span', { class: 'tab', title: state.tabTitle || '' }, state.tabTitle || ''));
+}
+
+function result(r, state) {
+  if (r.verdict === 'fail' || !r.songs.length) {
+    return [
+      verdictRow('none', '못 찾음', state),
+      h('h1', { class: 'headline sm' }, '이 구간에선', h('br'), '못 찾았어요'),
+      h('ul', { class: 'tips' },
+        h('li', {}, '음악이 크게 들리는 구간에서 다시 시도해 보세요.'),
+        h('li', {}, 'MC·함성이 크면 녹음 길이를 45초로 늘려 보세요.'),
+        h('li', {}, '라이브러리에 없는 곡일 수도 있어요.')),
+      h('button', { class: 'primary', onclick: start }, icon('again'), '다시 찾기'),
+    ];
+  }
+  // check = a rhythm or low-score fingerprint candidate: right most of the time, but not always.
+  const unsure = r.verdict === 'check';
+  const m = r.songs[0];  // only the best song is shown
+  const album = m.album;
+  const store = album?.store?.url?.startsWith('https://') ? album.store : null;
+  // "Artist - Album - 02 Song" -> "02 Song": the album line names the album.
+  let name = m.file.replace(/\.[^.]+$/, '');
+  const cut = album ? name.lastIndexOf(`${album.title} - `) : -1;
+  if (cut >= 0 && cut + album.title.length + 3 < name.length) name = name.slice(cut + album.title.length + 3);
+  const albumTitle = album?.title || m.folder || '';
+
+  const cover = album?.cover
+    ? h('img', { class: 'cover', src: album.cover, alt: `앨범 커버: ${albumTitle}` })
+    : h('div', { class: 'cover', role: 'img', 'aria-label': '앨범 커버 없음' }, albumTitle || '♪');
+
+  const out = [
+    verdictRow(unsure ? 'unsure' : 'found', unsure ? '찾음 · 확실하지 않음' : '찾음', state),
+    unsure && h('div', { class: 'note' }, '확실하지 않아요. 미리듣기로 같은 곡인지 확인해 주세요.'),
+    h('div', { class: 'song' }, cover,
+      h('div', { class: 'song-text' },
+        h('div', {}, h('div', { class: 'track' }, name),
+          albumTitle && h('div', { class: 'album' }, albumTitle),
+          album?.artist && h('div', { class: 'artist' }, album.artist)),
+        h('span', { class: 'pos' }, `곡의 ${fmt(m.match_start)}부터`))),
+    preview(m, unsure),
+  ];
+  if (store) {
+    const shop = STORE_NAME[store.store] || store.store;
+    const isAlbum = store.kind === 'album';
+    out.push(h('a', {
+      class: isAlbum ? 'primary' : 'outline', href: store.url, target: '_blank', rel: 'noopener',
+      onclick: (e) => { e.preventDefault(); chrome.tabs.create({ url: store.url }); },
+    }, isAlbum ? `${shop}에서 앨범 구매` : `${shop}에서 아티스트 보기`, icon('out')));
+    if (!isAlbum) out.push(h('div', { class: 'hint' }, '이 앨범의 판매 페이지는 없어서 아티스트 페이지로 연결해요.'));
+  }
+  if (r.id) out.push(ask(r.id, m.path));  // only stored queries take feedback
+  return out;
+}
+
+// The server cuts a 10 s excerpt from the matched spot; full files are never sent. Fetched rather
+// than set as <audio src> because the request needs the API key header. An unsure find gets one
+// big button (listening is the point); a confirmed one a compact player.
+function preview(m, big) {
+  const p = $('player');
+  const btn = big ? h('button', { class: 'light' }) : h('button', { class: 'play' });
+  const time = h('span', {}, '0:10');
+  const fill = h('div');
+  let loaded = false;
+  const show = (state) => {
+    btn.disabled = state === 'loading';
+    const playing = state === 'playing';
+    btn.setAttribute('aria-label', playing ? '미리듣기 멈춤' : '10초 미리듣기 재생');
+    btn.textContent = '';
+    if (big) btn.append(icon(playing ? 'pause' : 'play'), state === 'loading' ? '불러오는 중…' : playing ? '멈춤' : '10초 미리듣기로 확인');
+    else btn.append(icon(playing ? 'pause' : 'play'));
+  };
+  p.ontimeupdate = () => {
+    time.textContent = `${fmt(p.currentTime)} / ${fmt(p.duration || 10)}`;
+    fill.style.width = `${(p.currentTime / (p.duration || 10)) * 100}%`;
+  };
+  p.onended = p.onpause = () => show('paused');
+  p.onplay = () => show('playing');
+  btn.addEventListener('click', async () => {
+    if (!p.paused) return p.pause();
+    if (!loaded) {
+      show('loading');
+      try {
+        const r = await fetch(
+          `${SERVER.url}/preview?path=${encodeURIComponent(m.path)}&start=${Math.max(0, m.match_start).toFixed(1)}`,
+          { headers: authHeaders() });
+        if (!r.ok) throw new Error(r.status);
+        if (p.src.startsWith('blob:')) URL.revokeObjectURL(p.src);
+        p.src = URL.createObjectURL(await r.blob());
+        loaded = true;
+      } catch (e) {
+        show('paused');
+        time.textContent = `불러오지 못함 (${e.message})`;
+        return;
+      }
+    }
+    p.currentTime = p.ended ? 0 : p.currentTime;
     p.play();
-  } catch (e) {
-    showError(`미리듣기를 불러오지 못했습니다 (${e.message})`);
-  } finally {
-    button.disabled = false;
-    button.textContent = label;
+  });
+  show('paused');
+  if (big) {
+    return h('div', { style: 'display:flex;flex-direction:column;gap:8px' }, btn,
+      h('div', { class: 'bar light', 'aria-hidden': 'true' }, fill));
   }
+  return h('div', { class: 'player' }, btn,
+    h('div', { class: 'player-info' },
+      h('div', { class: 'player-row' }, h('span', {}, '10초 미리듣기'), time),
+      h('div', { class: 'bar light', 'aria-hidden': 'true' }, fill)));
 }
 
-async function feedback(id, correct, path, el) {
+function ask(id, path) {
+  const row = h('div', { class: 'ask' });
+  const send = async (correct) => {
+    try {
+      const r = await fetch(`${SERVER.url}/feedback`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json', ...authHeaders() },
+        body: JSON.stringify({ id, correct, path }),
+      });
+      if (!r.ok) throw new Error(r.status);
+      row.textContent = `${correct ? '맞음' : '틀림'}으로 기록했어요. 고마워요!`;
+    } catch {
+      row.textContent = '기록하지 못했어요. 잠시 후 다시 눌러 주세요.';
+      setTimeout(() => { row.textContent = ''; row.append(...buttons()); }, 2500);
+    }
+  };
+  const buttons = () => [h('span', {}, '결과가 맞나요?'),
+    h('div', {}, h('button', { onclick: () => send(true) }, '맞음'), h('button', { onclick: () => send(false) }, '틀림'))];
+  row.append(...buttons());
+  return row;
+}
+
+(async () => {
   try {
-    const r = await fetch(`${SERVER.url}/feedback`, {
-      method: 'POST', headers: { 'Content-Type': 'application/json', ...authHeaders() },
-      body: JSON.stringify({ id, correct, path }),
-    });
-    if (!r.ok) throw new Error(r.status);
-    el.querySelector('.actions').outerHTML = `<div class="thanks">${correct ? '맞음' : '틀림'}으로 기록했습니다.</div>`;
-  } catch {
-    showError('피드백 저장 실패 (서버 확인)');
-  }
-}
-
-$('start').onclick = start;
-$('stop').onclick = () => chrome.runtime.sendMessage({ target: 'background', type: 'stop' });
-$('library').onclick = () => chrome.tabs.create({ url: chrome.runtime.getURL('library.html') });
-chrome.storage.session.get('state').then(({ state }) => render(state));
+    const { duration: saved, consent: agreed } = await chrome.storage.local.get(['duration', 'consent']);
+    if (LENGTHS.includes(saved)) duration = saved;
+    consent = agreed === true;
+  } catch {}
+  const { state } = await chrome.storage.session.get('state');
+  render(state);
+  checkServer();
+})();
 chrome.storage.onChanged.addListener((changes, area) => {
   if (area === 'session' && changes.state) render(changes.state.newValue);
 });
-// Old builds kept { url, apiKey } in storage; drop it.
-chrome.storage.local.remove('settings');
-checkServer();
