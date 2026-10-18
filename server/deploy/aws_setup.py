@@ -285,7 +285,7 @@ WARM_EVENT = {
 
 def warm() -> None:
     """Call /health every 5 minutes so an instance stays warm. A cold start takes 13-15 s since the pair
-    index (2026-10-18), 3-4 s past a recording's first check at 10.5 s. Each ping is ~1 GB-s ($0.15/month
+    index (2026-10-18), 3-4 s past a recording's first check at 10.5 s. A ping bills 3 ms (0.03 GB-s, ~$0.01/month
     for 8,640 pings), against ~$133/month for provisioned concurrency of one 10 GB instance. It keeps one
     instance warm only, and AWS still replaces instances every few hours."""
     pushed_main()
