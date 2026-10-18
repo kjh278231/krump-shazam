@@ -12,7 +12,7 @@ build/runtime/ (S3 runtime/):
   data.mdb.parts/                         fingerprint DB, copied without the Windows map-size
                                           preallocation (32 GB file -> ~1.2 GB), as zstd parts
   rhythm.npz                              rhythm index
-  pair.npz                                pair-hash index (poc/pairfp.py build, 0.2 GB)
+  pair.npz.parts/                         pair-hash index (poc/pairfp.py build, 0.2 GB), as zstd parts
 Lambda reads rarely used image files at ~7 MB/s, so these are not in the image.
 """
 from __future__ import annotations
@@ -33,9 +33,9 @@ PART_BYTES = 32 << 20
 
 
 def split_compress(src: Path, out: Path) -> None:
-    """data.mdb as independently zstd-compressed 32 MB parts plus manifest.json, so the function
-    can download and decompress them in parallel (about half the bytes; Lambda's S3 download
-    bandwidth, ~80 MB/s, is the cold-start bottleneck)."""
+    """A file (data.mdb, pair.npz) as independently zstd-compressed 32 MB parts plus manifest.json, so
+    the function can download and decompress them in parallel (data.mdb shrinks by half, pair.npz by
+    14%; Lambda's S3 download bandwidth, ~80 MB/s, is the cold-start bottleneck)."""
     import zstandard
 
     out.mkdir(parents=True)
@@ -79,7 +79,7 @@ def main() -> None:
     shutil.rmtree(runtime, ignore_errors=True)
     runtime.mkdir(parents=True)
     shutil.copy2(ROOT / "db" / "rhythm.npz", runtime / "rhythm.npz")
-    shutil.copy2(ROOT / "db" / "pair.npz", runtime / "pair.npz")
+    split_compress(ROOT / "db" / "pair.npz", runtime / "pair.npz.parts")
     # Env.copy writes only the used pages (compact=True crashes on this Windows build).
     tmp = ROOT / "build" / "dbcopy"
     shutil.rmtree(tmp, ignore_errors=True)

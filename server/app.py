@@ -94,9 +94,9 @@ if os.environ.get("KF_DATA_PREFIX"):
         startup_log(f"{name} from S3 ({dest.stat().st_size / 1e6 / (time.time() - t):.0f} MB/s)")
 
     def fetch_parts(name: str, dest: Path) -> None:
-        """A file stored as independently zstd-compressed parts (server/deploy/stage.py): half
-        the bytes over the network; parts are fetched and decompressed in parallel (zstd releases
-        the GIL) and written at their offsets."""
+        """A file stored as independently zstd-compressed parts (server/deploy/stage.py): fewer
+        bytes over the network (half for data.mdb); parts are fetched and decompressed in parallel
+        (zstd releases the GIL) and written at their offsets."""
         import zstandard
 
         t = time.time()
@@ -124,7 +124,7 @@ if os.environ.get("KF_DATA_PREFIX"):
     fetch("rhythm.npz", RHYTHM_FILE)
     PAIR_FILE = TMP_DIR / "data" / "pair.npz"
     db_download = downloads.submit(fetch_parts, "data.mdb", DB_PATH / "db" / "data.mdb")
-    pair_download = downloads.submit(fetch, "pair.npz", PAIR_FILE)
+    pair_download = downloads.submit(fetch_parts, "pair.npz", PAIR_FILE)
 LINKS = load_links()
 # Library keys: paths relative to music/ with '/' (the same on this PC and on Lambda).
 LIBRARY = Library()

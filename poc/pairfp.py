@@ -30,7 +30,6 @@ from pathlib import Path
 
 import numpy as np
 from scipy.ndimage import maximum_filter
-from scipy.signal import lfilter
 
 from common import DB_DIR, FFMPEG, MUSIC_DIR, ROOT, Match, list_audio
 
@@ -59,6 +58,20 @@ def confirm_score(seconds: float) -> float:
     return float(np.interp(seconds, *zip(*CONFIRM)))
 
 
+def onset_filter(L: np.ndarray) -> np.ndarray:
+    """scipy.signal.lfilter([1, -1], [1, -0.98], L, axis=1), bit for bit (float64, direct form II
+    transposed). Importing scipy.signal adds ~1 s to a Lambda cold start."""
+    L = L.astype(np.float64)
+    y = np.empty_like(L)
+    z = np.zeros(L.shape[0])
+    for n in range(L.shape[1]):
+        x = L[:, n]
+        yn = x + z
+        y[:, n] = yn
+        z = -x - (-0.98) * yn
+    return y
+
+
 def peaks(y: np.ndarray, shift: int = 0) -> np.ndarray:
     """(t, f) peaks, sorted by time then frequency."""
     y = y[shift:]
@@ -71,7 +84,7 @@ def peaks(y: np.ndarray, shift: int = 0) -> np.ndarray:
         return np.zeros((0, 2), np.int32)
     L = np.log(np.maximum(S, S.max() * 1e-6 + 1e-12))
     L -= L.mean()
-    L = lfilter([1, -1], [1, -0.98], L, axis=1)
+    L = onset_filter(L)
     L = L[:256]  # 0 - 5.5 kHz
     is_max = (L == maximum_filter(L, size=(2 * FW + 1, 2 * TW + 1), mode="constant", cval=-np.inf)) & (L > 0)
     f, t = np.nonzero(is_max)
