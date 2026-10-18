@@ -222,6 +222,15 @@
    "title": "RetributioN",
    "cover": null
   },
+  "1b02f58f053f": {
+   "url": "https://knkrtworld.com/music",
+   "kind": "artist",
+   "store": "knkrtworld",
+   "title": null,
+   "cover": null,
+   "artist": "KNKRT",
+   "note": "KNKRT album (told by the user); not on knkrtworld.com, whose WLDLF has other tracks; links to its music page"
+  },
   "1c95427e1f69": {
    "url": "https://mmp-kidny.bandcamp.com/album/2018-moz-x-noscipt-x-kid-ny",
    "kind": "album",
@@ -1100,6 +1109,15 @@
    "cover": null,
    "note": "not sold on the store (2026-10-16); links to Soulfabex's Gumroad"
   },
+  "82552c5dd59d": {
+   "url": "https://knkrtworld.com/music",
+   "kind": "artist",
+   "store": "knkrtworld",
+   "title": null,
+   "cover": null,
+   "artist": "KNKRT",
+   "note": "KNKRT album (told by the user); not on knkrtworld.com, whose WLDLF has other tracks; links to its music page"
+  },
   "82ee9224ed8e": {
    "url": "https://proofthexrook.bandcamp.com/album/master-of-the-goon-talk-vol-z",
    "kind": "album",
@@ -1114,6 +1132,13 @@
    "title": "NEW ERA",
    "cover": null,
    "note": "confirmed by the user in a browser; returns 404 to our fetcher"
+  },
+  "83c016203735": {
+   "url": "https://braze-uk.bandcamp.com/album/mask-off",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "Mask Off",
+   "cover": "https://f4.bcbits.com/img/a0926375076_10.jpg"
   },
   "8476be8f601f": {
    "url": "https://playabeats.bandcamp.com/",
@@ -1235,6 +1260,14 @@
    "store": "bandcamp",
    "title": "KISMET",
    "cover": "https://f4.bcbits.com/img/a2730559651_10.jpg"
+  },
+  "932c9d7c1858": {
+   "url": "https://kobakrump.bandcamp.com/album/forastero",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "Forastero",
+   "cover": "https://f4.bcbits.com/img/a2531264905_10.jpg",
+   "note": "artist is Koba (Colombia), tagged Kob; found 2026-10-18"
   },
   "93cee39e8aeb": {
    "url": "https://morfmuziik.bandcamp.com/album/morf-against-mmp-vol-3",
@@ -1694,6 +1727,14 @@
    "title": "Making A Mxrderer",
    "cover": "https://f4.bcbits.com/img/a2690993069_10.jpg"
   },
+  "c0e30e0b2997": {
+   "url": "https://flipsidemadrootz.bandcamp.com/album/2-complikated-part-ii",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "2 COMPLIKATED PART II",
+   "cover": "https://f4.bcbits.com/img/a0361341080_10.jpg",
+   "note": "by Flipside (Madrootz); library files have no tags; found 2026-10-18"
+  },
   "c0e79d39be29": {
    "url": "https://roxxdabeathovn.bandcamp.com/album/hidden-lost-tape1",
    "kind": "album",
@@ -1750,6 +1791,14 @@
    "store": "bandcamp",
    "cover": null,
    "note": "album page not found; links to the artist's Bandcamp"
+  },
+  "c4a31548a729": {
+   "url": "https://mowglibeatz.bandcamp.com/album/epic-killa",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "EPIC KILLA",
+   "cover": "https://f4.bcbits.com/img/a2590360172_10.jpg",
+   "note": "TRUST now goes by MOWGLI (mowglibeatz.bandcamp.com); found 2026-10-18"
   },
   "c59bcc05da01": {
    "url": "https://knkrtworld.com/album/2695009/self-destruk",
@@ -2079,6 +2128,14 @@
    "title": "Street F",
    "cover": "https://f4.bcbits.com/img/a1247865196_10.jpg"
   },
+  "f4cc5857eb6b": {
+   "url": "https://mowglibeatz.bandcamp.com/album/inkarnation",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "InKarnation",
+   "cover": "https://f4.bcbits.com/img/a3178777757_10.jpg",
+   "note": "TrustBeatz = TRUST = MOWGLI (mowglibeatz.bandcamp.com); found 2026-10-18"
+  },
   "f54b85087ee5": {
    "url": "https://playabeats.bandcamp.com/",
    "kind": "artist",
@@ -2092,6 +2149,14 @@
    "store": "bandcamp",
    "title": "SUMMER BUCK SHXT",
    "cover": null
+  },
+  "f73958f9eca4": {
+   "url": "https://mf13.bandcamp.com/album/br41n-d4m4g3",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "BR41N D4M4G3",
+   "cover": "https://f4.bcbits.com/img/a4178569474_10.jpg",
+   "note": "store has 20 tracks; the library lacks track 1 Buckmouth_SAVAGES; found 2026-10-18"
   },
   "f8383d6c84cd": {
    "url": "https://lukaaustin.bandcamp.com/album/buck-that",
@@ -2141,6 +2206,14 @@
    "store": "bandcamp",
    "title": "SAVAGE VOLUME III",
    "cover": "https://f4.bcbits.com/img/a3862078543_10.jpg"
+  },
+  "fd34116c70ef": {
+   "url": "https://mowglibeatz.bandcamp.com/album/metamorphosis",
+   "kind": "album",
+   "store": "bandcamp",
+   "title": "Metamorphosis",
+   "cover": "https://f4.bcbits.com/img/a0501426145_10.jpg",
+   "note": "TRUST now goes by MOWGLI (mowglibeatz.bandcamp.com); found 2026-10-18"
   },
   "fe5b9fae0a8e": {
    "url": "https://eestmusic.bandcamp.com/",

@@ -28,18 +28,29 @@
 
 | | 앨범 수 |
 |---|---|
-| 밴드캠프 앨범 페이지 | 235 |
+| 밴드캠프 앨범 페이지 | 242 |
 | 밴드캠프 아티스트 페이지로 대체 | 45 |
 | knkrtworld.com 앨범 페이지 | 9 |
-| knkrtworld.com 음악 페이지로 대체 (Konkrete) | 4 |
+| knkrtworld.com 음악 페이지로 대체 (Konkrete, KNKRT의 WILDLYFE 2개) | 6 |
 | Gumroad 상품 페이지 (Soulfabex TEST YOUR MIGHT) | 1 |
 | Gumroad 상점으로 대체 (Soulfabex 나머지 7개) | 7 |
-| 링크 없음 | 18 |
+| 링크 없음 | 9 |
 | 전체 | 319 |
 
-링크 없는 18개: 폴더 정리용 묶음(`트랙리스트`, `단일 곡`, `미발매 트랙` 등), 판매처를 못 찾은 아티스트(TRUST,
-Braze, 82K Recordz, M1ND FR3AKZ, WILDLYFE 등). Apple Music·Spotify·YouTube 검색과 인스타그램 확인에서도
-판매처가 나오지 않았다.
+2026-10-18에 링크 없던 앨범 6개를 더 찾았다(트랙 목록으로 확인).
+- TRUST의 EPIC KILLA, Metamorphosis와 TrustBeatz의 InKarnation: 지금 이름은 MOWGLI(이탈리아),
+  mowglibeatz.bandcamp.com.
+- M1ND FR3AKZ BR41N D4M4G3: mf13.bandcamp.com. 스토어 쪽은 20곡이고, 라이브러리에는 1번 트랙(Buckmouth_SAVAGES)이 없다.
+- Kob의 Forastero: Koba(콜롬비아), kobakrump.bandcamp.com.
+- 태그 없는 폴더 `2 COMPLIKATED PT2`: Flipside(Madrootz)의 2 COMPLIKATED PART II.
+
+남은 링크 없는 9개:
+- 폴더 정리용 묶음 6개: `트랙리스트`, `단일 곡`, `미발매 트랙`, `20190630신곡`, `tracks`, `HipHop beats`.
+- 82K Recordz의 82KR : 사딸라!: 앨범 판매처는 없다. Pied Piper는 Pluton의 Endgame: World Edition에,
+  Rumble RMX는 TED(cart97)의 U.R.BeatTED에, Emergency는 Cloud_D(cloudd0603.bandcamp.com)의 Bvck Monster에
+  들어 있다.
+- Daisy & Encore의 I Know: 판매처를 못 찾았다.
+- Alphabex의 The Biginning: 판매처를 못 찾았다. YouTube 재업로드만 있다.
 
 ## 만든 방법
 
@@ -61,6 +72,7 @@ Braze, 82K Recordz, M1ND FR3AKZ, WILDLYFE 등). Apple Music·Spotify·YouTube �
   - EEST/300의 옛 계정 m300sk는 비었고, 앨범은 eestmusic.bandcamp.com(레이블 Savage Kulture)에 있다.
   - tighteyez.bandcamp.com은 위조 문서를 파는 스팸 페이지가 됐다. 앨범은 officialtighteyex.bandcamp.com에 있다.
   - Ted(T)는 cart97.bandcamp.com에서 판다(사용자가 알려 줌).
+  - Braze는 braze-uk.bandcamp.com에서 판다(2026-10-18, 사용자가 알려 줌).
   - 사라진 계정 이름은 누구나 다시 만들 수 있다. 링크는 주기적으로 다시 확인해야 한다(`checked` 날짜).
 - SOJU의 NEW ERA(ssojuu.bandcamp.com/album/new-era)는 브라우저에서는 열리지만 우리 쪽 도구에는 404가 나온다.
   사용자가 확인한 링크라 그대로 두었다(`note`).
@@ -74,6 +86,9 @@ Braze, 82K Recordz, M1ND FR3AKZ, WILDLYFE 등). Apple Music·Spotify·YouTube �
 라이브러리의 폴더 두 개는 이름이 다르다.
 - `it's just buck-KNKRT(Secret tracks)`: ITZ JUST BUCK과 10곡이 모두 같다.
 - `KNKRT(Secret tracks)`: 8곡 중 4곡만 SELF DESTRUK에 있다(`note`에 적어 둠).
+
+`WILDLYFE`, `wildlyfe vol2` 폴더는 KNKRT 앨범이다(사용자가 알려 줌). 태그에 아티스트가 없어서 링크 항목의
+`artist`(KNKRT)를 서버가 앨범 아티스트로 쓴다. knkrtworld.com의 WLDLF는 곡이 달라서 음악 페이지로 연결한다.
 
 ## Gumroad (Soulfabex)
 

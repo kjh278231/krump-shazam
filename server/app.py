@@ -164,6 +164,8 @@ COVERS_DIR = ROOT / "db" / "covers"
 STORE_COVERS_DIR = ROOT / "db" / "store_covers"
 ALBUMS = json.loads(ALBUMS_FILE.read_text(encoding="utf-8")) if ALBUMS_FILE.exists() else []
 STORES = json.loads(STORE_FILE.read_text(encoding="utf-8"))["albums"] if STORE_FILE.exists() else {}
+for _a in ALBUMS:  # folders without artist tags (WILDLYFE): the artist known from the store
+    _a["artist"] = _a["artist"] or (STORES.get(_a["id"]) or {}).get("artist") or ""
 ALBUM_OF = {t: a for a in ALBUMS for t in a["tracks"]}
 # The fingerprint DB keeps byte-identical copies once, under whichever path came first, so a found
 # file may sit in a bundle folder while the same audio is also in its album: albums by Panako id,
