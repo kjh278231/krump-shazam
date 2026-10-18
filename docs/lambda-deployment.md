@@ -115,7 +115,8 @@ python server/deploy/aws_setup.py bucket data image function
 | 데이터를 이미지에 포함, 새 이미지 직후 | 45~67초 | rhythm index 읽기 35초, Panako 18초. 첫 요청이 타임아웃(60초)으로 실패하기도 함 |
 | 데이터를 이미지에 포함, 캐시된 경우 | 7.8초 | 대신 첫 검색들이 DB 페이지를 느리게 읽어 10초 검색 1회에 27초 |
 | S3에서 원본 1.4GB 다운로드 | 19~25초 | 인스턴스당 약 80MB/s. 메모리 10GB로 올려도 같음 |
-| **S3, DB를 zstd 조각으로 (현재)** | **9.8~12.8초** (새 이미지 직후 포함, 3회) | 다운로드 0.7GB. rhythm.npz 3초 → rhythm index 5초 동안 DB 다운로드가 겹쳐 진행 |
+| S3, DB를 zstd 조각으로 | 9.8~12.8초 (새 이미지 직후 포함, 3회) | 다운로드 0.7GB. rhythm.npz 3초 → rhythm index 5초 동안 DB 다운로드가 겹쳐 진행 |
+| **위 + 2점 해시 인덱스 (현재, 2026-10-18)** | **13.4~14.6초** (이미지 캐시 후 3회 중 2회. 1회는 27초로 import·Panako가 함께 느린 인스턴스) | 다운로드 0.92GB. pair.npz(조각 188MB)와 DB가 대역폭을 나눠 써서 둘 다 약 12초에 끝남. 처음 판(조각 아님, scipy.signal import)은 14.7초 |
 
 웜 상태 응답 (서울 Lambda, 10GB, 이 PC에서 측정, 2026-10-15). 응답의 `timings`에 단계별 초가 들어 있다:
 
@@ -126,6 +127,7 @@ python server/deploy/aws_setup.py bucket data image function
 | 최종 검색 (30초, fingerprint 실패 → 리듬) | 약 1.5초 |
 | 최종 검색, 못 찾는 곡 (넓은 속도 범위까지) | 약 4.4초 (넓은 범위 2.9초) |
 | 10초 미리듣기 | 0.5초 |
+| 2점 해시 단계 (`timings.pair`, 2026-10-18) | 10초 녹음 0.07~0.15초, 30초 녹음 0.2~0.28초 |
 
 확장 프로그램 흐름 시험 (하네스, Lambda):
 
