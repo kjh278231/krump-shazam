@@ -25,11 +25,20 @@ Lambda 단가 (서울):
 | 실행, ARM | $0.0000133334 / GB-초 |
 | 요청 | $0.20 / 100만 건 |
 | `/tmp` 512MB 초과분 | $0.0000000309 / GB-초 (무시할 수준) |
+| 상시 대기(provisioned concurrency) | 켜 두는 동안 $0.0000051254 / GB-초 + 실행 $0.0000119592 / GB-초 |
 
 실행비 계산 (10GB 메모리):
 - 곡 찾기 1회 = 콜드 스타트 약 11초 + 검색 호출 3~4번 약 5초 → 약 16초 × 10GB = 160GB-초.
 - 하루 5회 × 30일 = 150회 → 약 24,000GB-초 → x86 기준 약 $0.40/월.
 - Lambda 상시 무료 한도(월 40만 GB-초, 100만 요청)가 계정에 적용되면 실행비는 0원이다.
+
+웜 유지 (2026-10-18, `aws_setup.py warm`):
+- 2점 해시 인덱스가 들어간 뒤 콜드 스타트가 13~15초가 됐다. 녹음의 첫 중간 검색(10.5초)보다 3~4초 늦다.
+- EventBridge Scheduler가 5분마다 `/health`를 부른다(Function URL 요청 형식이라 앱까지 간다).
+  한 번에 약 1GB-초라 월 8,640번에 약 $0.15다. AWS가 몇 시간마다 인스턴스를 바꿀 때의 콜드 스타트(회당 약 $0.002)를
+  더해도 월 $1 미만이다.
+- 따뜻하게 유지되는 인스턴스는 1개뿐이고, 교체 직후에는 콜드 스타트가 난다.
+- 상시 대기 인스턴스 1개(10GB)를 24시간 켜 두면 약 $133/월이라 쓰지 않는다. 컨테이너 이미지라 SnapStart는 쓸 수 없다.
 
 참고: 혼자 쓰는 동안은 로컬 PC에서 서버를 돌리는 것도 0원이다. 확장 프로그램은 Lambda를 쓰고,
 `extension/config.js`의 주소를 `http://127.0.0.1:8765`로 고치면 로컬 서버를 쓴다.
@@ -56,6 +65,7 @@ Chrome 확장 ──HTTPS(Function URL, X-Api-Key 헤더)──▶ Lambda krump-
 | ECR 저장소 | `krump-finder`, 최근 이미지 3개만 유지 |
 | IAM 역할 | `krump-finder-lambda`: CloudWatch Logs + 이 버킷의 `previews/`·`runtime/` 읽기, `recordings/` 읽기·쓰기 |
 | S3 버킷 | `krump-finder-previews-136575447624`: 비공개(Block Public Access), SSE-S3 암호화 |
+| 웜 유지 | EventBridge Scheduler 그룹 `krump-finder`의 `krump-finder-warm`(5분마다 `/health`), 역할 `krump-finder-scheduler`(이 함수 호출만) |
 | 태그 | 모든 리소스에 `Project=krump-finder` |
 
 비용 상한: 동시 실행 3개와 타임아웃 60초가 폭주 비용을 막는다. 2026-10-18 웹스토어 공개를 앞두고
@@ -76,7 +86,7 @@ python server/fetch_store_covers.py              # 판매처 커버 → db/store
 python server/deploy/make_previews.py            # 라이브러리 → build/previews/ (96kbps CBR MP3)
 aws s3 sync build/previews s3://krump-finder-previews-136575447624/previews/
 python server/deploy/stage.py                    # build/lambda (이미지), build/runtime (S3 데이터)
-python server/deploy/aws_setup.py bucket data image function
+python server/deploy/aws_setup.py bucket data image function warm
 ```
 
 - 곡을 추가하면: 인덱스 재생성 → `build_albums.py` → (`album_links.json`에 새 앨범 링크 추가 →

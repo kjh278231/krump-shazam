@@ -4,6 +4,7 @@
     python server/deploy/aws_setup.py data        upload the fingerprint DB + rhythm index (stage.py first)
     python server/deploy/aws_setup.py image       ECR repository + build/push the image (stage.py first)
     python server/deploy/aws_setup.py function    IAM role, Lambda function, Function URL
+    python server/deploy/aws_setup.py warm        EventBridge schedule that keeps one instance warm
     python server/deploy/aws_setup.py budget      monthly cost alert by e-mail (KF_BUDGET_EMAIL, KF_BUDGET_USD=10)
     python server/deploy/aws_setup.py all
 
@@ -13,7 +14,7 @@ allocation tag (a billing setting; it changes no resource) and filters the budge
 Project=krump-finder, so the account's other resources are not counted. Not part of `all`.
 
 data, image and function run only from main as pushed to origin, on a build staged from that commit
-(release.py, CLAUDE.md); the image tag ends with the commit.
+(release.py, CLAUDE.md); the image tag ends with the commit. warm also runs only from pushed main.
 
 Every step only creates what is missing (or updates the function's code/config), never touches
 resources it did not create, and tags everything Project=krump-finder. The API key is generated
@@ -32,7 +33,7 @@ from pathlib import Path
 import boto3
 from botocore.exceptions import ClientError
 
-from release import require_staged
+from release import pushed_main, require_staged
 
 ROOT = Path(__file__).resolve().parents[2]
 REGION = "ap-northeast-2"
@@ -58,6 +59,7 @@ s3 = boto3.client("s3", region_name=REGION)
 ecr = boto3.client("ecr", region_name=REGION)
 iam = boto3.client("iam")
 lam = boto3.client("lambda", region_name=REGION)
+scheduler = boto3.client("scheduler", region_name=REGION)
 
 
 def exists(call, *codes) -> bool:
@@ -265,8 +267,60 @@ def budget() -> None:
     print(f"created budget {name} (${limit}/month, alerts to {email})")
 
 
-STEPS = {"bucket": bucket, "data": data, "image": image, "function": function, "budget": budget}
-ALL = ("bucket", "data", "image", "function")
+WARM_ROLE = f"{NAME}-scheduler"
+WARM_RATE = "rate(5 minutes)"
+# GET /health as a Function URL request, so the Lambda Web Adapter hands it to the app like any request
+# (a plain event would go to its /events pass-through path instead). /health needs no API key.
+WARM_EVENT = {
+    "version": "2.0", "routeKey": "$default", "rawPath": "/health", "rawQueryString": "",
+    "headers": {"host": "warm.local", "user-agent": f"{NAME}-warm"},
+    "requestContext": {"accountId": "anonymous", "apiId": "warm", "domainName": "warm.local", "domainPrefix": "warm",
+                       "http": {"method": "GET", "path": "/health", "protocol": "HTTP/1.1", "sourceIp": "127.0.0.1",
+                                "userAgent": f"{NAME}-warm"},
+                       "requestId": "warm", "routeKey": "$default", "stage": "$default",
+                       "time": "01/Jan/2026:00:00:00 +0000", "timeEpoch": 0},
+    "isBase64Encoded": False,
+}
+
+
+def warm() -> None:
+    """Call /health every 5 minutes so an instance stays warm. A cold start takes 13-15 s since the pair
+    index (2026-10-18), 3-4 s past a recording's first check at 10.5 s. Each ping is ~1 GB-s ($0.15/month
+    for 8,640 pings), against ~$133/month for provisioned concurrency of one 10 GB instance. It keeps one
+    instance warm only, and AWS still replaces instances every few hours."""
+    pushed_main()
+    fn_arn = lam.get_function(FunctionName=NAME)["Configuration"]["FunctionArn"]
+    trust = {"Version": "2012-10-17", "Statement": [{
+        "Effect": "Allow", "Principal": {"Service": "scheduler.amazonaws.com"}, "Action": "sts:AssumeRole",
+        "Condition": {"StringEquals": {"aws:SourceAccount": ACCOUNT}}}]}
+    try:
+        role = iam.get_role(RoleName=WARM_ROLE)["Role"]["Arn"]
+    except iam.exceptions.NoSuchEntityException:
+        role = iam.create_role(RoleName=WARM_ROLE, AssumeRolePolicyDocument=json.dumps(trust),
+                               Description="krump-finder warm-up schedule: invoke the function only",
+                               Tags=[{"Key": k, "Value": v} for k, v in TAGS.items()])["Role"]["Arn"]
+        print("created role", WARM_ROLE)
+        time.sleep(10)  # IAM propagation before the scheduler can assume it
+    iam.put_role_policy(RoleName=WARM_ROLE, PolicyName=f"{NAME}-invoke", PolicyDocument=json.dumps({
+        "Version": "2012-10-17", "Statement": [{"Effect": "Allow", "Action": "lambda:InvokeFunction",
+                                                "Resource": [fn_arn, f"{fn_arn}:*"]}]}))
+    if not exists(lambda: scheduler.get_schedule_group(Name=NAME), "ResourceNotFoundException"):
+        scheduler.create_schedule_group(Name=NAME, Tags=[{"Key": k, "Value": v} for k, v in TAGS.items()])
+        print("created schedule group", NAME)
+    spec = dict(Name=f"{NAME}-warm", GroupName=NAME, ScheduleExpression=WARM_RATE, State="ENABLED",
+                FlexibleTimeWindow={"Mode": "OFF"}, Description="GET /health every 5 minutes (aws_setup.py warm)",
+                Target={"Arn": fn_arn, "RoleArn": role, "Input": json.dumps(WARM_EVENT),
+                        "RetryPolicy": {"MaximumRetryAttempts": 0, "MaximumEventAgeInSeconds": 60}})
+    if exists(lambda: scheduler.get_schedule(Name=spec["Name"], GroupName=NAME), "ResourceNotFoundException"):
+        scheduler.update_schedule(**spec)
+        print("updated schedule", spec["Name"])
+    else:
+        scheduler.create_schedule(**spec)
+        print("created schedule", spec["Name"], WARM_RATE)
+
+
+STEPS = {"bucket": bucket, "data": data, "image": image, "function": function, "warm": warm, "budget": budget}
+ALL = ("bucket", "data", "image", "function", "warm")
 
 if __name__ == "__main__":
     steps = ALL if sys.argv[1:] == ["all"] else sys.argv[1:]
