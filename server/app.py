@@ -52,7 +52,8 @@ from pydantic import BaseModel  # noqa: E402
 
 from common import DB_DIR, FFMPEG, MUSIC_DIR, ROOT, EXCLUDE_FILE, Library, PanakoServer  # noqa: E402
 from grouping import group, load_links, verdict  # noqa: E402
-from pairfp import INDEX_FILE as PAIR_INDEX_FILE, SR as PAIR_SR, PairIndex, confirm_score as pair_confirm_score  # noqa: E402
+from pairfp import (AGREE as PAIR_AGREE, AGREE_SECONDS as PAIR_AGREE_SECONDS, INDEX_FILE as PAIR_INDEX_FILE,  # noqa: E402
+                    SR as PAIR_SR, PairIndex, confirm_score as pair_confirm_score)
 from rhythm import SR as RHYTHM_SR, RhythmIndex, identify as rhythm_identify  # noqa: E402
 
 startup_log("imports")
@@ -353,6 +354,7 @@ def identify_audio(body: bytes, title: str, url: str, partial: bool, share: bool
     result, reason = verdict(songs)
     method = "fingerprint"
     dur = len(pcm) / PANAKO_SR
+    pair_songs = []
     if result != "confirmed" and PAIR is not None:
         t1 = time.time()
         pair = [m for m in PAIR.query(resample(pcm, PANAKO_SR, PAIR_SR)) if m.match_path not in EXCLUDED]
@@ -374,16 +376,22 @@ def identify_audio(body: bytes, title: str, url: str, partial: bool, share: bool
             "time_factor": m.time_factor,
         }
 
-    out_songs = [{
-        **describe(s.head),
-        "score": s.score,
-        "preview_only": s.preview_only,
-        "also_in": [describe(m) for m in s.members if m is not s.head],
-    } for s in songs]
-    top_ids = [m.match_id for m in sorted(songs[0].members, key=lambda m: m is not songs[0].head)] if songs else []
+    def listed(songs):
+        return [{
+            **describe(s.head),
+            "score": s.score,
+            "preview_only": s.preview_only,
+            "also_in": [describe(m) for m in s.members if m is not s.head],
+        } for s in songs]
+
+    def head_ids(songs):
+        return [m.match_id for m in sorted(songs[0].members, key=lambda m: m is not songs[0].head)] if songs else []
+
+    out_songs, top_ids = listed(songs), head_ids(songs)
 
     # Mid-recording checks also run the rhythm search (most battle-100 windows confirm by neither
-    # fingerprint: Panako 41 of 2,344, with the pair stage 414). RHYTHM_EARLY, measured on 10/15/20 s
+    # fingerprint: Panako 41 of 2,344, with the pair stage 414, 464 with its agreement below; the
+    # rest show a rhythm candidate or nothing). RHYTHM_EARLY, measured on 10/15/20 s
     # prefixes (poc/eval_rhythm_early.py): of 409 battle windows found at 30 s, 30 stop at 10 s
     # and 135 more at 15 s (1 wrong); of 1,618 windows where the final search finds nothing,
     # 27 stop on a candidate (20 s only: 15).
@@ -403,9 +411,16 @@ def identify_audio(body: bytes, title: str, url: str, partial: bool, share: bool
                 t1 = time.time()
                 r = rhythm_identify(RHYTHM, y, same_audio, wide=True, threads=RHYTHM_THREADS)
                 timings["rhythm_wide"] = round(time.time() - t1, 2)
+        # The candidate is confirmed when the pair stage, below its own bar, names the same
+        # recording as its top song (pairfp.AGREE).
+        if (r and dur <= PAIR_AGREE_SECONDS + RHYTHM_SLACK
+                and verdict(pair_songs, confirm=PAIR_AGREE, check=PAIR_AGREE)[0] == "confirmed"
+                and any(same_audio(int(r["songs"][0]["id"]), m.match_id) for m in pair_songs[0].members)):
+            result, reason, method = "confirmed", "", "rhythm+pair"
+            out_songs, top_ids, final = listed(pair_songs), head_ids(pair_songs), True
         # Mid-recording, only strong candidates are shown: weak ones also appeared for 6-10/39
         # songs that are not in the library, and a wrong hint is worse than none.
-        if r and (not partial or r["strength"] == "strong"):
+        elif r and (not partial or r["strength"] == "strong"):
             result, reason, method = "check", "rhythm", "rhythm"
             out_songs = []
             top_ids = [int(r["songs"][0]["id"])]

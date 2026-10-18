@@ -111,7 +111,8 @@ Candidates are grouped into songs (`poc/grouping.py`):
   score; otherwise 추가 확인 (low score or close rival); below 5 → 실패. On the synthetic set
   this gives 0 confirmed-but-wrong answers (crowd 3 dB: 85 confirmed, 5 check, 10 fail).
 - When Panako does not confirm, the pair-hash stage gets the same audio (see **Pair-hash stage**
-  below). Its answer is 확정 or nothing; the rhythm search runs only when neither confirms.
+  below). Its answer is 확정 or nothing; the rhythm search runs only when neither confirms. A
+  rhythm candidate is 확정 too when the pair stage, below its bar, has the same song on top.
 
 Flow: popup gets a tab-capture stream id → background service worker → offscreen document
 records with `MediaRecorder` (Opus) while playing the audio back to the speakers →
@@ -217,6 +218,13 @@ Songs not in the library, and noisy or off-speed library songs, scored at most 2
 from 15 s on. Those are shared drum loops whose hashes line up at one offset across the clip, so
 the bar does not grow past 15 s.
 
+**Agreeing with the rhythm search.** Below that bar, a rhythm candidate becomes 확정 when it is the
+pair stage's top song with ≥ 20 hashes and no other song at 60% of that, on up to 30 s of audio
+(`AGREE` in `poc/pairfp.py`), mid-recording too. Calibration (`poc/fpexp/e9_rhythm_pair.py prod` on
+branch `fp-experiments`, E9c): 622 clips of songs not in the library, cut to the 10/15/20/24/30 s the
+extension sends. The rhythm search's (wrong) candidates were the pair's top song at 18 at most
+(30 s; 14 at 24 s, 11 at 15–20 s), each time with a rival at 60%, so the rule never fired.
+
 **Battle-100** (`python poc/eval_pair.py` → `realtest/battle100/pair_report.txt`). Each of the 2,344
 windows was queried again with the pair stage, at 10/15/20/30 s:
 
@@ -228,13 +236,14 @@ windows was queried again with the pair stage, at 10/15/20/30 s:
 | rhythm 약한 | 241 | 32 | 6 | 203 |
 | nothing | 1,618 | | 56 new | 1,562 |
 
-- Confirmed windows go from 41 to 414.
+- Confirmed windows go from 41 to 414, and to 464 with the agreement rule (36 rhythm 유력, 14 약한).
 - Of the 8 "another song" windows, 3 follow a Panako confirmation of the pair's song in the window
   before (ctwqUAT9bIE), and 4 are rhythm answers that change from window to window while the pair
   answer stays.
 - 46 of the 56 new answers name a song that a window 30 s away also names.
-- Recordings stop earlier. Among windows answered either way, 10 s stops go from 27 to 218, and full
-  30 s recordings from 428 to 363.
+- Recordings stop earlier. Among windows answered either way, 10 s stops go from 27 to 227 (218
+  without the agreement rule), and full 30 s recordings from 428 to 358. Of the stops at 10/15/20 s,
+  219/70/35 are 확정.
 
 ## Rhythm fallback (reverberant room recordings)
 
@@ -282,7 +291,8 @@ Ranking stays on the raw score; z = (score − track mean) / track std alone was
 User captures that Panako missed: DARK, Afro Krump and one KILL EM come back 유력; another
 KILL EM comes back 약한. The fifth, a recording across a DJ jump-back, still fails.
 
-Rhythm results are never 확정, only 추가 확인 with a "listen to check" prompt.
+Rhythm results alone are never 확정, only 추가 확인 with a "listen to check" prompt. They become
+확정 when the pair stage agrees (see **Pair-hash stage**).
 
 **Off-speed videos** (`poc/eval_rhythm_wide.py` → `realtest/rhythm_wide_report.txt`). Some
 uploads play the track faster or slower: the shorts hdnJN-k6ePg plays WLDLF 07 at 1.03. Panako

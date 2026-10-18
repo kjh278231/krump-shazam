@@ -58,6 +58,16 @@ def confirm_score(seconds: float) -> float:
     return float(np.interp(seconds, *zip(*CONFIRM)))
 
 
+# Below that bar, a rhythm candidate (server/app.py) is confirmed when it is this index's top song with
+# AGREE or more (no other song at 0.6 of that), on up to AGREE_SECONDS of audio, the lengths measured.
+# Branch fp-experiments, poc/fpexp/e9_rhythm_pair.py (E9c): on 622 clips of songs not in the library, cut
+# to the 10-30 s the extension sends, the rhythm search's (wrong) candidates were the top song at 18 at
+# most (30 s; 14 at 24 s, 11 at 15-20 s), each time with a rival at 0.6, so never by this rule. On
+# battle-100 it confirms 50 more 30 s windows (414 -> 464).
+AGREE = 20
+AGREE_SECONDS = 30
+
+
 def onset_filter(L: np.ndarray) -> np.ndarray:
     """scipy.signal.lfilter([1, -1], [1, -0.98], L, axis=1), bit for bit (float64, direct form II
     transposed). Importing scipy.signal adds ~1 s to a Lambda cold start."""

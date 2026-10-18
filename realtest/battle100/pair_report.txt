@@ -2,24 +2,26 @@ windows: 2344 in 100 videos
 pair stage per query: mean 0.285 s, 95th percentile 0.500 s, max 0.621 s
 
 ## 30 s answers: deployed server (rows) and the pair stage (columns)
-                             (Panako가 먼저 확정)               같은 곡 확정               다른 곡 확정     새 답 (30초 옆 창과 일치)           새 답 (근거 없음)                확정 안 함
-fingerprint 확정                            41                     0                     0                     0                     0                     0
-fingerprint 추가 확인                          0                    23                     0                     0                     0                    11
-rhythm strong                              0                   254                     2                     0                     0                   154
-rhythm weak                                0                    32                     6                     0                     0                   203
-답 없음                                       0                     0                     0                    46                    10                  1562
+                             (Panako가 먼저 확정)               같은 곡 확정               다른 곡 확정     새 답 (30초 옆 창과 일치)           새 답 (근거 없음)             리듬과 일치 확정                확정 안 함
+fingerprint 확정                            41                     0                     0                     0                     0                     0                     0
+fingerprint 추가 확인                          0                    23                     0                     0                     0                     0                    11
+rhythm strong                              0                   254                     2                     0                     0                    36                   118
+rhythm weak                                0                    32                     6                     0                     0                    14                   189
+답 없음                                       0                     0                     0                    46                    10                     0                  1562
 
 ## 30 s answers after adding the pair stage
    답 없음                   1562
    2점 해시 확정                373
-   rhythm weak             203
-   rhythm strong           154
+   rhythm weak             189
+   rhythm strong           118
+   리듬+2점 해시 확정              50
    fingerprint 확정           41
    fingerprint 추가 확인        11
 
 ## when the recording stops (windows answered at 30 s by either)
-   before: 10 s: 27, 15 s: 132, 20 s: 98, 30 s: 428, no answer: 59
-   after:  10 s: 218, 15 s: 92, 20 s: 71, 30 s: 363
+   before: 10 s: 27, 15 s: 132, 20 s: 98, 30 s: 428, no answer: 61
+   after:  10 s: 227, 15 s: 98, 20 s: 63, 30 s: 358
+   after, stops before 30 s that are 확정 (pair alone or agreeing with rhythm): 10 s: 219, 15 s: 70, 20 s: 35
 
 ## pair answers that differ from or add to the deployed server (video, t, score/second, song | note)
    -VeJZDR73vc    75    39/13   Kid NY - RUGGED SHXT/Kid NY - RUGGED SHXT - 06 Wobble Way.mp3  |  consistent
