@@ -4,12 +4,13 @@
     python server/deploy/aws_setup.py data        upload the fingerprint DB + rhythm index (stage.py first)
     python server/deploy/aws_setup.py image       ECR repository + build/push the image (stage.py first)
     python server/deploy/aws_setup.py function    IAM role, Lambda function, Function URL
+    python server/deploy/aws_setup.py budget      monthly cost alert by e-mail (KF_BUDGET_EMAIL, KF_BUDGET_USD=10)
     python server/deploy/aws_setup.py all
 
-Cost cap: reserved concurrency 3 and a 60 s timeout bound what runaway traffic can cost. A
-budget alert is not created: a tag-filtered budget needs the Project cost allocation tag
-activated in Billing first (an account setting), and an unfiltered one would include the
-account's other resources.
+Cost cap: reserved concurrency 3 and a 60 s timeout bound what runaway traffic can cost. The
+budget step adds an e-mail alert on this project's costs only: it activates the Project cost
+allocation tag (a billing setting; it changes no resource) and filters the budget on
+Project=krump-finder, so the account's other resources are not counted. Not part of `all`.
 
 Every step only creates what is missing (or updates the function's code/config), never touches
 resources it did not create, and tags everything Project=krump-finder. The API key is generated
@@ -216,8 +217,47 @@ def extension_config(url: str) -> None:
     print("wrote extension/config.js")
 
 
-STEPS = {"bucket": bucket, "data": data, "image": image, "function": function}
+def budget() -> None:
+    """Monthly budget on Project=krump-finder: e-mail when actual cost passes 80 % or the month's
+    forecast passes 100 %. The tag counts only once activated, and AWS needs up to 24 h after
+    activation (and after a tagged resource first appears in billing) to apply it."""
+    import os
+
+    email = os.environ.get("KF_BUDGET_EMAIL")
+    if not email:
+        raise SystemExit("set KF_BUDGET_EMAIL")
+    limit = os.environ.get("KF_BUDGET_USD", "10")
+    ce = boto3.client("ce", region_name="us-east-1")
+    try:
+        ce.update_cost_allocation_tags_status(CostAllocationTagsStatus=[{"TagKey": "Project", "Status": "Active"}])
+        print("cost allocation tag Project: active")
+    except ClientError as e:
+        print(f"cost allocation tag not activated yet ({e.response['Error']['Message']}); re-run later")
+    budgets = boto3.client("budgets", region_name="us-east-1")
+    name = f"{NAME}-monthly"
+    spec = {"BudgetName": name, "BudgetType": "COST", "TimeUnit": "MONTHLY",
+            "BudgetLimit": {"Amount": limit, "Unit": "USD"},
+            "CostFilters": {"TagKeyValue": [f"user:Project${NAME}"]}}
+    try:
+        budgets.describe_budget(AccountId=ACCOUNT, BudgetName=name)
+        budgets.update_budget(AccountId=ACCOUNT, NewBudget=spec)
+        print(f"updated budget {name} (${limit}/month)")
+        return
+    except budgets.exceptions.NotFoundException:
+        pass
+    subscribers = [{"SubscriptionType": "EMAIL", "Address": email}]
+    budgets.create_budget(AccountId=ACCOUNT, Budget=spec, NotificationsWithSubscribers=[
+        {"Notification": {"NotificationType": "ACTUAL", "ComparisonOperator": "GREATER_THAN",
+                          "Threshold": 80, "ThresholdType": "PERCENTAGE"}, "Subscribers": subscribers},
+        {"Notification": {"NotificationType": "FORECASTED", "ComparisonOperator": "GREATER_THAN",
+                          "Threshold": 100, "ThresholdType": "PERCENTAGE"}, "Subscribers": subscribers},
+    ])
+    print(f"created budget {name} (${limit}/month, alerts to {email})")
+
+
+STEPS = {"bucket": bucket, "data": data, "image": image, "function": function, "budget": budget}
+ALL = ("bucket", "data", "image", "function")
 
 if __name__ == "__main__":
-    for step in (STEPS if sys.argv[1:] == ["all"] else sys.argv[1:]):
+    for step in (ALL if sys.argv[1:] == ["all"] else sys.argv[1:]):
         STEPS[step]()

@@ -67,23 +67,28 @@ song is not in the library), then `python poc/evaluate.py --manifest your.csv`.
    To point it at a local server (`server\start.bat`, `http://127.0.0.1:8765`), edit that file.
 2. Chrome → `chrome://extensions` → enable *Developer mode* → *Load unpacked* → pick `extension/`.
    Pin the extension.
-3. On a tab playing a video, click the extension icon → **현재 탭에서 찾기**. The popup can be
-   closed while recording; the badge shows REC → ... → OK / X.
-4. The popup shows only the outcome: 찾는 중… while it listens and searches, then 찾음 or
-   못 찾음. Mid-recording hints and search details are not shown. A find that the server did not
-   confirm (추가 확인: a rhythm candidate, low score or close rival) is 찾음 in amber with
-   "확실하지 않아요. 미리듣기로 확인해 주세요." The result shows the best song only, with its
+3. On a tab playing a video, pick the maximum length (10/20/30/45초, remembered) and click
+   **현재 탭에서 찾기**. The popup can be closed while recording; the badge shows REC → ... →
+   OK / X.
+4. The popup (dark theme, orange accent; fonts Archivo and IBM Plex Sans KR from Google Fonts,
+   system fallback offline) has one screen per state: 대기, 찾는 중 (elapsed time, 지금 멈추고
+   검색), then 찾음, 찾음 · 확실하지 않음 or 못 찾음 (tips and 다시 찾기). Mid-recording hints and
+   search details are not shown. A find that the server did not confirm (a rhythm candidate, low
+   score or close rival) gets an amber badge, "확실하지 않아요. 미리듣기로 같은 곡인지 확인해
+   주세요." and a large preview button. The result shows the best song only, with its
    album cover, album, artist and position in the library track, and a button to the album's
    store page (밴드캠프 / KNKRTWORLD / Gumroad에서 앨범 구매; 아티스트 보기 where only the artist's
    page was found). The links are in `db/album_links.json`, checked by hand
    (`docs/album-links.md`); 301 of 319 albums have one. When the found file sits in a bundle
    folder, the album comes from a copy of the same audio (Panako id or `db/same_audio.csv`).
-   **▶ 10초 미리듣기** plays a 10 s MP3 excerpt from that spot, cut by the server's `/preview`.
+   **10초 미리듣기** plays a 10 s MP3 excerpt from that spot, cut by the server's `/preview`.
    Full library files are never served, because of copyright once this is distributed.
-   **✔ 맞음 / ✘ 틀림** records ground truth.
-5. **라이브러리** (popup header) opens a tab listing the library's albums: cover, title, artist,
-   track count and a 구매 / 아티스트 link to the store; click an album for its tracks, search by
-   album, artist or track name. The list
+   **맞음 / 틀림** (결과가 맞나요?) records ground truth. **다시 찾기** returns to 대기.
+5. **라이브러리** (popup header; its dot shows whether the server answers) opens a tab listing the
+   library's albums as cover cards: title, artist, track count and a 구매 / 아티스트 link to the
+   store. 곡 목록 opens an album's tracks; search by album, artist or track name; filter 전체 /
+   구매 가능 / 판매처 없음. Large covers load from the store's image CDN (`art`, Bandcamp 700 px),
+   falling back to the inlined 120 px thumbnail, then to a title tile. The list
    comes from the server's `/albums` (cached in the extension, so it shows at once next time).
    Rebuild it after adding music: `python server/build_albums.py` → `db/albums.json` +
    `db/covers/` (needs `pip install mutagen pillow`). An album is a top-level folder, named by
@@ -109,10 +114,19 @@ records with `MediaRecorder` (Opus) while playing the audio back to the speakers
 `POST /identify` → server converts with FFmpeg and runs a Panako query (~2.5 s, mostly JVM
 start-up).
 
-On Lambda, final recordings go to S3 instead (`recordings/<id>.wav` + `<id>.json` in the
-bucket). Locally, every recording is kept in `recordings/` and logged in `recordings/log.csv`, which is a valid
+Using the extension requires agreeing to the privacy policy (`extension/privacy.html`,
+`docs/privacy-policy.md`) on a first-run screen; 동의 철회 under the idle screen withdraws it. The
+extension then sends `share=1` with the tab's title and URL, and the server keeps the final
+recording; without `share` (older builds) it deletes the audio after the search and returns no
+id, and the popup hides 맞음 / 틀림. The server writes no access log (request URLs carry titles).
+On Lambda, kept recordings go to S3 (`recordings/<id>.wav` + `<id>.json` in the bucket).
+Locally, each one is kept in `recordings/` and logged in `recordings/log.csv`, which is a valid
 evaluate.py manifest (rows without feedback are skipped):
 `python poc/evaluate.py --manifest recordings/log.csv`.
+
+Chrome Web Store: `python store/package.py` builds the upload zip; `store/listing.md` has the
+listing text, permission reasons, data disclosures and steps; `store/assets/` the screenshots
+and promo tile.
 
 ## PoC results (2026-10-13, synthetic degradations)
 

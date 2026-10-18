@@ -57,9 +57,11 @@ Chrome 확장 ──HTTPS(Function URL, X-Api-Key 헤더)──▶ Lambda krump-
 | S3 버킷 | `krump-finder-previews-136575447624`: 비공개(Block Public Access), SSE-S3 암호화 |
 | 태그 | 모든 리소스에 `Project=krump-finder` |
 
-비용 상한: 동시 실행 3개와 타임아웃 60초가 폭주 비용을 막는다. AWS Budgets 경보는 만들지 않았다.
-태그로 거른 예산은 Billing에서 `Project` 비용 할당 태그를 먼저 활성화해야 하고(계정 설정 변경),
-거르지 않은 예산은 계정의 다른 리소스 비용까지 섞이기 때문이다.
+비용 상한: 동시 실행 3개와 타임아웃 60초가 폭주 비용을 막는다. 2026-10-18 웹스토어 공개를 앞두고
+AWS Budgets 경보를 추가했다: `KF_BUDGET_EMAIL=… KF_BUDGET_USD=10 python server/deploy/aws_setup.py budget`.
+- `Project` 비용 할당 태그를 활성화하고(리소스는 바꾸지 않는 Billing 설정), `Project=krump-finder`로
+  거른 월 $10 예산 `krump-finder-monthly`를 만든다. 계정의 다른 리소스 비용은 섞이지 않는다.
+- 실제 비용 80%, 월말 예상 100%를 넘으면 메일이 온다. 태그가 비용에 반영되기까지 최대 24시간 걸린다.
 
 ## 배포·갱신 방법
 
