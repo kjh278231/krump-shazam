@@ -36,16 +36,17 @@ NAME = "krump-finder"
 BUCKET = f"{NAME}-previews-{ACCOUNT}"
 TAGS = {"Project": NAME}
 ROLE = f"{NAME}-lambda"
-# Rhythm index ~1.5 GB + JVM + the fingerprint DB in the page cache (1.2 GB, prefetched). More
-# memory also means more vCPU: 10 GB = 6 vCPU, searched as 6 speeds at once (RHYTHM_THREADS).
+# Rhythm index ~1.5 GB + JVM + the fingerprint DB in the page cache (1.2 GB, prefetched) + the pair
+# index (0.2 GB). More memory also means more vCPU: 10 GB = 6 vCPU, searched as 6 speeds at once
+# (RHYTHM_THREADS).
 # Measured 2026-10-15: the 21-speed rhythm stage took 4.7 s at 6 GB / 3 threads, 2.9 s at 10 GB / 6.
 MEMORY_MB = 10240
 RHYTHM_THREADS = 6
 TIMEOUT_S = 60
 MAX_CONCURRENCY = 3  # cost cap: at most 3 instances at once
-# The fingerprint DB and rhythm index are downloaded from here into /tmp at every cold start.
+# The fingerprint DB, rhythm index and pair index are downloaded from here into /tmp at every cold start.
 DATA_PREFIX = "runtime/"
-TMP_MB = 3072  # /tmp: 1.4 GB of data + recordings
+TMP_MB = 3072  # /tmp: 1.6 GB of data + recordings
 KEY_FILE = ROOT / "build" / "api_key.txt"
 
 s3 = boto3.client("s3", region_name=REGION)

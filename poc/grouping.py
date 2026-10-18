@@ -74,14 +74,14 @@ def group(matches: list[Match], links: set[frozenset]) -> list[Song]:
     return songs
 
 
-def verdict(songs: list[Song]) -> tuple[str, str]:
-    """(verdict, reason) with verdict in confirmed / check / fail."""
-    if not songs or songs[0].score < CHECK_SCORE:
+def verdict(songs: list[Song], confirm: float = CONFIRM_SCORE, check: float = CHECK_SCORE) -> tuple[str, str]:
+    """(verdict, reason) with verdict in confirmed / check / fail. The scores default to Panako's."""
+    if not songs or songs[0].score < check:
         return "fail", ""
     top = songs[0]
     rival = songs[1] if len(songs) > 1 else None
     if rival and rival.score >= RIVAL_RATIO * top.score:
         return "check", "rival"
-    if top.score < CONFIRM_SCORE:
+    if top.score < confirm:
         return "check", "low"
     return "confirmed", ""

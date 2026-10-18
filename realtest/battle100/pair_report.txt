@@ -1,0 +1,88 @@
+windows: 2344 in 100 videos
+pair stage per query: mean 0.285 s, 95th percentile 0.500 s, max 0.621 s
+
+## 30 s answers: deployed server (rows) and the pair stage (columns)
+                             (Panako가 먼저 확정)               같은 곡 확정               다른 곡 확정     새 답 (30초 옆 창과 일치)           새 답 (근거 없음)                확정 안 함
+fingerprint 확정                            41                     0                     0                     0                     0                     0
+fingerprint 추가 확인                          0                    23                     0                     0                     0                    11
+rhythm strong                              0                   254                     2                     0                     0                   154
+rhythm weak                                0                    32                     6                     0                     0                   203
+답 없음                                       0                     0                     0                    46                    10                  1562
+
+## 30 s answers after adding the pair stage
+   답 없음                   1562
+   2점 해시 확정                373
+   rhythm weak             203
+   rhythm strong           154
+   fingerprint 확정           41
+   fingerprint 추가 확인        11
+
+## when the recording stops (windows answered at 30 s by either)
+   before: 10 s: 27, 15 s: 132, 20 s: 98, 30 s: 428, no answer: 59
+   after:  10 s: 218, 15 s: 92, 20 s: 71, 30 s: 363
+
+## pair answers that differ from or add to the deployed server (video, t, score/second, song | note)
+   -VeJZDR73vc    75    39/13   Kid NY - RUGGED SHXT/Kid NY - RUGGED SHXT - 06 Wobble Way.mp3  |  consistent
+   -VeJZDR73vc   120    42/10   Various Artists - KING OF BUCK Ⅹ MIXTAPE ALBUM/Various Artists - KING OF BUCK Ⅹ MIXTAPE ALBUM 2K19 - 04 ４、PLAYA - KOB10 BATTLE.mp3  |  consistent
+   -VeJZDR73vc   195    32/12   Various Artists - KING OF BUCK Ⅹ MIXTAPE ALBUM/Various Artists - KING OF BUCK Ⅹ MIXTAPE ALBUM 2K19 - 04 ４、PLAYA - KOB10 BATTLE.mp3  |  consistent
+   -VeJZDR73vc   240    43/9    Tight Eyex - The Othxrz/Tighteyex - The Othxrz - 07 HWS.mp3  |  consistent
+   -VeJZDR73vc   315    41/10   Tight Eyex - The Othxrz/Tighteyex - The Othxrz - 07 HWS.mp3  |  consistent
+   1r6AvdSw5to   210    67/12   Krump Forever - Konkrete/J Krete.wav  |  consistent
+   7smIm4AKj54   225   125/15   BravoDomo - Beauty within Chaos/BravoDomo - Beauty within Chaos - 09 This the Hype (swift vs beast).mp3  |  consistent
+   Bp6FDYh3634   120    50/11   Mozarf X Dabl2ody - KMD/Mozarf X Dabl2ody - KMD - 02 STOMP SUR TOI.mp3  |  consistent
+   Ff95hgsHh2A   135    49/16   Big Rulez - Krump/Big Rulez - Krump - 22 Stylebender Anthem (ft. Shash'U).mp3  |  consistent
+   Ff95hgsHh2A   195    33/10   Big Rulez - Krump/Big Rulez - Krump - 22 Stylebender Anthem (ft. Shash'U).mp3  |  consistent
+   Gxmnqstqvxo    45    34/11   PLAYA - NO MERCY/Playa - FREE ALBUM!!! NO MERCY - 10 Hardcore remix.mp3  |  
+   HEneb-n5KDY    90    39/10   Big Rulez - π Afro Samurai π/Big Rulez - π Afro Samurai π - 04 1K Anthem.mp3  |  consistent
+   HlBNf_CR-Ro   135    37/10   MOZARF - FROM THE STREET/MOZARF - FROM THE STREET - 10 UNDERGROUND GUETTO ( black black ).mp3  |  consistent
+   HlBNf_CR-Ro   150    49/11   MOZARF - FROM THE STREET/MOZARF - FROM THE STREET - 10 UNDERGROUND GUETTO ( black black ).mp3  |  
+   HlBNf_CR-Ro   165    49/10   MOZARF - FROM THE STREET/MOZARF - FROM THE STREET - 10 UNDERGROUND GUETTO ( black black ).mp3  |  consistent
+   HlBNf_CR-Ro   210    62/10   MOZARF - FROM THE STREET/MOZARF - FROM THE STREET - 10 UNDERGROUND GUETTO ( black black ).mp3  |  
+   IEIBv0Qp5VM    45    51/12   Desert stom/DESERT STORM 3 Soundtrack by lil RoxxDaMus, Shazam Tracks & L_-_Thrilla - thunderSHOCKlil Roxxdamus - 02 - WHEN - L-Thrilla.mp3  |  
+   IEIBv0Qp5VM    60    52/9    Desert stom/DESERT STORM 3 Soundtrack by lil RoxxDaMus, Shazam Tracks & L_-_Thrilla - thunderSHOCKlil Roxxdamus - 02 - WHEN - L-Thrilla.mp3  |  
+   QhIv4ZH9WDM   210    71/33   Flipside - FCD KRUMP BUCKIN/Flipside - FCD KRUMP BUCKIN - 06 Flipside - C'est Grave Part III ( Old Track ).mp3  |  
+   QhIv4ZH9WDM   225    67/31   Flipside - FCD KRUMP BUCKIN/Flipside - FCD KRUMP BUCKIN - 06 Flipside - C'est Grave Part III ( Old Track ).mp3  |  
+   QhIv4ZH9WDM   270    46/23   Flipside - FCD KRUMP BUCKIN/Flipside - FCD KRUMP BUCKIN - 06 Flipside - C'est Grave Part III ( Old Track ).mp3  |  
+   ZlAA4HqjuEo     0    46/20   KOBeatz - KING OF BUCK 13/KOBeatz - KING OF BUCK 13 MIX TAPE 2K22 - 10 9. CYBER RAIN (Miss Twiggz vs Girl Twiggz) - Prince KiLLiK.mp3  |  consistent
+   ZlAA4HqjuEo   120    40/12   KOBeatz - KING OF BUCK 13/KOBeatz - KING OF BUCK 13 MIX TAPE 2K22 - 10 9. CYBER RAIN (Miss Twiggz vs Girl Twiggz) - Prince KiLLiK.mp3  |  consistent
+   aZ7v2HTR5w0     0    45/10   MORFMUZIK - OUTSIDERZ 3/MORFMUZIK - OUTSIDERZ 3 - MOZARF - 06 OUTSIDERZ FOR LIFE.mp3  |  consistent
+   aZ7v2HTR5w0   180    54/11   Tight Eyex - The Othxrz/Tighteyex - The Othxrz - 10 Fxck a hat move ft. KillFrankie.mp3  |  consistent
+   aZ7v2HTR5w0   300    58/9    Tight Eyex - The Othxrz/Tighteyex - The Othxrz - 10 Fxck a hat move ft. KillFrankie.mp3  |  consistent
+   aZ7v2HTR5w0   510    38/12   MORFMUZIK - OUTSIDERZ 3/MORFMUZIK - OUTSIDERZ 3 - MOZARF - 06 OUTSIDERZ FOR LIFE.mp3  |  consistent
+   ctwqUAT9bIE    30   285/9    MORFMUZIK - OUTSIDERZ 3/MORFMUZIK - OUTSIDERZ 3 - MOZARF - 11 WHEN THE WORST COME.mp3  |  consistent
+   ctwqUAT9bIE    45   140/11   MORFMUZIK - OUTSIDERZ 3/MORFMUZIK - OUTSIDERZ 3 - MOZARF - 11 WHEN THE WORST COME.mp3  |  consistent
+   ctwqUAT9bIE    60    84/11   MORFMUZIK - OUTSIDERZ 3/MORFMUZIK - OUTSIDERZ 3 - MOZARF - 11 WHEN THE WORST COME.mp3  |  consistent
+   ctwqUAT9bIE    75    38/22   MORFMUZIK - OUTSIDERZ 3/MORFMUZIK - OUTSIDERZ 3 - MOZARF - 11 WHEN THE WORST COME.mp3  |  consistent
+   ctwqUAT9bIE   150    39/11   KIMG OF BUCK IX MIX TAPE ALBUM 2K18/PLAYA Soulfabex MOZARF Kid NY Mindlezz HYPESTEREO Kaataaa Young Twiggz - KING OF BUCK Ⅸ MIX TAPE ALBUM 2K18 - 17 YoungTwiggz - Gap of heart.mp3  |  consistent
+   ctwqUAT9bIE   270   184/10   MORFMUZIK - OUTSIDERZ 3/MORFMUZIK - OUTSIDERZ 3 - MOZARF - 11 WHEN THE WORST COME.mp3  |  FCDKrump - FCD Krump Worldwide/FCDKrump - FCD Krump Worldwide - 13 KlawBeatz - Spain.mp3
+   ctwqUAT9bIE   285   177/10   MORFMUZIK - OUTSIDERZ 3/MORFMUZIK - OUTSIDERZ 3 - MOZARF - 11 WHEN THE WORST COME.mp3  |  FCDKrump - FCD Krump Worldwide/FCDKrump - FCD Krump Worldwide - 13 KlawBeatz - Spain.mp3
+   ctwqUAT9bIE   300    70/10   MORFMUZIK - OUTSIDERZ 3/MORFMUZIK - OUTSIDERZ 3 - MOZARF - 11 WHEN THE WORST COME.mp3  |  FCDKrump - FCD Krump Worldwide/FCDKrump - FCD Krump Worldwide - 13 KlawBeatz - Spain.mp3
+   cwxXc58b-Co    90   135/11   Mozarf X Dabl2ody - KMD/Mozarf X Dabl2ody - KMD - 02 STOMP SUR TOI.mp3  |  consistent
+   cwxXc58b-Co   180   120/25   Mozarf X Dabl2ody - KMD/Mozarf X Dabl2ody - KMD - 02 STOMP SUR TOI.mp3  |  consistent
+   cwxXc58b-Co   195   118/27   Big Rulez - Retribution/Pull Up.mp3  |  consistent
+   cwxXc58b-Co   255    56/19   Big Rulez - Retribution/Pull Up.mp3  |  consistent
+   cwxXc58b-Co   315   138/62   KMD2 - MMP X DABL2ODY/Mozarf X Dabl2ody - K.M.D VOL 2 - 04 NATURAL BUCK.mp3  |  consistent
+   cwxXc58b-Co   540    47/10   KMD2 - MMP X DABL2ODY/Mozarf X Dabl2ody - K.M.D VOL 2 - 09 THE NATURAL BUCKNESS.mp3  |  Morf&Rulez - OVERDOSE -2/Morf&Rulez - OVERDOSE -2- - 06 Mozarf - Saturation.mp3
+   d6oIL8erQoc   225    35/12   TightEyex - The SHIFT/TightEyex - The SHIFT - 05 Apocalypse.mp3  |  consistent
+   d6oIL8erQoc   240    72/10   TightEyex - The SHIFT/TightEyex - The SHIFT - 05 Apocalypse.mp3  |  Pluton Beats - Rise Against 2K25/Pluton Beats - Rise Against 2K25 - 12 LUKE BANGERZ - I'M RUTHLESS.mp3
+   d6oIL8erQoc   255   156/12   TightEyex - The SHIFT/TightEyex - The SHIFT - 05 Apocalypse.mp3  |  TightEyex - 5417923/TightEyex - 5417923 - 03 Another raw Get-off (bvckloop).mp3
+   gYYMozM7eZY     0   102/11   MOZARF - FROM THE STREET/MOZARF - FROM THE STREET - 10 UNDERGROUND GUETTO ( black black ).mp3  |  
+   kVwepVAQ2uo   150    32/10   Secret Tracks/AUD-20241110-WA0000.mp3  |  consistent
+   kVwepVAQ2uo   180    34/10   KMD2 - MMP X DABL2ODY/Mozarf X Dabl2ody - K.M.D VOL 2 - 01 BAD GRIMMEY.mp3  |  consistent
+   llTEtYs7XtY     0    39/13   PLAYA - WHIPHEADZ/PLAYA - WHIPHEADZ - 02 WHIPHEAD KTS.mp3  |  consistent
+   miIWm1_FVyg   105    37/12   Morf&Rulez - OVERDOSE -2/Morf&Rulez - OVERDOSE -2- - 06 Mozarf - Saturation.mp3  |  consistent
+   miIWm1_FVyg   120    89/12   Morf&Rulez - OVERDOSE -2/Morf&Rulez - OVERDOSE -2- - 06 Mozarf - Saturation.mp3  |  consistent
+   miIWm1_FVyg   135    96/15   Morf&Rulez - OVERDOSE -2/Morf&Rulez - OVERDOSE -2- - 06 Mozarf - Saturation.mp3  |  consistent
+   miIWm1_FVyg   150    90/15   Morf&Rulez - OVERDOSE -2/Morf&Rulez - OVERDOSE -2- - 06 Mozarf - Saturation.mp3  |  consistent
+   miIWm1_FVyg   165    60/10   Morf&Rulez - OVERDOSE -2/Morf&Rulez - OVERDOSE -2- - 06 Mozarf - Saturation.mp3  |  consistent
+   mxrEt75RUXc   120    62/10   트랙리스트/LT Elitez Session Round 3.m4a  |  consistent
+   mxrEt75RUXc   675    44/11   트랙리스트/LT Elitez Session Round 3.m4a  |  consistent
+   mxrEt75RUXc   765    47/10   트랙리스트/LT Elitez Session Round 3.m4a  |  consistent
+   qd5UOrXfLp8   135    40/12   PLAYA/PLAYA x KID NY - -FREE- STILL TRUE - 03 I AM EVERYTHING.mp3  |  consistent
+   s-weowwHNUo    60    65/21   Big Rulez - 火影Hokage/Big Rulez - 火影Hokage - 15 Scary House -怖い家-.mp3  |  consistent
+   s-weowwHNUo   105    62/15   MORFMUZIK - GALAXY - EBS 2.0 - GOLDEN EDITION/MORFMUZIK - GALAXY - EBS 2.0 - GOLDEN EDITION - 10 SCRIPTERZ VS BULLZEYEX - MOZARF.mp3  |  consistent
+   s-weowwHNUo   210    44/10   MORFMUZIK - GALAXY - EBS 2.0 - GOLDEN EDITION/MORFMUZIK - GALAXY - EBS 2.0 - GOLDEN EDITION - 10 SCRIPTERZ VS BULLZEYEX - MOZARF.mp3  |  consistent
+   s2XkM5fVutQ    15    38/11   Tight Eyez - BVCKSTR #2(완전판)/Tight Eyez - BVCKSTR #2 - 05 Who are you.mp3  |  MOWGLI - Back to Buckness Vol. 2/MOWGLI - Back to Buckness Vol. 2 - 11 RABBIA.mp3
+   s2XkM5fVutQ    30    38/11   Tight Eyez - BVCKSTR #2(완전판)/Tight Eyez - BVCKSTR #2 - 05 Who are you.mp3  |  Big Rulez - DISTORTION/Big Rulez - DISTORTION - 05 The Blast.mp3
+   s2XkM5fVutQ   450    33/11   Morf muzik - OUTSIDERZ VOL.2/MORFMUZIK - OUTSIDERZ VOL 2 - 05 MORFMUZIK - MOZARF (BG BASTOS SAMPLE).mp3  |  
+   xEvfamzUTIs    75    44/14   MORFMUZIK - GALAXY - EBS 2.0 - GOLDEN EDITION/MORFMUZIK - GALAXY - EBS 2.0 - GOLDEN EDITION - 15 MOZARF_MADNESS TILL I DIE ....mp3  |  consistent

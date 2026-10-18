@@ -40,6 +40,7 @@ Lambda 단가 (서울):
 Chrome 확장 ──HTTPS(Function URL, X-Api-Key 헤더)──▶ Lambda krump-finder (컨테이너 이미지, x86_64)
                                                      ├ 시작할 때 S3 runtime/에서 받아 /tmp에 둠
                                                      │   ├ rhythm.npz (234MB)
+                                                     │   ├ pair.npz (2점 해시 인덱스, 214MB)
                                                      │   └ data.mdb (fingerprint DB, 1.17GB → zstd 조각 36개 472MB)
                                                      ├ Panako queryServer (JVM, 읽기 전용 LMDB)
                                                      ├ ffmpeg
@@ -147,5 +148,5 @@ python server/deploy/aws_setup.py bucket data image function
 |---|---|---|
 | 동기 요청 페이로드 | 6MB | 45초 Opus 녹음도 약 1MB라 문제없음 |
 | 실행 시간 | 함수 설정 60초 | 요청당 수 초 |
-| `/tmp` | 설정 3GB | 데이터 1.4GB + 녹음 변환 |
+| `/tmp` | 설정 3GB | 데이터 1.6GB + 녹음 변환 |
 | 인스턴스 네트워크 | 약 80MB/s (측정) | 콜드 스타트 하한을 정함 |

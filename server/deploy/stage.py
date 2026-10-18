@@ -12,7 +12,8 @@ build/runtime/ (S3 runtime/):
   data.mdb.parts/                         fingerprint DB, copied without the Windows map-size
                                           preallocation (32 GB file -> ~1.2 GB), as zstd parts
   rhythm.npz                              rhythm index
-Lambda reads rarely used image files at ~7 MB/s, so these two are not in the image.
+  pair.npz                                pair-hash index (poc/pairfp.py build, 0.2 GB)
+Lambda reads rarely used image files at ~7 MB/s, so these are not in the image.
 """
 from __future__ import annotations
 
@@ -57,7 +58,7 @@ def main() -> None:
         shutil.rmtree(app / sub, ignore_errors=True)
     (app / "poc").mkdir(parents=True)
     (app / "server").mkdir()
-    for name in ("common.py", "grouping.py", "rhythm.py"):
+    for name in ("common.py", "grouping.py", "pairfp.py", "rhythm.py"):
         shutil.copy2(ROOT / "poc" / name, app / "poc" / name)
     shutil.copy2(ROOT / "server" / "app.py", app / "server" / "app.py")
     for name in ("Dockerfile", "requirements.txt", ".dockerignore"):
@@ -78,6 +79,7 @@ def main() -> None:
     shutil.rmtree(runtime, ignore_errors=True)
     runtime.mkdir(parents=True)
     shutil.copy2(ROOT / "db" / "rhythm.npz", runtime / "rhythm.npz")
+    shutil.copy2(ROOT / "db" / "pair.npz", runtime / "pair.npz")
     # Env.copy writes only the used pages (compact=True crashes on this Windows build).
     tmp = ROOT / "build" / "dbcopy"
     shutil.rmtree(tmp, ignore_errors=True)

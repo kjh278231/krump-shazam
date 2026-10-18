@@ -11,8 +11,8 @@ S3 under recordings/ (WAV + one JSON per query). Otherwise the audio is deleted 
 Environment (all optional; unset = local behaviour):
   KF_BUCKET       S3 bucket for recordings and the preview MP3s (previews/<library key>.mp3)
   KF_API_KEY      required X-Api-Key header on every endpoint except /health
-  KF_DATA_PREFIX  download the fingerprint DB (data.mdb) and rhythm.npz from s3://KF_BUCKET/<prefix>
-                  into KF_TMP at start (Lambda)
+  KF_DATA_PREFIX  download the fingerprint DB (data.mdb), rhythm.npz and pair.npz from
+                  s3://KF_BUCKET/<prefix> into KF_TMP at start (Lambda)
   KF_READONLY_DB  1 = open the fingerprint DB read-only without a lock file
   KF_DB_DIR       Panako DB folder (default db/panako)
   KF_TMP          scratch folder for WAVs (default recordings/)
@@ -52,6 +52,7 @@ from pydantic import BaseModel  # noqa: E402
 
 from common import DB_DIR, FFMPEG, MUSIC_DIR, ROOT, EXCLUDE_FILE, Library, PanakoServer  # noqa: E402
 from grouping import group, load_links, verdict  # noqa: E402
+from pairfp import INDEX_FILE as PAIR_INDEX_FILE, SR as PAIR_SR, PairIndex, confirm_score as pair_confirm_score  # noqa: E402
 from rhythm import SR as RHYTHM_SR, RhythmIndex, identify as rhythm_identify  # noqa: E402
 
 startup_log("imports")
@@ -69,10 +70,11 @@ if BUCKET:
     from botocore.config import Config as BotoConfig
     S3 = boto3.client("s3", config=BotoConfig(max_pool_connections=32))
 RHYTHM_FILE = ROOT / "db" / "rhythm.npz"
+PAIR_FILE = PAIR_INDEX_FILE
 DB_PATH = Path(os.environ.get("KF_DB_DIR", str(DB_DIR)))
-db_download = None
+db_download = pair_download = None
 if os.environ.get("KF_DATA_PREFIX"):
-    # The two large files come from S3 at every cold start instead of from the image: Lambda reads
+    # The large files come from S3 at every cold start instead of from the image: Lambda reads
     # rarely used image files at ~7 MB/s (66 s cold starts, 27 s first queries), S3 in-region is
     # far faster. Each download is parallel ranged GETs; the fingerprint DB keeps downloading
     # while the rhythm index is loaded (CPU-bound).
@@ -117,9 +119,12 @@ if os.environ.get("KF_DATA_PREFIX"):
         startup_log(f"{name} from S3 ({sent / 1e6:.0f} MB compressed, {sent / 1e6 / dt:.0f} MB/s)")
 
     downloads = ThreadPoolExecutor(2)
-    # The rhythm index first (needed first, and CPU-bound to load), then the DB in the background.
+    # The rhythm index first (needed first, and CPU-bound to load), then the DB and the pair index
+    # in the background.
     fetch("rhythm.npz", RHYTHM_FILE)
+    PAIR_FILE = TMP_DIR / "data" / "pair.npz"
     db_download = downloads.submit(fetch_parts, "data.mdb", DB_PATH / "db" / "data.mdb")
+    pair_download = downloads.submit(fetch, "pair.npz", PAIR_FILE)
 LINKS = load_links()
 # Library keys: paths relative to music/ with '/' (the same on this PC and on Lambda).
 LIBRARY = Library()
@@ -154,6 +159,12 @@ PANAKO = PanakoServer(db_dir=DB_PATH,
                                     # Panako creates its (here unused) print cache folder on start.
                                     **({"PANAKO_CACHE_FOLDER": str(TMP_DIR / "panako_cache")} if READONLY_DB else {})})
 startup_log("panako server, ready")
+if pair_download is not None:
+    pair_download.result()
+# Second fingerprint stage (poc/pairfp.py): pair hashes, which survive hall reverb and crowd noise
+# far better than Panako's triplets but only match near the original speed.
+PAIR = PairIndex(PAIR_FILE) if PAIR_FILE.exists() else None
+startup_log("pair index")
 
 
 # Album, cover and store link of a found song. albums.json: server/build_albums.py;
@@ -340,6 +351,17 @@ def identify_audio(body: bytes, title: str, url: str, partial: bool, share: bool
 
     songs = group(matches, LINKS)
     result, reason = verdict(songs)
+    method = "fingerprint"
+    dur = len(pcm) / PANAKO_SR
+    if result != "confirmed" and PAIR is not None:
+        t1 = time.time()
+        pair = [m for m in PAIR.query(resample(pcm, PANAKO_SR, PAIR_SR)) if m.match_path not in EXCLUDED]
+        timings["pair"] = round(time.time() - t1, 2)
+        pair_songs = group(pair, LINKS)
+        need = pair_confirm_score(dur)
+        if verdict(pair_songs, confirm=need, check=need)[0] == "confirmed":
+            songs, result, reason, method = pair_songs, "confirmed", "", "pair"
+        elapsed = time.time() - t0
 
     def describe(m):
         return {
@@ -358,12 +380,10 @@ def identify_audio(body: bytes, title: str, url: str, partial: bool, share: bool
         "preview_only": s.preview_only,
         "also_in": [describe(m) for m in s.members if m is not s.head],
     } for s in songs]
-    method = "fingerprint"
     top_ids = [m.match_id for m in sorted(songs[0].members, key=lambda m: m is not songs[0].head)] if songs else []
 
-    dur = len(pcm) / PANAKO_SR
-    # Mid-recording checks also run the rhythm search (battle videos almost never confirm by
-    # fingerprint: 41 of 2,344 battle-100 windows). RHYTHM_EARLY, measured on 10/15/20 s
+    # Mid-recording checks also run the rhythm search (most battle-100 windows confirm by neither
+    # fingerprint: Panako 41 of 2,344, with the pair stage 414). RHYTHM_EARLY, measured on 10/15/20 s
     # prefixes (poc/eval_rhythm_early.py): of 409 battle windows found at 30 s, 30 stop at 10 s
     # and 135 more at 15 s (1 wrong); of 1,618 windows where the final search finds nothing,
     # 27 stop on a candidate (20 s only: 15).

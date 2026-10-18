@@ -15,6 +15,7 @@ before building the Chrome extension.
 | `tools/Panako/` | Panako 2.1 source checkout (not in git) |
 | `patches/panako.patch` | Our changes to Panako (see below) |
 | `db/panako/` | Fingerprint DB (LMDB) + per-track print cache |
+| `db/pair.npz` | Pair-hash index, the second fingerprint stage (`poc/pairfp.py`) |
 | `db/rhythm.npz`, `db/rhythm_cohort.npz` | Rhythm fallback index and per-track score stats |
 | `db/same_audio.csv` | Library files that contain the same recording |
 | `db/holdout.txt` | ~2% of tracks never indexed, used to measure false positives |
@@ -38,8 +39,8 @@ git -C tools/Panako apply ../../patches/panako.patch
 cd tools/Panako && gradlew.bat shadowJar
 ```
 
-Not in git (see `.gitignore`): `music/`, the generated DBs (`db/panako/`, `db/rhythm*.npz`;
-rebuild with `build_index.py`, `build_rhythm_index.py`, `rhythm_cohort.py`), the album list
+Not in git (see `.gitignore`): `music/`, the generated DBs (`db/panako/`, `db/pair.npz`, `db/rhythm*.npz`;
+rebuild with `build_index.py`, `pairfp.py build`, `build_rhythm_index.py`, `rhythm_cohort.py`), the album list
 (`db/albums.json`, `db/covers/`; `server/build_albums.py`), the store covers (`db/store_covers/`;
 `server/fetch_store_covers.py`), `recordings/`,
 downloaded video audio and generated test clips. `db/same_audio.csv` and `db/holdout.txt` are
@@ -49,6 +50,7 @@ committed because they are small and slow to rebuild.
 
 ```bash
 python poc/build_index.py --threads 8      # fingerprint the library (resumable)
+python poc/pairfp.py build                 # pair-hash index of the same files (~20 min)
 python poc/make_testset.py --n 100         # synthetic noisy 30 s clips + manifest.csv
 python poc/evaluate.py --threads 8         # metrics -> poc/report.txt, poc/results.csv
 ```
@@ -108,6 +110,8 @@ Candidates are grouped into songs (`poc/grouping.py`):
 - Verdict: 확정 when the best song scores ≥ 10 and no *different* song reaches 60% of its
   score; otherwise 추가 확인 (low score or close rival); below 5 → 실패. On the synthetic set
   this gives 0 confirmed-but-wrong answers (crowd 3 dB: 85 confirmed, 5 check, 10 fail).
+- When Panako does not confirm, the pair-hash stage gets the same audio (see **Pair-hash stage**
+  below). Its answer is 확정 or nothing; the rhythm search runs only when neither confirms.
 
 Flow: popup gets a tab-capture stream id → background service worker → offscreen document
 records with `MediaRecorder` (Opus) while playing the audio back to the speakers →
@@ -186,9 +190,55 @@ End to end through the HTTP server (`python server/loadtest.py <webm>... --clean
 
 On Linux, process start-up is milliseconds, so the ffmpeg share should mostly disappear.
 
+## Pair-hash stage (second fingerprint)
+
+**Why.** Panako hashes three spectral peaks. In a hall with crowd noise, a hash survives only if
+all three peaks do, so with a peak surviving at p the hash survives at p³. A Shazam-style hash of
+two peaks (Wang 2003) survives at p². On the battle-100 windows the rhythm search had found,
+Panako confirms 29 of 409 and a pair index 290 (`docs/fp-experiments-e1-e6.md` E5, branch
+`fp-experiments`). Pairs do not survive a speed change: at ±3% they find nothing, so off-speed
+videos stay with Panako and the rhythm search.
+
+**How it works** (`poc/pairfp.py`, audfprint conventions):
+- 11025 Hz, 512-point STFT, hop 256. Log magnitude, then a high-pass over time per bin that
+  favours onsets. Local maxima over 31 bins × 9 frames, at most 20 per second.
+- Each peak pairs with its next 3 peaks within 63 frames and ±31 bins: a 20-bit hash (f1, df, dt).
+- A query votes per track for the time offset, with ±1 frame tolerance, and is fingerprinted at
+  4 sub-hop shifts. Score = hashes at the best offset.
+- `python poc/pairfp.py build` → `db/pair.npz`: the 4,132 files of the fingerprint DB (read from its
+  LMDB resource map) under their Panako ids, so `db/same_audio.csv` grouping applies unchanged.
+  51.7 M hashes in 214 MB (per hash a start offset; per entry the file number and time in 32 bits),
+  built in 19 min with 4 processes. A query takes 0.1 s for 10 s of audio and 0.3 s for 30 s.
+
+**When an answer counts.** 확정 needs 24 hashes at one offset for 10 s of audio and 32 from 15 s
+on, with no other song at 60% of that (`CONFIRM` in `poc/pairfp.py`). Calibration
+(`poc/fpexp/e7_pair_lengths.py` on branch `fp-experiments`): 3,842 test clips cut to 10–30 s.
+Songs not in the library, and noisy or off-speed library songs, scored at most 20 at 10 s and 29
+from 15 s on. Those are shared drum loops whose hashes line up at one offset across the clip, so
+the bar does not grow past 15 s.
+
+**Battle-100** (`python poc/eval_pair.py` → `realtest/battle100/pair_report.txt`). Each of the 2,344
+windows was queried again with the pair stage, at 10/15/20/30 s:
+
+| Deployed answer (30 s) | Windows | Pair stage confirms the same song | another song | nothing |
+|---|---|---|---|---|
+| fingerprint 확정 | 41 | (Panako first) | | |
+| fingerprint 추가 확인 | 34 | 23 | 0 | 11 |
+| rhythm 유력 | 410 | 254 | 2 | 154 |
+| rhythm 약한 | 241 | 32 | 6 | 203 |
+| nothing | 1,618 | | 56 new | 1,562 |
+
+- Confirmed windows go from 41 to 414.
+- Of the 8 "another song" windows, 3 follow a Panako confirmation of the pair's song in the window
+  before (ctwqUAT9bIE), and 4 are rhythm answers that change from window to window while the pair
+  answer stays.
+- 46 of the 56 new answers name a song that a window 30 s away also names.
+- Recordings stop earlier. Among windows answered either way, 10 s stops go from 27 to 218, and full
+  30 s recordings from 428 to 363.
+
 ## Rhythm fallback (reverberant room recordings)
 
-**When it runs.** If Panako finds nothing, the server runs a second search on rhythm
+**When it runs.** If Panako and the pair stage find nothing, the server runs a search on rhythm
 (`poc/rhythm.py`). Hall/camera recordings smear the spectral peaks Panako uses, but the timing
 of the drum hits survives.
 
@@ -249,9 +299,9 @@ stricter thresholds: 유력 at ratio ≥ 1.25 and agree, 약한 at ratio ≥ 1.3
 | Unknown songs (39 at 1.0, 39 off speed) | +1 | – |
 | User captures | WLDLF 07 (유력) | yes |
 
-**During recording** (`poc/eval_rhythm_early.py` → `realtest/rhythm_early.jsonl`). Battle videos
-almost never confirm by fingerprint (41 of 2,344 battle-100 windows), so mid-recording checks also
-run the rhythm search, from 10 s on. A 유력 candidate ends the recording when its ratio clears the
+**During recording** (`poc/eval_rhythm_early.py` → `realtest/rhythm_early.jsonl`). Most battle
+windows confirm by neither fingerprint (Panako 41 of 2,344 battle-100 windows, 414 with the pair
+stage), so mid-recording checks also run the rhythm search, from 10 s on. A 유력 candidate ends the recording when its ratio clears the
 bar for the length recorded: 1.5 at 10 s, 1.3 at 15 s, 1.2 from 20 s (`RHYTHM_EARLY` in
 `server/app.py`). The checks run at 10.5 s, then every 4 s, held back to 15.5 / 20.5 s when they
 would land just short of a step.

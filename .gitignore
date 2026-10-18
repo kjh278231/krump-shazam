@@ -3,6 +3,7 @@ music/
 
 # Generated databases (rebuild with the poc/ scripts)
 db/panako/
+db/pair.npz
 db/rhythm.npz
 db/rhythm_cohort.npz
 db/rhythm_cohort_wide.npz
