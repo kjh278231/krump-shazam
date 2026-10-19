@@ -33,6 +33,7 @@
   2. `screenshot-2-unsure.png`
   3. `screenshot-3-listen.png`
   4. `screenshot-4-library.png`
+  5. `screenshot-5-retry.png` (1.1.0부터)
 - 작은 프로모션 타일(440×280): `store/assets/promo-small-440x280.png`
 - 스크린샷의 앨범 커버는 일부러 제목 타일로 바꿨습니다. 다른 아티스트의 앨범 아트를 홍보 이미지에 쓰지 않기 위해서입니다.
 
@@ -62,7 +63,7 @@ Krump Track Finder는 지금 보고 있는 탭의 소리를 듣고 크럼프 음
 
 ■ 알아 두세요
 - 라이브러리에 있는 곡만 찾을 수 있습니다.
-- 처음 쓸 때 개인정보처리방침에 동의해야 합니다. 찾기를 누르면 탭의 소리(최대 1분)와 탭 제목·주소를
+- 처음 쓸 때와 방침이 바뀔 때 개인정보처리방침에 동의해야 합니다. 찾기를 누르면 탭의 소리(최대 1분)와 탭 제목·주소를
   서버로 보내고, 곡 찾기 정확도를 높이기 위해 저장합니다. 이름·계정 같은 정보는 받지 않습니다.
 ```
 
@@ -84,7 +85,7 @@ Krump Track Finder listens to the current tab and finds the same track in a krum
 - Browse and search the whole library.
 
 Only tracks in the library can be found. Using the extension requires agreeing to the privacy
-policy: when you search, the tab's audio (up to 1 minute) and its title and URL are sent to the server
+policy (again when it changes): when you search, the tab's audio (up to 1 minute) and its title and URL are sent to the server
 and stored to improve accuracy. No name, account or other personal details are collected.
 ```
 
@@ -135,6 +136,7 @@ and stored to improve accuracy. No name, account or other personal details are c
 
 1. `extension/manifest.json`의 `version`을 올립니다(이전보다 커야 업로드됩니다).
 2. `python store/package.py` → 대시보드의 패키지 탭에서 새 zip을 올리고 검토를 제출합니다.
+   화면이 바뀌었으면 스토어 등록정보의 스크린샷과 설명도 맞춥니다.
 3. 권한이나 수집 데이터가 바뀌면 4번과 개인정보처리방침도 고칩니다.
 
 ## 비용과 보안 메모
