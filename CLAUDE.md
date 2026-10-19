@@ -10,6 +10,7 @@
   - 평가 세트·도구와 측정 결과: `docs/evaluation.md`
   - 설치, 인덱스 빌드, 실행: `README.md`
   - 배포 구성과 절차: `docs/lambda-deployment.md`
+  - 영상별 기록(공유 규칙, `/video`): `docs/video-records.md`
 - 구조나 검색 단계가 바뀌면 `docs/overview.md`도 같이 고친다.
 
 ## 배포 (AWS Lambda)

@@ -7,6 +7,8 @@ A final query is kept only when the user agreed to share recordings (the extensi
 docs/privacy-policy.md): locally under recordings/ (WAV + row in recordings/log.csv, a valid
 poc/evaluate.py manifest once the popup's feedback fills in `expected`); with KF_BUCKET set, in
 S3 under recordings/ (WAV + one JSON per query). Otherwise the audio is deleted after the search.
+A shared confirmed or unsure result in a YouTube or Instagram video also becomes a per-video record
+(server/videos.py, docs/video-records.md) that GET /video serves to other users of the same video.
 
 Environment (all optional; unset = local behaviour):
   KF_BUCKET       S3 bucket for recordings and the preview MP3s (previews/<library key>.mp3)
@@ -16,6 +18,7 @@ Environment (all optional; unset = local behaviour):
   KF_READONLY_DB  1 = open the fingerprint DB read-only without a lock file
   KF_DB_DIR       Panako DB folder (default db/panako)
   KF_TMP          scratch folder for WAVs (default recordings/)
+  KF_VIDEO_DIR    per-video records without KF_BUCKET (default recordings/videos/)
   HOST, PORT      listen address (default 127.0.0.1:8765)
 """
 from __future__ import annotations
@@ -55,6 +58,7 @@ from grouping import group, load_links, verdict  # noqa: E402
 from pairfp import (AGREE as PAIR_AGREE, AGREE_SECONDS as PAIR_AGREE_SECONDS, INDEX_FILE as PAIR_INDEX_FILE,  # noqa: E402
                     SR as PAIR_SR, PairIndex, confirm_score as pair_confirm_score)
 from rhythm import SR as RHYTHM_SR, RhythmIndex, identify as rhythm_identify  # noqa: E402
+import videos  # noqa: E402
 
 startup_log("imports")
 
@@ -70,6 +74,12 @@ if BUCKET:
     import boto3
     from botocore.config import Config as BotoConfig
     S3 = boto3.client("s3", config=BotoConfig(max_pool_connections=32))
+# Per-video records (server/videos.py): S3 videos/ on Lambda, else a local folder.
+VIDEO_STORE = (videos.S3Store(S3, BUCKET) if S3
+               else videos.DirStore(Path(os.environ.get("KF_VIDEO_DIR", str(ROOT / "recordings" / "videos")))))
+# The commit the image was staged from (server/deploy/stage.py), kept in each record.
+BUILD_FILE = Path(__file__).resolve().parent / "build.txt"
+BUILD = BUILD_FILE.read_text().strip()[:7] if BUILD_FILE.exists() else "local"
 RHYTHM_FILE = ROOT / "db" / "rhythm.npz"
 PAIR_FILE = PAIR_INDEX_FILE
 DB_PATH = Path(os.environ.get("KF_DB_DIR", str(DB_DIR)))
@@ -304,18 +314,24 @@ def resample(x: np.ndarray, sr_in: int, sr_out: int) -> np.ndarray:
 
 @app.post("/identify", dependencies=[Depends(check_key)])
 async def identify(request: Request, title: str = "", url: str = "", partial: bool = False,
-                   share: bool = False) -> dict:
+                   share: bool = False, vkey: str = "") -> dict:
     """partial=1: a mid-recording check from the extension; the recording continues unless the
     answer is final. share=1: the user agreed to share recordings, so the final query is kept
     with the tab's title and URL (title and url are sent only then); else nothing is stored.
 
+    vkey (1.2.0 on, with share=1): the tab's video (docs/video-records.md). A final answer then
+    carries `video`, and a shared confirmed or unsure one is recorded for the video. A malformed
+    vkey is ignored: everything is as before.
+
     The work runs on the thread pool so concurrent requests from several users overlap: the
     Panako server handles queries on its own Java threads and numpy releases the GIL."""
     body = await request.body()
-    return await run_in_threadpool(identify_audio, body, title, url, partial, share)
+    video = {"key": vkey} if videos.parse_key(vkey) else None
+    return await run_in_threadpool(identify_audio, body, title, url, partial, share, video)
 
 
-def identify_audio(body: bytes, title: str, url: str, partial: bool, share: bool = False) -> dict:
+def identify_audio(body: bytes, title: str, url: str, partial: bool, share: bool = False,
+                   video: dict | None = None) -> dict:
     if len(body) < 1000:
         raise HTTPException(400, "recording is empty (is the tab playing audio?)")
     TMP_DIR.mkdir(parents=True, exist_ok=True)
@@ -459,7 +475,7 @@ def identify_audio(body: bytes, title: str, url: str, partial: bool, share: bool
     else:
         wav.unlink()
 
-    return {
+    out = {
         "id": stamp if share else None,  # feedback needs a stored query
         "verdict": result,
         "reason": reason,
@@ -469,16 +485,38 @@ def identify_audio(body: bytes, title: str, url: str, partial: bool, share: bool
         "timings": timings,
         "songs": out_songs,
     }
+    if video is not None:
+        out["video"] = {"key": video["key"]}
+        event = share and videos.make_event(stamp, video["key"], result, method, out_songs,
+                                            top_ids[0] if top_ids else None, BUILD,
+                                            datetime.now().date().isoformat())
+        if event:
+            try:
+                VIDEO_STORE.put(event)
+            except Exception as e:  # the search result matters more than its record
+                print(f"video record not saved: {type(e).__name__}", file=sys.stderr, flush=True)
+    return out
 
 
 class Feedback(BaseModel):
     id: str
     correct: bool
     path: str = ""  # library key of the match the user confirmed (defaults to the top one)
+    video: str = ""  # video key of the result (1.2.0 on): the answer also goes on its video record
 
 
 @app.post("/feedback", dependencies=[Depends(check_key)])
 def feedback(fb: Feedback) -> dict:
+    save_feedback(fb)
+    if videos.parse_key(fb.video):
+        try:  # there is no record when nothing was found
+            VIDEO_STORE.update_feedback(fb.video, fb.id, fb.correct)
+        except Exception as e:
+            print(f"video record feedback not saved: {type(e).__name__}", file=sys.stderr, flush=True)
+    return {"ok": True}
+
+
+def save_feedback(fb: Feedback) -> None:
     if S3:
         key = f"recordings/{Path(fb.id).name}.json"
         try:
@@ -489,7 +527,7 @@ def feedback(fb: Feedback) -> dict:
         row["expected"] = (fb.path or row["match"]) if fb.correct else ""
         S3.put_object(Bucket=BUCKET, Key=key, Body=json.dumps(row, ensure_ascii=False).encode(),
                       ContentType="application/json")
-        return {"ok": True}
+        return
     with log_lock:
         rows = read_log()
         for r in rows:
@@ -497,8 +535,38 @@ def feedback(fb: Feedback) -> dict:
                 r["feedback"] = "correct" if fb.correct else "wrong"
                 r["expected"] = (str(MUSIC_DIR / fb.path) if fb.path else r["match"]) if fb.correct else ""
                 write_log(rows)
-                return {"ok": True}
+                return
     raise HTTPException(404, "unknown query id")
+
+
+key_of_id: dict[int, str] | None = None
+
+
+def library_song(song: dict) -> dict | None:
+    """A recorded song as the popup shows it, from the library as it is now: a file that moved since
+    is found again by its content id (rhythm index), an excluded or removed one is dropped."""
+    global key_of_id
+    path = LIBRARY.keys.get(song["path"].lower(), "")
+    ids = song.get("ids") or ([song["id"]] if song.get("id") is not None else [])
+    if not path and ids and RHYTHM is not None:
+        if key_of_id is None:
+            key_of_id = {int(i): LIBRARY.key(p) for i, p in zip(RHYTHM.ids, RHYTHM.paths)}
+        path = next((key_of_id[i] for i in ids if i in key_of_id), "")
+    if not path or path in EXCLUDED:
+        return None
+    return {"path": path, "file": path.rsplit("/", 1)[-1], "folder": path.rsplit("/", 1)[0] if "/" in path else "",
+            "match_start": song["match_start"], "album": album_info([path], ids)}
+
+
+@app.get("/video", dependencies=[Depends(check_key)])
+def video(key: str) -> dict:
+    """The songs other users found in this video (docs/video-records.md), best first. Nothing is
+    stored and there is no listing of videos."""
+    if not videos.parse_key(key):
+        raise HTTPException(400, "bad video key")
+    songs = [{"status": s["status"], "song": song} for s in videos.summarize(VIDEO_STORE.list(key), same_audio)
+             if (song := library_song(s["song"]))]
+    return {"key": key, "songs": songs}
 
 
 PREVIEW_SECONDS = 10

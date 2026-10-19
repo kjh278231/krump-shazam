@@ -160,8 +160,9 @@ def role_arn() -> str:
         "Version": "2012-10-17", "Statement": [
             {"Effect": "Allow", "Action": ["s3:GetObject"], "Resource": [
                 f"arn:aws:s3:::{BUCKET}/previews/*", f"arn:aws:s3:::{BUCKET}/{DATA_PREFIX}*"]},
+            # recordings/: kept queries; videos/: per-video records (server/videos.py)
             {"Effect": "Allow", "Action": ["s3:GetObject", "s3:PutObject"],
-             "Resource": f"arn:aws:s3:::{BUCKET}/recordings/*"},
+             "Resource": [f"arn:aws:s3:::{BUCKET}/recordings/*", f"arn:aws:s3:::{BUCKET}/videos/*"]},
             # without ListBucket a missing key is reported as AccessDenied instead of NoSuchKey
             {"Effect": "Allow", "Action": ["s3:ListBucket"], "Resource": f"arn:aws:s3:::{BUCKET}"},
         ]}))

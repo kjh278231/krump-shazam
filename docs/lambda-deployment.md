@@ -38,6 +38,11 @@ Lambda 단가 (서울):
   한 번의 청구 시간은 3ms(측정)라 0.03GB-초이고, 월 8,640번에 약 $0.01이다. AWS가 몇 시간마다 인스턴스를 바꿀 때의
   콜드 스타트(회당 약 $0.002)를 더해도 월 $1 미만이다.
 - 따뜻하게 유지되는 인스턴스는 1개뿐이고, 교체 직후에는 콜드 스타트가 난다.
+
+영상별 기록(1.2.0, [영상별 기록](video-records.md)):
+- 영상 탭에서 팝업을 열면 `/health` 대신 `GET /video`를 부르므로 Lambda 호출 수는 그대로다.
+- S3 요청이 늘어난다. 조회마다 LIST 1번 + 그 영상의 이벤트 수만큼 GET, 공유한 찾기마다 PUT 1번이다. 하루 팝업 20번(이벤트
+  10개씩)과 찾기 5번이면 월 LIST 600 + GET 6,000 + PUT 150번으로 $0.01 미만이다(서울 단가 LIST·PUT $0.0045, GET $0.00035 / 1,000건).
 - 상시 대기 인스턴스 1개(10GB)를 24시간 켜 두면 약 $133/월이라 쓰지 않는다. 컨테이너 이미지라 SnapStart는 쓸 수 없다.
 
 참고: 혼자 쓰는 동안은 로컬 PC에서 서버를 돌리는 것도 0원이다. 확장 프로그램은 Lambda를 쓰고,
@@ -54,7 +59,8 @@ Chrome 확장 ──HTTPS(Function URL, X-Api-Key 헤더)──▶ Lambda krump-
                                                      ├ Panako queryServer (JVM, 읽기 전용 LMDB)
                                                      ├ ffmpeg
                                                      ├─▶ S3 previews/   미리듣기용 96kbps MP3 (Range GET으로 10초만)
-                                                     └─▶ S3 recordings/ 녹음 WAV + 결과·피드백 JSON
+                                                     ├─▶ S3 recordings/ 녹음 WAV + 결과·피드백 JSON
+                                                     └─▶ S3 videos/     영상별 기록 이벤트 JSON (1.2.0, GET /video가 읽음)
 ```
 
 | 리소스 | 이름 / 값 |
@@ -63,7 +69,7 @@ Chrome 확장 ──HTTPS(Function URL, X-Api-Key 헤더)──▶ Lambda krump-
 | Function URL | `build/function_url.txt`, 확장 프로그램의 기본 서버. `AuthType NONE` + 앱의 API 키 확인 |
 | API 키 | `build/api_key.txt` (git에 없음), 함수 환경 변수 `KF_API_KEY` |
 | ECR 저장소 | `krump-finder`, 최근 이미지 3개만 유지 |
-| IAM 역할 | `krump-finder-lambda`: CloudWatch Logs + 이 버킷의 `previews/`·`runtime/` 읽기, `recordings/` 읽기·쓰기 |
+| IAM 역할 | `krump-finder-lambda`: CloudWatch Logs + 이 버킷의 `previews/`·`runtime/` 읽기, `recordings/`·`videos/` 읽기·쓰기(`videos/`는 1.2.0 서버부터), 버킷 LIST |
 | S3 버킷 | `krump-finder-previews-136575447624`: 비공개(Block Public Access), SSE-S3 암호화 |
 | 웜 유지 | EventBridge Scheduler 그룹 `krump-finder`의 `krump-finder-warm`(5분마다 `/health`), 역할 `krump-finder-scheduler`(이 함수 호출만) |
 | 태그 | 모든 리소스에 `Project=krump-finder` |
@@ -94,6 +100,10 @@ python server/deploy/aws_setup.py bucket data image function warm
 - 앨범 목록(`GET /albums`)은 표지를 data URI로 넣은 JSON 하나(약 2MB)로 보낸다. 표지마다 요청하면
   300번 넘게 Lambda를 호출하게 되고 동시 실행 상한(3)에 걸린다.
 - 코드만 바꾸면 `stage.py` → `aws_setup.py image function`. 이미지에서 코드가 마지막 레이어라 몇 MB만 올라간다.
+  `function`은 함수 코드를 바꾸기 전에 IAM 역할의 버킷 정책(`role_arn()`)을 다시 쓰므로, 정책이 바뀐 배포(예: `videos/`)도
+  같은 두 단계다.
+- 배포 뒤 확인: `python tests/check_api.py --server "$(cat build/function_url.txt)" --key-file build/api_key.txt --no-store`.
+  `share=1`을 보내지 않아 녹음도 영상 기록도 남기지 않는다([영상별 기록](video-records.md) §6.2).
 - 확장 프로그램: Function URL과 API 키는 `extension/config.js`(git에 없음)에 고정돼 있고, 팝업에서
   보거나 바꿀 수 없다. `aws_setup.py function`이 이 파일을 다시 쓰므로 URL·키가 바뀌면 다시 실행하고
   확장 프로그램을 새로고침한다. 키는 확장 프로그램 파일과 요청 헤더에 그대로 들어 있어 숨겨지지는 않는다.
@@ -114,6 +124,8 @@ python server/deploy/aws_setup.py bucket data image function warm
 5. **API 키**: `KF_API_KEY`가 있으면 `/health`를 뺀 모든 요청에 `X-Api-Key`가 맞아야 한다(아니면 401).
    확장 프로그램은 미리듣기도 fetch로 받아 헤더를 붙인다.
 6. **FastAPI를 Lambda에서 실행**: Lambda Web Adapter 0.9.1. `/health`가 준비 확인 경로다.
+7. **영상별 기록**(1.2.0): `KF_BUCKET`이 있으면 S3 `videos/<플랫폼>/<영상 id>/<녹음 id>.json`, 없으면 `KF_VIDEO_DIR`
+   (기본 `recordings/videos/`). 이미지에는 `server/videos.py`와, 묶은 커밋을 담은 `server/build.txt`(`stage.py`가 씀)가 들어간다.
 
 ## 콜드 스타트 (측정)
 
@@ -139,6 +151,9 @@ python server/deploy/aws_setup.py bucket data image function warm
 | 최종 검색, 1분 녹음 (2026-10-19, feb8b41) | 찾은 경우 1.6~2.8초, 못 찾는 곡 6.5초 (fingerprint 1.6 + pair 0.5 + 리듬 0.8 + 넓은 범위 3.6). 같은 곡 30초는 5.0초 |
 | 10초 미리듣기 | 0.5초 |
 | 2점 해시 단계 (`timings.pair`, 2026-10-18) | 10초 녹음 0.07~0.15초, 30초 녹음 0.2~0.28초 |
+
+`GET /video`(1.2.0)는 아직 Lambda에서 재지 않았다. 로컬에서는 이벤트 3개 2ms, 200개 33ms였다([영상별 기록](video-records.md) §6.3).
+배포 뒤 이 표에 넣는다.
 
 확장 프로그램 흐름 시험 (하네스, Lambda):
 

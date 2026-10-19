@@ -2,7 +2,8 @@
 large data files the function downloads from S3 at start (aws_setup.py data uploads them).
 
 Image (no music files):
-  app/poc/*.py, app/server/app.py         code
+  app/poc/*.py, app/server/app.py, videos.py   code
+  app/server/build.txt                    the staged commit (kept in per-video records)
   app/db/rhythm_cohort.npz, rhythm_cohort_wide.npz, same_audio.csv, exclude.txt
   app/db/catalog.json                     library keys (music/ is not in the image)
   app/db/albums.json, covers/             album list (server/build_albums.py, run it first)
@@ -66,7 +67,9 @@ def main() -> None:
     (app / "server").mkdir()
     for name in ("common.py", "grouping.py", "pairfp.py", "rhythm.py"):
         shutil.copy2(ROOT / "poc" / name, app / "poc" / name)
-    shutil.copy2(ROOT / "server" / "app.py", app / "server" / "app.py")
+    for name in ("app.py", "videos.py"):
+        shutil.copy2(ROOT / "server" / name, app / "server" / name)
+    (app / "server" / "build.txt").write_text(commit)
     for name in ("Dockerfile", "requirements.txt", ".dockerignore"):
         shutil.copy2(HERE / name, OUT / name)
 

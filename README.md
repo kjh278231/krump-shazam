@@ -25,6 +25,7 @@ covers setup, building the indexes and running; the rest is under [Documentation
 | `poc/` | Indexing, evaluation and matching code (shared by the server) |
 | `server/` | FastAPI backend for the extension; `server/deploy/` builds and deploys it to AWS Lambda |
 | `extension/` | Chrome extension (Manifest V3) |
+| `tests/` | Unit tests (`server/videos.py`, `extension/video.js`) and checks against a running server |
 | `realtest/` | Real-video and battle-100 test results |
 | `store/` | Chrome Web Store package script, listing text and assets |
 | `docs/` | Design and reference documents (see [Documentation](#documentation)) |
@@ -83,7 +84,23 @@ The deployed server also needs the preview MP3s and the new data staged and uplo
    How the extension behaves: [`docs/extension.md`](docs/extension.md).
 
 Deploying the server: only from `main` as pushed to origin (`CLAUDE.md`, [`docs/lambda-deployment.md`](docs/lambda-deployment.md)).
-Tests and measurements: [`docs/evaluation.md`](docs/evaluation.md).
+Search accuracy tests and measurements: [`docs/evaluation.md`](docs/evaluation.md).
+
+## Tests
+
+No packages beyond the server's requirements; Node is optional (development only).
+
+```bash
+python -m unittest discover -s tests       # server/videos.py: video keys, sharing rules, stores
+node --test "tests/*.test.mjs"             # extension/video.js (Node 22; quote the glob, a bare folder does not work)
+```
+
+`tests/check_api.py` checks a running server: the requests of earlier extension versions get the same answers
+(`--baseline` before a server change, `--compare` after), the per-video records contract (`--contract`, local
+server only) and a deployed server without storing anything (`--no-store`). It cuts its clips from the
+battle-100 audio (`realtest/battle100/audio/`, not in git). Run the local server with `KF_TMP` and
+`KF_VIDEO_DIR` pointing at a scratch folder so `recordings/` is not touched; details in
+[`docs/video-records.md`](docs/video-records.md) §6.
 
 ## Documentation
 
@@ -94,6 +111,7 @@ Tests and measurements: [`docs/evaluation.md`](docs/evaluation.md).
 | [`docs/extension.md`](docs/extension.md) | Extension files, recording flow, popup screens, library page, consent and stored recordings, Web Store releases |
 | [`docs/evaluation.md`](docs/evaluation.md) | Test sets and tools, PoC results, real-video test, unverified candidates |
 | [`docs/lambda-deployment.md`](docs/lambda-deployment.md) | AWS Lambda: cost, deployed resources, deploy steps, cold starts |
+| [`docs/video-records.md`](docs/video-records.md) | Per-video records: video keys, event format, sharing rules, `GET /video`, tests |
 | [`docs/album-links.md`](docs/album-links.md) | Store links and covers (`db/album_links.json`) |
 | [`docs/privacy-policy.md`](docs/privacy-policy.md) | Privacy policy |
 | [`docs/review-shazam-noise-robustness.md`](docs/review-shazam-noise-robustness.md), [`docs/design-a-nmfp.md`](docs/design-a-nmfp.md), [`docs/design-b-muq.md`](docs/design-b-muq.md) | Fingerprint review and neural fingerprint proposals |
