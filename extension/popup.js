@@ -3,6 +3,10 @@
 // chrome.storage.session (background.js), because the popup closes whenever it loses focus.
 // Searching needs the user's consent to the privacy policy (privacy.html): recordings are kept
 // on the server to improve accuracy. Without it only the consent screen is shown.
+// Consent is to one version of the policy, its 시행일. When privacy.html changes, set POLICY to the
+// new 시행일 and POLICY_CHANGE to what changed: earlier consents (1.0.0 stored `true`) are asked again.
+const POLICY = '2026-10-19';
+const POLICY_CHANGE = '녹음이 최대 1분으로 늘었어요.';
 const $ = (id) => document.getElementById(id);
 const authHeaders = () => ({ 'X-Api-Key': SERVER.apiKey });
 // Every search records up to 30 s (the length the server's thresholds are calibrated on). Only
@@ -21,7 +25,8 @@ const ICON = {
   out: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M9 7h8v8"/></svg>',
 };
 
-let consent = false;  // chrome.storage.local 'consent'
+let consent = false;  // chrome.storage.local 'consent' is POLICY
+let agreedBefore = false;  // consented to an earlier policy: the consent screen says what changed
 const openPage = (file) => chrome.tabs.create({ url: chrome.runtime.getURL(file) });
 let tick = null;
 let serverDot = '';  // '', 'on' or 'off' (checkServer)
@@ -111,7 +116,8 @@ function render(state = {}) {
 
 async function setConsent(value) {
   consent = value;
-  try { await chrome.storage.local.set({ consent: value }); } catch {}
+  agreedBefore = false;  // agreed now, or withdrawn: no change to point out next time
+  try { await chrome.storage.local.set({ consent: value ? POLICY : false }); } catch {}
   const { state } = await chrome.storage.session.get('state');
   render(state);
 }
@@ -120,8 +126,9 @@ function consentScreen() {
   return [
     h('div', {}, h('h1', { class: 'headline' }, '시작하기 전에'),
       h('div', { class: 'sub' }, '곡을 찾으려면 아래 내용에 동의해 주세요.')),
+    agreedBefore && h('div', { class: 'note' }, '개인정보처리방침이 바뀌었어요.', h('br'), POLICY_CHANGE),
     h('ul', { class: 'tips' },
-      h('li', {}, '찾기를 누르면 이 탭의 소리(최대 45초)와 탭 제목·주소를 서버로 보내요.'),
+      h('li', {}, '찾기를 누르면 이 탭의 소리(최대 1분)와 탭 제목·주소를 서버로 보내요.'),
       h('li', {}, '보낸 녹음은 서버에 저장해 곡 찾기 정확도를 높이는 데 써요. 팔거나 다른 곳에 넘기지 않아요.'),
       h('li', {}, '이름·이메일·계정 같은 정보는 받지 않아요.')),
     h('button', { class: 'linkish', onclick: () => openPage('privacy.html') }, '개인정보처리방침 전체 보기'),
@@ -331,7 +338,8 @@ function ask(id, path) {
   try {
     // Earlier builds also kept a chosen length ('duration'); it is no longer read.
     const { consent: agreed } = await chrome.storage.local.get('consent');
-    consent = agreed === true;
+    consent = agreed === POLICY;
+    agreedBefore = !consent && (agreed === true || typeof agreed === 'string');
   } catch {}
   const { state, answered: a } = await chrome.storage.session.get(['state', 'answered']);
   answered = a || null;

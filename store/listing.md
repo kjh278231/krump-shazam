@@ -62,7 +62,7 @@ Krump Track Finder는 지금 보고 있는 탭의 소리를 듣고 크럼프 음
 
 ■ 알아 두세요
 - 라이브러리에 있는 곡만 찾을 수 있습니다.
-- 처음 쓸 때 개인정보처리방침에 동의해야 합니다. 찾기를 누르면 탭의 소리(최대 45초)와 탭 제목·주소를
+- 처음 쓸 때 개인정보처리방침에 동의해야 합니다. 찾기를 누르면 탭의 소리(최대 1분)와 탭 제목·주소를
   서버로 보내고, 곡 찾기 정확도를 높이기 위해 저장합니다. 이름·계정 같은 정보는 받지 않습니다.
 ```
 
@@ -84,7 +84,7 @@ Krump Track Finder listens to the current tab and finds the same track in a krum
 - Browse and search the whole library.
 
 Only tracks in the library can be found. Using the extension requires agreeing to the privacy
-policy: when you search, the tab's audio (up to 45 s) and its title and URL are sent to the server
+policy: when you search, the tab's audio (up to 1 minute) and its title and URL are sent to the server
 and stored to improve accuracy. No name, account or other personal details are collected.
 ```
 
@@ -102,7 +102,7 @@ and stored to improve accuracy. No name, account or other personal details are c
 | tabCapture | 사용자가 "현재 탭에서 찾기"를 누른 탭의 오디오를 녹음해 곡을 찾습니다. 녹음 중에도 소리는 사용자에게 그대로 들립니다. |
 | offscreen | Manifest V3 서비스 워커는 미디어를 녹음할 수 없어서, 오프스크린 문서에서 MediaRecorder로 탭 오디오를 녹음합니다(reason: USER_MEDIA). |
 | activeTab | 사용자가 아이콘을 누른 현재 탭만 대상으로 하고, 그 탭의 제목을 결과 화면에 표시합니다. |
-| storage | 동의 여부, 고른 녹음 길이, 진행 중인 찾기 상태, 라이브러리 목록 캐시를 브라우저에 저장합니다. |
+| storage | 동의 여부(동의한 개인정보처리방침의 시행일), 진행 중인 찾기 상태, 라이브러리 목록 캐시를 브라우저에 저장합니다. |
 | 호스트 권한 `https://*.lambda-url.ap-northeast-2.on.aws/*` | 녹음을 검색 서버(AWS Lambda)로 보내고 결과, 10초 미리듣기, 라이브러리 목록을 받습니다. |
 
 ### 원격 코드 (Remote code)
