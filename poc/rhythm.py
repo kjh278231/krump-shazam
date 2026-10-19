@@ -57,7 +57,9 @@ class RhythmIndex:
     FFT per chunk."""
 
     N = 1 << 16           # chunk length (frames)
-    MAX_Q = 2048          # longest query in frames (~47 s)
+    # Longest query in frames (~71 s). The extension records up to 60 s, 2,709 frames at speed 1.05;
+    # a longer query wraps around inside a chunk and inflates scores (2048: up to 43% too high at 60 s).
+    MAX_Q = 3072
 
     def __init__(self, path, exclude=frozenset(), cohort=None, cohort_wide=None):
         """exclude: normcased paths never to return, or a predicate on the stored path. cohort: path
