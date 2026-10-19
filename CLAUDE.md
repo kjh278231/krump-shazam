@@ -3,7 +3,13 @@
 ## 프로젝트 개요
 
 - 사용 목적, 아키텍처, 검색 단계별 기술 배경, 데이터, 문서 지도는 `docs/overview.md`에 정리돼 있다.
-  처음 작업할 때 먼저 읽는다. 실행법과 측정 수치 전체는 `README.md`에 있다.
+  처음 작업할 때 먼저 읽는다.
+- 세부 문서는 구성 요소별로 나뉘어 있다. 바뀐 곳의 문서를 같이 고친다.
+  - 검색 단계, 판정 기준과 보정, Panako 패치, 서버 속도: `docs/search-pipeline.md`
+  - 확장 프로그램 동작과 화면, 동의, 웹스토어 배포: `docs/extension.md`
+  - 평가 세트·도구와 측정 결과: `docs/evaluation.md`
+  - 설치, 인덱스 빌드, 실행: `README.md`
+  - 배포 구성과 절차: `docs/lambda-deployment.md`
 - 구조나 검색 단계가 바뀌면 `docs/overview.md`도 같이 고친다.
 
 ## 배포 (AWS Lambda)

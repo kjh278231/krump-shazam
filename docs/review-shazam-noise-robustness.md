@@ -9,7 +9,7 @@
     ([PDF](https://www.ee.columbia.edu/~dpwe/papers/Wang03-shazam.pdf))
   - 우리 Panako 소스: `tools/Panako`, 특히 `PanakoFingerprint.java`, `PanakoEventPointProcessor.java`,
     `util/Key.java`
-  - 우리 측정값: README의 "PoC results", "Rhythm fallback", "Real video test"
+  - 우리 측정값: [평가](evaluation.md)의 "PoC 결과", "실제 영상 테스트", [검색 파이프라인](search-pipeline.md)의 "rhythm search"
 - 관련 문서: [설계안 A — NMFP](design-a-nmfp.md), [설계안 B — MuQ](design-b-muq.md)
 
 ## 0. 요약
@@ -115,7 +115,7 @@
 
 ### 3.2 잔향은 더하기 잡음이 아니다
 
-우리 실패의 주원인은 README에 정리된 대로 홀 잔향입니다.
+우리 실패의 주원인은 [평가](evaluation.md)에 정리된 대로 홀 잔향입니다.
 
 | 조건 (25곡, 30 s, Panako) | 식별 |
 |---|---|
@@ -204,7 +204,7 @@ Panako(`PANAKO` 전략)가 저장과 검색에 실제로 쓰는 해시는 `Panak
 
 | ID | 가설 | 방법 | 비용 | 위험 |
 |---|---|---|---|---|
-| **E1** 오탐률 기반 Panako 임계값 | 고정 `score ≥ 10`이 너무 보수적이어서 약한 정답을 버리고 있을 수 있음 | 쿼리 시 `PANAKO_MIN_HITS_UNFILTERED/FILTERED`, `PANAKO_MIN_MATCH_DURATION`을 낮춰 sub-threshold 점수까지 받음. null 창들로 "최고 오답 점수" 분포를 만들고 0.1% 오탐에 맞는 임계값을 정함 (논문 2.3.1절) | 낮음. DB 재빌드 없음 | README상 배틀은 "약한 후보조차 없음"이라 상승폭이 작을 수 있음. **먼저 측정** |
+| **E1** 오탐률 기반 Panako 임계값 | 고정 `score ≥ 10`이 너무 보수적이어서 약한 정답을 버리고 있을 수 있음 | 쿼리 시 `PANAKO_MIN_HITS_UNFILTERED/FILTERED`, `PANAKO_MIN_MATCH_DURATION`을 낮춰 sub-threshold 점수까지 받음. null 창들로 "최고 오답 점수" 분포를 만들고 0.1% 오탐에 맞는 임계값을 정함 (논문 2.3.1절) | 낮음. DB 재빌드 없음 | [평가](evaluation.md)상 배틀은 "약한 후보조차 없음"이라 상승폭이 작을 수 있음. **먼저 측정** |
 | **E2** 녹음 길이 / 창 누적 | 길이가 늘면 정렬 해시가 쌓여 임계값을 넘음 (논문 Fig. 4) | battle100 오디오로 같은 위치를 30 s와 60 s로 Panako 쿼리해 비교. 효과가 있으면 "Panako 실패 + rhythm 약함"일 때만 녹음을 연장하거나, 연속 창의 hit를 Δt 정렬해 합산 | 낮음 (측정). 연장은 UX 비용 | 잔향 열화는 길이로 안 풀릴 수 있음 |
 | **E3** 크기 순서 비트 제거 | 비트 9–11이 잡음·잔향에서 뒤집혀 해시를 깸 | `hash()`에서 m 비트를 0으로 패치. 작은 DB(`poc/test_db`)로 재빌드해 합성 조건 비교 | 중간. 패치 + 소규모 재빌드. 본 DB 반영 시 43분 재빌드 | 엔트로피 3비트 감소 → 충돌과 오탐 증가. E1 방식으로 오탐 확인 |
 | **E4** 피크 밀도·fan-out 조정 | 기본값은 깨끗한 음원 기준. 휴대폰·홀 조건에는 더 촘촘하게 (논문 2.2절) | `PANAKO_FREQ_MAX_FILTER_SIZE`(103), `PANAKO_TIME_MAX_FILTER_SIZE`(25), `PANAKO_FP_MAX_TIME_DIST`(33)를 격자로 탐색. 작은 DB에서 비교 | 중간–높음. print 수와 DB 크기가 늘어 Lambda 이미지와 메모리에 영향 | 잡음 피크도 늘어남. Δt 투표가 걸러 줄지 확인 |
@@ -238,7 +238,7 @@ Panako(`PANAKO` 전략)가 저장과 검색에 실제로 쓰는 해시는 `Panak
 | `PANAKO_MIN_HITS_UNFILTERED` / `FILTERED` | 10 / 5 | 매치 후보 최소 hit |
 | `PANAKO_MIN_MATCH_DURATION` | 5 s | |
 | `PANAKO_MIN_SEC_WITH_MATCH` | 0.2 | |
-| `PANAKO_ROBUST_ALIGN` / `TOP_CANDIDATES` / `MAX_SPEED_CHANGE` | TRUE / 50 / 0.1 | 우리 패치 (README "Panako patches" 1) |
+| `PANAKO_ROBUST_ALIGN` / `TOP_CANDIDATES` / `MAX_SPEED_CHANGE` | TRUE / 50 / 0.1 | 우리 패치 ([검색 파이프라인](search-pipeline.md) §2.1의 1) |
 
 삼중 해시 생성(`packEventPointsIntoFingerprints`)은 anchor i에 대해 시간·주파수 거리 조건을 만족하는 모든
 (j, k)를 씁니다. fan-out 상한이 따로 없어서 피크 밀도에 따라 print 수가 대략 제곱으로 늘어납니다. E4에서

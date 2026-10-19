@@ -8,7 +8,7 @@ Music Identification*, ISMIR 2025 ([arXiv 2506.22661](https://arxiv.org/abs/2506
 
 ## 1. 왜 바꾸는가
 
-README "Real video test"에 정리된 대로, 배틀 영상에서 Panako가 실패하는 원인은 **곡이 없어서가 아니라
+[평가](evaluation.md) "실제 영상 테스트"에 정리된 대로, 배틀 영상에서 Panako가 실패하는 원인은 **곡이 없어서가 아니라
 홀 잔향 + 관중 + MC로 스펙트럼 피크가 번지는 것**입니다.
 
 - 라벨된 실패 3건(WWB 9 → DARK, Rise Against 3-way → KILL EM, PS Buck Vol.4 → Afro Krump)은
@@ -104,7 +104,7 @@ NAFP-Adam은 71.7%, Shazam 계열 피크 방식 GraFP는 82.5%였습니다. 우�
 | 관중 (함성, 박수, 휘파람) | FSD50K `Crowd`/`Cheering`/`Applause` + 기존 `make_testset.crowd()` | 합성 군중만으로는 다양성이 부족함 |
 | MC 음성 | LibriSpeech/MUSAN speech → PA 시뮬레이션 (200–5k Hz 대역, 소프트 클리핑, 같은 IR 통과) | 배틀 MC는 홀 스피커를 거쳐 나옴 |
 | SNR | 음악 대비 −3 ~ +10 dB | `crowd0`, `crowd-3` 진단 조건 포함 |
-| 저역 손실 | 고역통과 100–300 Hz | README 리듬 섹션의 관찰 |
+| 저역 손실 | 고역통과 100–300 Hz | [검색 파이프라인](search-pipeline.md) rhythm search 섹션의 관찰 |
 | 코덱 | ffmpeg AAC 96–128 kbps → Opus 48–96 kbps 재인코딩 | YouTube → 탭 캡처 경로 |
 | 마이크 | 논문의 마이크 IR + 휴대폰 대역 제한 | 촬영 카메라/폰 |
 
@@ -193,7 +193,7 @@ semi-hard mining이 이 경우를 자연스럽게 다루지만, 평가에서 교
 
 **선행 작업: 실제 라벨을 늘립니다.** 지금 실패 라벨은 3곡뿐이라 비교 근거가 약합니다.
 - `realtest/labels.csv`(video, t_start, t_end, track_path)를 만듭니다.
-- README의 미확인 리듬 후보(EBS 2026 final → Proof the Xrook 등)를 확인합니다.
+- [평가](evaluation.md) "미확인 후보"의 리듬 후보(EBS 2026 final → Proof the Xrook 등)를 확인합니다.
 - 확장 프로그램의 ✔/✘ 피드백을 쌓습니다.
 
 비교 기준선은 같은 세트에서의 Panako, rhythm, Panako + rhythm(현재 운영 구조)입니다.

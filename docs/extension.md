@@ -1,0 +1,102 @@
+# 확장 프로그램 (Krump Track Finder)
+
+작성 2026-10-19(README의 확장 프로그램 설명을 옮김). 전체 그림은 [개요](overview.md), 서버가 하는 검색은
+[검색 파이프라인](search-pipeline.md)에 있다. 설치 방법은 [README](../README.md)의 "Running"에 있다.
+
+## 1. 파일
+
+| 파일 | 역할 |
+|---|---|
+| `manifest.json` | Manifest V3. 권한 `tabCapture`, `offscreen`, `storage`, `activeTab`. 호스트 권한은 로컬 서버와 Lambda Function URL |
+| `config.js` | 서버 주소와 API 키(`SERVER`). git에 없고 `python server/deploy/aws_setup.py function`이 쓴다 |
+| `popup.html`, `popup.js`, `popup.css` | 툴바 팝업: 동의, 대기, 찾는 중, 결과 화면 |
+| `background.js` | service worker. 팝업과 녹음기 사이를 잇고 상태를 `chrome.storage.session`에 둔다. 툴바 배지 |
+| `offscreen.html`, `offscreen.js` | 탭 오디오 녹음, 녹음 중 확인, 최종 검색 |
+| `library.html`, `library.js`, `library.css` | 라이브러리 앨범 목록 탭 |
+| `privacy.html` | 개인정보처리방침([같은 내용](privacy-policy.md)) |
+| `icons/` | 툴바·스토어 아이콘 |
+
+빌드 단계는 없다. 순수 JS·CSS를 그대로 불러온다.
+
+**서버 연결.** 기본 서버는 배포된 AWS Lambda다([Lambda 배포](lambda-deployment.md)). 엔드포인트와 API 키는
+`config.js`에 고정돼 있고, 확장 프로그램에는 이를 보거나 바꾸는 설정 화면이 없다. 로컬 서버(`server\start.bat`,
+`http://127.0.0.1:8765`)를 쓰려면 이 파일을 고친다. 키는 확장 프로그램 파일과 요청 헤더에 그대로 들어 있어 숨겨지지
+않는다.
+
+## 2. 녹음 흐름
+
+1. 팝업이 `chrome.tabCapture`로 스트림 id를 받아 background service worker에 넘긴다.
+2. background가 offscreen 문서를 띄운다. offscreen 문서는 `MediaRecorder`(Opus, 1초 조각)로 녹음하면서 소리를
+   스피커로 계속 내보낸다. 첫 조각에 WebM 헤더가 있어 어느 시점까지 모은 조각이든 그대로 디코딩된다.
+3. 10.5초부터 약 4초마다 지금까지의 녹음을 `POST /identify?partial=1`로 보낸다. 15초·20초 바로 앞에 걸리는 확인은
+   15.5·20.5초로 미룬다(서버가 그 길이부터 기준을 낮추기 때문, [검색 파이프라인](search-pipeline.md) §4.7).
+4. 서버가 `final`로 답하면(fingerprint 확정, 또는 길이에 비해 충분히 뚜렷한 rhythm 후보) 녹음을 바로 멈추고 그
+   답을 결과로 쓴다. 아니면 최대 길이까지 녹음한 뒤 전체 녹음으로 최종 검색을 한다.
+5. 녹음이 끝날 때 확인이 아직 돌고 있으면 그 답을 기다린다. 최종 검색을 같이 보내면 Lambda 인스턴스가 하나 더
+   콜드 스타트로 뜨는데, 그쪽이 기다리는 것보다 느리다.
+6. **지금 멈추고 검색**을 누르면 최소 길이(5초)를 채운 뒤 멈춘다.
+
+팝업은 포커스를 잃으면 닫히지만 녹음은 계속된다. 상태(`state`)가 `chrome.storage.session`에 있어서 다시 열면
+이어서 보인다. 툴바 배지는 REC(주황) → ...(회색) → OK(확정 주황, 확실하지 않음 노랑) / X(회색)이고, 오류는 ERR이다.
+
+## 3. 팝업 화면
+
+어두운 테마에 주황 강조색을 쓴다. 폰트는 Archivo와 IBM Plex Sans KR(Google Fonts, 오프라인이면 시스템 폰트)이다.
+상태마다 화면이 하나다.
+
+- **동의**: 처음 실행하면 개인정보처리방침 요약과 **동의하고 시작**만 보인다(§5).
+- **대기**: 최대 녹음 길이(10/20/30/45초, 기억함)와 **현재 탭에서 찾기**. 아래에 개인정보처리방침과 동의 철회 링크.
+- **찾는 중**: 경과 시간, 듣는 탭 제목, **지금 멈추고 검색**. 녹음 중 힌트와 검색 세부는 보이지 않는다.
+- **결과**: 찾음, 찾음 · 확실하지 않음, 못 찾음(팁과 다시 찾기).
+
+찾은 결과는 최고 곡 하나만 보인다.
+- 앨범 커버, 트랙 이름, 앨범, 아티스트, 라이브러리 트랙 안의 위치("곡의 1:23부터").
+- 서버가 확정하지 않은 결과(rhythm 후보, 낮은 점수, 가까운 라이벌)는 노란 배지와 "확실하지 않아요. 미리듣기로
+  같은 곡인지 확인해 주세요." 안내가 붙는다. 미리듣기 플레이어는 확정과 같다.
+- 앨범 판매 페이지 버튼: 밴드캠프 / KNKRTWORLD / Gumroad에서 앨범 구매. 아티스트 페이지만 찾은 앨범은 아티스트
+  보기. 링크는 손으로 확인한 `db/album_links.json`에 있고([앨범 링크](album-links.md)), 앨범 319개 중 301개에 있다.
+- 찾은 파일이 여러 앨범을 모은 폴더에 있으면, 같은 오디오의 사본(Panako id 또는 `db/same_audio.csv`)에서 앨범을
+  가져온다.
+- **10초 미리듣기**: 서버 `/preview`가 찾은 위치에서 자른 10초 MP3를 재생한다. 배포하면 저작권 문제가 있어서
+  라이브러리 전체 파일은 내보내지 않는다. 요청에 API 키 헤더가 필요해서 `<audio src>` 대신 fetch로 받는다.
+- **맞음 / 틀림**(결과가 맞나요?): 정답을 기록한다. 결과마다 한 번만 답할 수 있다. 답은 결과 id와 함께
+  `chrome.storage.session`(`answered`)에 남아, 팝업을 다시 열면 버튼 대신 기록한 답이 보인다. 누르는 순간 저장하고,
+  서버가 받지 못하면 지워서 다시 누를 수 있게 한다. 저장된 녹음(id가 있는 결과)에만 보인다.
+- **다시 찾기**는 대기 화면으로 돌아간다.
+
+## 4. 라이브러리 페이지
+
+팝업 머리의 **라이브러리**(점은 서버가 응답하는지 보여 줌)를 누르면 라이브러리 앨범을 커버 카드로 보여 주는 탭이
+열린다.
+
+- 카드마다 제목, 아티스트, 트랙 수, 판매처의 구매 / 아티스트 링크. **곡 목록**으로 앨범의 트랙을 펼친다.
+- 앨범·아티스트·트랙 이름으로 검색하고, 전체 / 구매 가능 / 판매처 없음으로 거른다.
+- 큰 커버는 판매처 이미지 CDN에서 불러오고(`art`, 밴드캠프 700 px), 안 되면 JSON에 들어 있는 120 px 썸네일, 그것도
+  없으면 제목 타일을 보인다.
+- 목록은 서버의 `/albums`에서 오고, 확장 프로그램에 캐시해서 다음에는 바로 보인다.
+
+목록 다시 만들기(곡을 추가한 뒤):
+- `python server/build_albums.py` → `db/albums.json` + `db/covers/`(`pip install mutagen pillow` 필요).
+  - 앨범은 최상위 폴더 하나다. 이름은 파일의 album / album-artist 태그, 없으면 폴더 이름("Artist - Album")이다.
+  - 여러 앨범의 트랙을 모은 폴더(`트랙리스트`)는 album 태그로 나눈다.
+  - 커버는 파일에 들어 있는 그림(앨범 319개 중 287개)을 120 px JPEG로 만든다.
+- 팝업은 판매처 커버를 먼저 쓴다: `python server/fetch_store_covers.py` → `db/store_covers/`(144 px, 앨범 226개).
+
+## 5. 동의와 녹음 저장
+
+- 확장 프로그램을 쓰려면 첫 화면에서 개인정보처리방침(`extension/privacy.html`, [개인정보처리방침](privacy-policy.md))에
+  동의해야 한다. 대기 화면 아래 **동의 철회**로 거둘 수 있다. 동의 여부는 `chrome.storage.local`(`consent`)에 있다.
+- 동의하면 확장 프로그램이 `share=1`과 함께 탭 제목·주소를 보내고, 서버가 최종 녹음을 저장한다. `share`가 없으면
+  (이전 빌드) 서버는 검색 뒤 오디오를 지우고 id를 돌려주지 않으며, 팝업은 맞음 / 틀림을 숨긴다.
+- 서버는 접근 로그를 남기지 않는다(요청 URL에 탭 제목이 들어 있기 때문).
+- Lambda에서는 저장한 녹음이 S3에 간다(버킷의 `recordings/<id>.wav` + `<id>.json`).
+- 로컬 서버에서는 `recordings/`에 남고 `recordings/log.csv`에 기록된다. 이 파일은 그대로 `evaluate.py` manifest로
+  쓸 수 있다(피드백이 없는 줄은 건너뜀): `python poc/evaluate.py --manifest recordings/log.csv`.
+
+## 6. 웹스토어 배포
+
+- 1.0.0을 Unlisted로 올렸다(2026-10-18).
+- 업데이트: `manifest.json`의 `version`을 올리고 `python store/package.py`로 업로드용 zip을 만들어 개발자 대시보드에
+  올린다.
+- `store/listing.md`에 등록 문구, 권한 사유, 데이터 공개 항목, 절차가 있고, `store/assets/`에 스크린샷과 프로모
+  타일이 있다.

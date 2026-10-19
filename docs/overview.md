@@ -1,7 +1,12 @@
 # 프로젝트 개요 — Krump Track Finder
 
-작성 2026-10-19. 이 문서는 전체 그림만 다룬다. 실행법과 측정 수치 전체는 [README](../README.md),
-배포 구성은 [Lambda 배포](lambda-deployment.md)에 있다.
+작성 2026-10-19. 이 문서는 전체 그림만 다룬다. 세부는 구성 요소별 문서에 있다(§7 문서 지도).
+
+- 검색 단계의 원리·기준·보정: [검색 파이프라인](search-pipeline.md)
+- 확장 프로그램의 동작: [확장 프로그램](extension.md)
+- 측정 세트와 결과: [평가](evaluation.md)
+- 배포 구성: [Lambda 배포](lambda-deployment.md)
+- 설치·빌드·실행: [README](../README.md)
 
 ## 1. 무엇을 하나
 
@@ -64,6 +69,8 @@ Chrome 확장 (extension/, Manifest V3, 프레임워크 없는 JS)
 
 ## 3. 한 번의 찾기
 
+자세한 내용은 확장 프로그램 쪽이 [확장 프로그램](extension.md) §2, 서버 쪽이 [검색 파이프라인](search-pipeline.md)이다.
+
 1. 팝업이 `chrome.tabCapture`로 스트림 id를 받아 background에 넘기고, background가 offscreen 문서를 띄운다.
    offscreen 문서가 녹음하면서 소리를 스피커로 계속 내보낸다. 팝업을 닫아도 녹음은 계속되고, 상태는
    `chrome.storage.session`에 있어 다시 열면 이어서 보인다.
@@ -77,7 +84,7 @@ Chrome 확장 (extension/, Manifest V3, 프레임워크 없는 JS)
 |---|---|---|
 | Panako fingerprint 검색 | 항상 | 최고 곡 score ≥ 10이고 다른 곡이 그 60%에 못 미치면 확정. 5 미만은 실패 |
 | pair stage (2점 해시) | Panako가 확정하지 못할 때 | 한 오프셋에 해시 24개(10초)·32개(15초부터), 라이벌 60% 미만이면 확정 |
-| rhythm search, 속도 0.99–1.01 | 둘 다 아무것도 확정하지 못할 때. 중간 확인에선 10초부터 | 단독으로는 "확실하지 않음"까지만. pair stage 1위(해시 ≥ 20, 라이벌 60% 미만)와 같은 곡이면 확정(`rhythm+pair`) |
+| rhythm search, 속도 0.99–1.01 | Panako가 실패(추가 확인도 아님)이고 pair stage도 확정하지 못할 때. 중간 확인에선 10초부터 | 단독으로는 "확실하지 않음"까지만. pair stage 1위(해시 ≥ 20, 라이벌 60% 미만)와 같은 곡이면 확정(`rhythm+pair`) |
 | rhythm search, 속도 0.95–1.05 | 최종 검색에서 앞 rhythm 단계가 아무것도 못 찾았을 때 | 빠르거나 느리게 재생된 재업로드용. "확실하지 않음"까지만 |
 
 - 중간 확인에서 rhythm 후보는 강한 후보(유력)만 보이고, 녹음 길이별 비율 기준(10초 1.5, 15초 1.3,
@@ -88,32 +95,31 @@ Chrome 확장 (extension/, Manifest V3, 프레임워크 없는 JS)
 
 ## 4. 기술 배경
 
-### 4.1 오디오 fingerprint — Panako
+단계마다 원리, 기준, 보정 근거는 [검색 파이프라인](search-pipeline.md)에 있다. 여기서는 왜 세 단계인지만 요약한다.
+
+### 4.1 오디오 fingerprint — Panako ([검색 파이프라인](search-pipeline.md) §2)
 
 - 스펙트로그램의 국소 최대점(피크)을 골라 피크 몇 개의 주파수·시간 관계를 해시로 만들고, 쿼리와 라이브러리의
   해시가 같은 시간 차로 많이 겹치는 트랙을 찾는다. Shazam(Wang, ISMIR 2003)과 같은 계열이다.
 - Panako는 피크 3개로 해시를 만들고 속도 변화(±10%까지 검색)를 견딘다. 대신 피크 하나가 살아남을 확률이
   p일 때 해시는 p³로 살아남아, 잔향이 심하면 거의 남지 않는다([Shazam 잡음 강건성 검토](review-shazam-noise-robustness.md)).
 - 합성 잡음 세트에서 관중 소리 3 dB 클립은 83%를 찾고, 라이브러리에 없는 곡 39개에서 실제 오탐은 0건이었다.
-  반면 잔향이 강한 홀 녹음(관중 0 dB + 강한 잔향)은 0%다.
-- 우리 패치(`patches/panako.patch`): 시간 정렬을 전체 히트에 대한 Hough 방식으로 바꿈, 스레드 안전성,
-  Windows 대응, 비ASCII 경로, 파일 이름 대신 내용 해시 id, 상주 쿼리 서버(`queryServer`), WAV 직접 읽기,
-  읽기 전용 DB(Lambda). 자세한 내용은 README "Panako patches".
+  반면 잔향이 강한 홀 녹음(관중 0 dB + 강한 잔향)은 0%다([평가](evaluation.md) §2).
+- upstream에 우리 패치(`patches/panako.patch`)를 얹어 쓴다. 시간 정렬, 스레드 안전성, Windows, 상주 쿼리 서버,
+  읽기 전용 DB(Lambda) 등이다.
 
-### 4.2 pair stage — 2점 해시 fingerprint
+### 4.2 pair stage — 2점 해시 fingerprint ([검색 파이프라인](search-pipeline.md) §3)
 
-- Shazam처럼 피크 2개로 해시를 만든다. 해시가 p²로 살아남아 잔향·잡음에 Panako보다 강하다(`poc/pairfp.py`,
-  audfprint 방식).
+- Shazam처럼 피크 2개로 해시를 만든다. 해시가 p²로 살아남아 잔향·잡음에 Panako보다 강하다.
 - 배틀 100편의 30초 구간 2,344개에서 확정 구간이 41개 → 414개, rhythm 일치 규칙까지 넣으면 464개가 됐다.
 - 속도가 ±3%만 달라도 아무것도 못 찾는다. 속도가 다른 영상은 Panako와 rhythm search가 맡는다.
-- 확정 기준은 라이브러리에 없는 곡과 잡음 섞인 클립 3,842개로 보정했다(실험 브랜치 `fp-experiments`).
 
-### 4.3 rhythm search
+### 4.3 rhythm search ([검색 파이프라인](search-pipeline.md) §4)
 
-- 잔향이 피크를 번지게 해도 드럼 타격의 타이밍은 남는다. 150–5500 Hz 대역별 onset envelope(약 43 프레임/초)을
-  라이브러리 전체와 cross-correlation한다. 라이브러리 쪽은 overlap-save FFT 조각으로 미리 계산해 둔다.
-- 드럼 루프 트랙과 긴 믹스는 아무 크럼프 비트와도 잘 맞는다. `db/exclude.txt`로 긴 믹스를 빼고, 트랙마다
-  라이브러리 밖 음악에 대한 평소 점수(cohort, z-score)를 저장해 후보의 신뢰도를 판단한다.
+- 잔향이 피크를 번지게 해도 드럼 타격의 타이밍은 남는다. 대역별 onset envelope를 라이브러리 전체와
+  cross-correlation한다.
+- 드럼 루프 트랙과 긴 믹스는 아무 크럼프 비트와도 잘 맞는다. 긴 믹스는 빼고(`db/exclude.txt`), 트랙마다 라이브러리
+  밖 음악에 대한 평소 점수(cohort)를 두어 후보의 신뢰도를 판단한다.
 - 단독으로는 확정하지 않는다. 라이브러리에 없는 곡에도 후보가 나오는 경우가 있어서다. pair stage가 같은 곡을
   1위로 꼽을 때만 확정한다.
 
@@ -154,7 +160,10 @@ Chrome 확장 (extension/, Manifest V3, 프레임워크 없는 JS)
 
 | 문서 | 내용 |
 |---|---|
-| [README](../README.md) | 설치, 실행법, 확장 프로그램 동작, 단계별 측정 결과, Panako 패치 |
+| [README](../README.md) | 설치, 인덱스 빌드, 로컬 실행, 확장 프로그램 불러오기 |
+| [검색 파이프라인](search-pipeline.md) | 단계 순서, 후보 묶기와 판정, Panako와 패치, pair stage, rhythm search, 기준과 보정, 서버 실행 구조와 속도 |
+| [확장 프로그램](extension.md) | 파일 구성, 녹음 흐름, 팝업 화면, 라이브러리 페이지, 동의와 녹음 저장, 웹스토어 배포 |
+| [평가](evaluation.md) | 평가 세트와 도구, PoC 결과, 실제 영상 테스트, 미확인 후보 |
 | [Lambda 배포](lambda-deployment.md) | 왜 Lambda인가, 비용, 배포된 리소스, 배포 절차, 콜드 스타트 측정 |
 | [앨범 링크](album-links.md) | `db/album_links.json` 형식과 링크를 찾은 방법 |
 | [개인정보처리방침](privacy-policy.md) | 보내는 정보, 보관, 철회 |
