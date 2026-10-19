@@ -5,7 +5,10 @@
 // on the server to improve accuracy. Without it only the consent screen is shown.
 const $ = (id) => document.getElementById(id);
 const authHeaders = () => ({ 'X-Api-Key': SERVER.apiKey });
-const LENGTHS = [10, 20, 30, 45];
+// Every search records up to 30 s (the length the server's thresholds are calibrated on). Only
+// after 못 찾음 can the next search, and that one alone, listen longer.
+const FIRST_LENGTH = 30;
+const RETRY_LENGTHS = [30, 45, 60];
 const STORE_NAME = { bandcamp: '밴드캠프', knkrtworld: 'KNKRTWORLD', gumroad: 'Gumroad' };
 const ICON = {
   listen: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M6.3 6.3a8 8 0 0 0 0 11.4M17.7 6.3a8 8 0 0 1 0 11.4"/></svg>',
@@ -18,7 +21,6 @@ const ICON = {
   out: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M9 7h8v8"/></svg>',
 };
 
-let duration = 30;
 let consent = false;  // chrome.storage.local 'consent'
 const openPage = (file) => chrome.tabs.create({ url: chrome.runtime.getURL(file) });
 let tick = null;
@@ -44,9 +46,10 @@ function fmt(sec) {
   const s = Math.max(0, Math.round(sec));
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 }
+const lengthLabel = (s) => (s % 60 ? `${s}초` : `${s / 60}분`);  // 45 -> 45초, 60 -> 1분
 
 async function checkServer() {
-  // Also wakes a cold Lambda while the user is still picking a length.
+  // Also wakes a cold Lambda while the popup is open, before the user clicks.
   try {
     serverDot = (await fetch(`${SERVER.url}/health`)).ok ? 'on' : 'off';
   } catch {
@@ -59,7 +62,7 @@ async function checkServer() {
   }
 }
 
-async function start() {
+async function start(duration = FIRST_LENGTH) {
   if (!consent) return;
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   let streamId;
@@ -128,22 +131,13 @@ function consentScreen() {
 }
 
 function idle(error) {
-  const lengths = h('div', { class: 'lengths' });
-  const pick = (s) => {
-    duration = s;
-    try { chrome.storage.local.set({ duration: s }); } catch {}
-    for (const b of lengths.children) b.setAttribute('aria-pressed', String(Number(b.dataset.s) === s));
-  };
-  for (const s of LENGTHS) {
-    lengths.append(h('button', { 'data-s': s, 'aria-pressed': String(s === duration), onclick: () => pick(s) }, `${s}초`));
-  }
   return [
     h('div', {}, h('h1', { class: 'headline' }, '지금 나오는 트랙'),
       h('div', { class: 'sub' }, '이 탭의 소리를 듣고 크럼프 라이브러리에서 찾아요.')),
-    h('div', { role: 'group', 'aria-label': '최대 녹음 길이' }, h('div', { class: 'label' }, '최대 녹음 길이'), lengths),
     error && h('div', { class: 'error', role: 'alert' }, error),
-    h('button', { class: 'primary', onclick: start }, icon('listen'), '현재 탭에서 찾기'),
-    h('div', { class: 'hint' }, '곡이 확실해지면 바로 멈춰요 · 팝업을 닫아도 계속 들어요'),
+    h('button', { class: 'primary', onclick: () => start() }, icon('listen'), '현재 탭에서 찾기'),
+    h('div', { class: 'hint' }, `최대 ${lengthLabel(FIRST_LENGTH)} 듣고, 곡이 확실해지면 바로 멈춰요`, h('br'),
+      '팝업을 닫아도 계속 들어요'),
     h('div', { class: 'foot' },
       h('button', { class: 'linkish', onclick: () => openPage('privacy.html') }, '개인정보처리방침'),
       h('span', { 'aria-hidden': 'true' }, '·'),
@@ -188,14 +182,26 @@ function verdictRow(kind, text, state) {
 
 function result(r, state) {
   if (r.verdict === 'fail' || !r.songs.length) {
+    // The longer lengths are offered here only, for this one retry; nothing is remembered.
+    let retry = FIRST_LENGTH;
+    const lengths = h('div', { class: 'lengths' });
+    const pick = (s) => {
+      retry = s;
+      for (const b of lengths.children) b.setAttribute('aria-pressed', String(Number(b.dataset.s) === s));
+    };
+    for (const s of RETRY_LENGTHS) {
+      lengths.append(h('button', { 'data-s': s, 'aria-pressed': String(s === retry), onclick: () => pick(s) }, lengthLabel(s)));
+    }
     return [
       verdictRow('none', '못 찾음', state),
       h('h1', { class: 'headline sm' }, '이 구간에선', h('br'), '못 찾았어요'),
       h('ul', { class: 'tips' },
         h('li', {}, '음악이 크게 들리는 구간에서 다시 시도해 보세요.'),
-        h('li', {}, 'MC·함성이 크면 녹음 길이를 45초로 늘려 보세요.'),
+        h('li', {}, 'MC·함성이 크면 45초나 1분으로 더 길게 들어 보세요.'),
         h('li', {}, '라이브러리에 없는 곡일 수도 있어요.')),
-      h('button', { class: 'primary', onclick: start }, icon('again'), '다시 찾기'),
+      h('div', { role: 'group', 'aria-label': '다시 찾을 때 최대 녹음 길이' },
+        h('div', { class: 'label' }, '최대 녹음 길이'), lengths),
+      h('button', { class: 'primary', onclick: () => start(retry) }, icon('again'), '다시 찾기'),
     ];
   }
   // check = a rhythm or low-score fingerprint candidate: right most of the time, but not always.
@@ -323,8 +329,8 @@ function ask(id, path) {
 
 (async () => {
   try {
-    const { duration: saved, consent: agreed } = await chrome.storage.local.get(['duration', 'consent']);
-    if (LENGTHS.includes(saved)) duration = saved;
+    // Earlier builds also kept a chosen length ('duration'); it is no longer read.
+    const { consent: agreed } = await chrome.storage.local.get('consent');
     consent = agreed === true;
   } catch {}
   const { state, answered: a } = await chrome.storage.session.get(['state', 'answered']);

@@ -78,7 +78,8 @@ The deployed server also needs the preview MP3s and the new data staged and uplo
    `python server/deploy/aws_setup.py function`.
 2. Chrome → `chrome://extensions` → enable *Developer mode* → *Load unpacked* → pick `extension/`.
    Pin the extension.
-3. On a tab playing a video, pick the maximum length (10/20/30/45초) and click **현재 탭에서 찾기**.
+3. On a tab playing a video, click **현재 탭에서 찾기**. It listens for up to 30 s; after 못 찾음 the retry
+   can listen for 45 s or 1 min.
    How the extension behaves: [`docs/extension.md`](docs/extension.md).
 
 Deploying the server: only from `main` as pushed to origin (`CLAUDE.md`, [`docs/lambda-deployment.md`](docs/lambda-deployment.md)).

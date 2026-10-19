@@ -36,7 +36,7 @@ main { display: flex; flex-direction: column; gap: 16px; padding: 18px 16px 16px
 .headline.sm { font-size: 30px; line-height: 1.05; }
 .sub { font-size: 13px; color: var(--muted); margin-top: 4px; }
 .label { font-size: 12px; font-weight: 600; color: var(--muted); letter-spacing: .04em; margin-bottom: 8px; }
-.lengths { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+.lengths { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 6px; }
 .lengths button { height: 44px; border-radius: 8px; border: 1px solid #2e2b29; background: var(--surface);
                   color: var(--fg); font-weight: 600; }
 .lengths button[aria-pressed=true] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
