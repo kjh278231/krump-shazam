@@ -5,6 +5,9 @@
 // marks a check final (fingerprint confirmed, or a rhythm candidate clear enough for the length
 // recorded) the recording stops right away; otherwise, at the end, the full recording gets the
 // complete search.
+//
+// In a video tab shared requests also carry the video's key (vkey, docs/video-records.md), so the
+// server can record the songs found in that video.
 
 // Server address and API key: SERVER from config.js (fixed at build time, aws_setup.py).
 const MIN_SECONDS = 5;
@@ -60,7 +63,7 @@ async function identify(blob, params) {
   return res.json();
 }
 
-async function record({ streamId, duration, tabTitle, tabUrl, share }) {
+async function record({ streamId, duration, tabTitle, tabUrl, share, video }) {
   if (recorder?.state === 'recording') throw new Error('Already recording');
   const stream = await navigator.mediaDevices.getUserMedia({
     audio: { mandatory: { chromeMediaSource: 'tab', chromeMediaSourceId: streamId } },
@@ -76,9 +79,9 @@ async function record({ streamId, duration, tabTitle, tabUrl, share }) {
   fetch(`${SERVER.url}/health`).catch(() => {}).finally(() => { warm = true; });
 
   const chunks = [];
-  // The tab's title and URL go with the audio only when the user agreed to share recordings
+  // The tab's title, URL and video go with the audio only when the user agreed to share recordings
   // (the server then keeps them; otherwise it deletes the audio after the search).
-  const page = share ? { title: tabTitle || '', url: tabUrl || '', share: 1 } : {};
+  const page = share ? { title: tabTitle || '', url: tabUrl || '', share: 1, ...(video?.key ? { vkey: video.key } : {}) } : {};
   recorder = new MediaRecorder(stream, { mimeType: 'audio/webm;codecs=opus', audioBitsPerSecond: 160000 });
   recorder.startedAt = Date.now();
   recorder.ondataavailable = (e) => e.data.size && chunks.push(e.data);

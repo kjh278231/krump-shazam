@@ -1,8 +1,10 @@
 // Coordinates the popup and the offscreen recorder. Offscreen documents only get
 // chrome.runtime, so the state they report is stored here in chrome.storage.session,
-// which the popup reads (the popup closes whenever it loses focus).
+// which the popup reads (the popup closes whenever it loses focus). Finished searches in a video
+// also go into this browser's own record ('history' in chrome.storage.local).
 
 const OFFSCREEN_URL = 'offscreen.html';
+const HISTORY_MAX = 100;
 
 async function ensureOffscreen() {
   const contexts = await chrome.runtime.getContexts({ contextTypes: ['OFFSCREEN_DOCUMENT'] });
@@ -17,6 +19,18 @@ async function ensureOffscreen() {
 async function setState(patch) {
   const { state = {} } = await chrome.storage.session.get('state');
   await chrome.storage.session.set({ state: { ...state, ...patch } });
+}
+
+// One line per finished search in a video (docs/video-records.md): the newest HISTORY_MAX, no covers.
+async function remember(r) {
+  const top = r.verdict !== 'fail' ? r.songs?.[0] : null;
+  const { history = [] } = await chrome.storage.local.get('history');
+  history.push({
+    id: r.id, key: r.video.key, verdict: r.verdict,
+    song: top && { path: top.path, file: top.file, folder: top.folder, album: top.album?.title || '', match_start: top.match_start },
+    date: new Date().toISOString().slice(0, 10),
+  });
+  await chrome.storage.local.set({ history: history.slice(-HISTORY_MAX) });
 }
 
 async function fail(error) {
@@ -39,7 +53,7 @@ chrome.runtime.onMessage.addListener((msg) => {
         await ensureOffscreen();
         await setState({
           status: 'recording', startedAt: Date.now(), duration: msg.duration,
-          tabTitle: msg.tabTitle, tabUrl: msg.tabUrl, result: null, error: null, partial: null,
+          tabTitle: msg.tabTitle, tabUrl: msg.tabUrl, video: msg.video || null, result: null, error: null, partial: null,
         });
         badge('REC', '#ff5a1f');
         // msg's own target/type must not override these, so spread it first.
@@ -64,6 +78,7 @@ chrome.runtime.onMessage.addListener((msg) => {
         const v = msg.result.verdict;
         // Found / not found only; an unconfirmed find keeps the amber colour.
         badge(v === 'fail' ? 'X' : 'OK', v === 'confirmed' ? '#ff5a1f' : v === 'check' ? '#f2b33d' : '#3a3532');
+        if (msg.result.video) await remember(msg.result).catch(() => {});
         break;
       }
       case 'error':

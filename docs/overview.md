@@ -6,6 +6,7 @@
 - 확장 프로그램의 동작: [확장 프로그램](extension.md)
 - 측정 세트와 결과: [평가](evaluation.md)
 - 배포 구성: [Lambda 배포](lambda-deployment.md)
+- 영상별 기록(영상에서 찾은 곡의 공유): [영상별 기록](video-records.md)
 - 설치·빌드·실행: [README](../README.md)
 
 ## 1. 무엇을 하나
@@ -18,10 +19,13 @@
 - 사용자 흐름: **현재 탭에서 찾기** → 최대 30초 녹음(확실해지면 일찍 멈춤) → 곡 이름, 앨범 커버,
   곡 안의 위치, 10초 미리듣기, 판매 페이지 링크 → **맞음 / 틀림** 피드백. 못 찾으면 그 한 번만 45초나 1분으로
   늘려 다시 찾을 수 있다.
+- 영상 탭(1.2.0부터): 같은 영상에서 다른 사용자가 이미 찾은 곡이 있으면, 팝업을 열자마자 그 곡들을 보여 준다
+  ([영상별 기록](video-records.md)). 영상의 몇 초에 나오는 곡인지는 기록하지 않는다.
 - 결과는 세 가지다. **찾음**(확정), **찾음 · 확실하지 않음**(미리듣기로 확인해 달라는 후보), **못 찾음**.
-- 공개 상태: Chrome Web Store 1.0.0 Unlisted(2026-10-18). 서버는 AWS Lambda(서울)에서 돈다.
-- 쓰려면 개인정보처리방침에 동의해야 한다. 동의하면 녹음과 탭 제목·주소가 서버에 남고, 그 녹음과 피드백이
-  정확도 평가 데이터가 된다([개인정보처리방침](privacy-policy.md)).
+- 공개 상태: Chrome Web Store 1.0.0 Unlisted(2026-10-18). 다음 공개는 1.2.0이다(1.1.0은 내지 않고 합침,
+  [확장 프로그램](extension.md) §6). 서버는 AWS Lambda(서울)에서 돈다.
+- 쓰려면 개인정보처리방침에 동의해야 한다. 동의하면 녹음과 탭 제목·주소가 서버에 남고, 그 녹음과 피드백이 정확도 평가
+  데이터가 된다. 찾은 곡은 같은 영상을 여는 다른 사용자에게 보인다([개인정보처리방침](privacy-policy.md)).
 
 ### 왜 어려운가
 
@@ -37,9 +41,10 @@
 
 ```
 Chrome 확장 (extension/, Manifest V3, 프레임워크 없는 JS)
-  popup.js       화면(동의 / 대기 / 찾는 중 / 결과), 미리듣기, 피드백
-  background.js  상태 저장(chrome.storage.session), 툴바 배지
+  popup.js       화면(동의 / 대기 / 찾는 중 / 결과), 미리듣기, 피드백, 영상 기록 카드와 목록
+  background.js  상태 저장(chrome.storage.session), 툴바 배지, 내 기록
   offscreen.js   탭 오디오 녹음(MediaRecorder, Opus, 1초 조각), 중간 확인, 최종 검색
+  video.js       탭 주소에서 영상 키
   library.js     라이브러리 앨범 목록 페이지
         │  HTTPS (Lambda Function URL), X-Api-Key 헤더
         ▼
@@ -47,19 +52,22 @@ Chrome 확장 (extension/, Manifest V3, 프레임워크 없는 JS)
   POST /identify   ffmpeg로 16 kHz mono WAV 변환 → 3단계 검색 → 판정
   GET  /preview    찾은 위치에서 10초 MP3 발췌 (전체 파일은 내보내지 않음)
   POST /feedback   맞음 / 틀림 기록
+  GET  /video      영상 하나에서 다른 사용자가 찾은 곡 (server/videos.py)
   GET  /albums     앨범 목록 (커버를 data URI로 넣은 JSON 하나)
   GET  /health     상태 확인, 웜 유지 핑
         │
         ├─ Panako queryServer   Java 17 JVM, LMDB fingerprint DB (db/panako/)
         ├─ pair stage           poc/pairfp.py, db/pair.npz
         ├─ rhythm search        poc/rhythm.py, db/rhythm.npz + cohort
-        └─ S3                   previews/ (96 kbps MP3), recordings/ (동의한 녹음), runtime/ (DB·인덱스)
+        └─ S3                   previews/ (96 kbps MP3), recordings/ (동의한 녹음), videos/ (영상별 기록), runtime/ (DB·인덱스)
 ```
 
 | 구성 요소 | 경로 | 역할 |
 |---|---|---|
 | 확장 프로그램 | `extension/` | 녹음, 화면, 미리듣기, 피드백. 서버 주소와 API 키는 `extension/config.js`(git에 없음) |
 | API 서버 | `server/app.py` | 검색 파이프라인과 엔드포인트. 로컬과 Lambda에서 같은 코드 |
+| 영상별 기록 | `server/videos.py`, `extension/video.js` | 영상 키, 공유 기준, 저장소([영상별 기록](video-records.md)) |
+| 시험 | `tests/` | `videos.py`·`video.js` 단위 시험, 실행 중인 서버의 계약·호환 확인(`check_api.py`) |
 | 검색 엔진 | `poc/common.py`, `poc/pairfp.py`, `poc/rhythm.py`, `poc/grouping.py` | Panako 클라이언트, pair stage, rhythm search, 같은 녹음 묶기와 판정 |
 | Panako | `tools/Panako/`(git에 없음) + `patches/panako.patch` | upstream f1248f7에 우리 패치를 적용해 빌드 |
 | 인덱스 빌드 | `poc/build_index.py`, `poc/pairfp.py build`, `poc/build_rhythm_index.py`, `poc/rhythm_cohort.py`, `poc/find_duplicates.py` | fingerprint DB, pair index, rhythm index, cohort, `db/same_audio.csv` |
@@ -78,6 +86,8 @@ Chrome 확장 (extension/, Manifest V3, 프레임워크 없는 JS)
 2. 10.5초부터 약 4초마다 지금까지의 녹음을 `partial=1`로 보낸다(15초·20초 기준에 맞춰 15.5·20.5초로 미룸).
    서버가 `final`이라고 답하면 녹음을 바로 멈추고 그 답을 결과로 쓴다.
 3. 끝까지 녹음하면 전체 녹음으로 최종 검색을 한다.
+4. 영상 탭이면 요청에 탭 주소에서 얻은 영상 키를 붙인다. 서버는 동의한 사용자의 확정·추가 확인 결과를 영상별 기록으로
+   남긴다([영상별 기록](video-records.md)).
 
 서버의 검색 순서(`server/app.py` `identify_audio`):
 
@@ -146,6 +156,8 @@ Chrome 확장 (extension/, Manifest V3, 프레임워크 없는 JS)
 | 보고 제외 파일 | `db/exclude.txt` | 긴 DJ 믹스·라이브 쇼 |
 | 앨범·판매 링크 | `db/albums.json`, `db/album_links.json`, `db/covers/`, `db/store_covers/` | 판매 링크는 손으로 확인 |
 | 사용자 녹음 | S3 `recordings/`(Lambda), `recordings/`(로컬) | 동의한 경우만. 로컬 `log.csv`는 `evaluate.py` manifest로 쓸 수 있음 |
+| 영상별 기록 | S3 `videos/<플랫폼>/<영상 id>/<녹음 id>.json`(Lambda), `recordings/videos/`(로컬) | 동의한 사용자의 확정·추가 확인 결과. 확정과 맞음 받은 결과만 다른 사용자에게 보임 |
+| 내 기록 | 사용자 브라우저 `chrome.storage.local`의 `history` | 최근 100건, 서버로 보내지 않음 |
 
 ## 6. 배포와 운영
 
@@ -166,6 +178,7 @@ Chrome 확장 (extension/, Manifest V3, 프레임워크 없는 JS)
 | [확장 프로그램](extension.md) | 파일 구성, 녹음 흐름, 팝업 화면, 라이브러리 페이지, 동의와 녹음 저장, 웹스토어 배포 |
 | [평가](evaluation.md) | 평가 세트와 도구, PoC 결과, 실제 영상 테스트, 미확인 후보 |
 | [Lambda 배포](lambda-deployment.md) | 왜 Lambda인가, 비용, 배포된 리소스, 배포 절차, 콜드 스타트 측정 |
+| [영상별 기록](video-records.md) | 영상 키, 이벤트 형식, 공유 기준, `GET /video`, 시험, 구간을 기록하지 않는 이유 |
 | [앨범 링크](album-links.md) | `db/album_links.json` 형식과 링크를 찾은 방법 |
 | [개인정보처리방침](privacy-policy.md) | 보내는 정보, 보관, 철회 |
 | [Shazam 잡음 강건성 검토](review-shazam-noise-robustness.md) | fingerprint 개선 실험(E1–E6)의 근거 |

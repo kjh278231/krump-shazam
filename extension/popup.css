@@ -77,6 +77,7 @@ main { display: flex; flex-direction: column; gap: 16px; padding: 18px 16px 16px
 .badge.none { background: var(--line); color: var(--soft); }
 .verdict .tab { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .note { font-size: 13px; color: #e9d9c8; padding: 10px 12px; border-radius: 8px; background: var(--warn-bg); margin-top: -6px; }
+.note.info { color: var(--soft); background: var(--surface); border: 1px solid var(--line); }
 .song { display: flex; gap: 14px; align-items: stretch; }
 .cover { flex: none; width: 128px; height: 128px; border-radius: 8px; object-fit: cover; background: #2b2320; }
 div.cover { border: 1px solid #3a322e; padding: 10px; display: flex; align-items: flex-end; overflow: hidden;
@@ -109,3 +110,13 @@ div.cover { border: 1px solid #3a322e; padding: 10px; display: flex; align-items
 .linkish:hover { color: var(--fg); }
 .foot { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: -4px; color: var(--muted); font-size: 12px; }
 .foot .linkish { font-size: 12px; color: var(--muted); align-self: center; }
+
+/* This video's records (idle screen) */
+.vlist { display: flex; flex-direction: column; gap: 12px; padding-top: 4px; }
+.vlist .label { margin-bottom: 0; }
+.vlist .card { display: flex; flex-direction: column; gap: 16px; }
+.vlist ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; }
+.vlist li { display: flex; align-items: center; min-height: 48px; padding: 6px 0; border-top: 1px solid var(--line); }
+.vlist .what { flex-grow: 1; min-width: 0; display: flex; flex-direction: column; }
+.vlist .name { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.vlist .tag { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

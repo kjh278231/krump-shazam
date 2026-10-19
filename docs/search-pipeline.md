@@ -16,7 +16,8 @@
 
 Panako가 추가 확인(점수가 낮거나 라이벌이 가까움)을 내면 rhythm search는 돌지 않는다. 판정 값은 서버에서
 `confirmed` / `check` / `fail`이고, 팝업에는 찾음 / 찾음 · 확실하지 않음 / 못 찾음으로 보인다. 결과의 `method`는
-`fingerprint`, `pair`, `rhythm`, `rhythm+pair` 중 하나다.
+`fingerprint`, `pair`, `rhythm`, `rhythm+pair` 중 하나다. 결과를 영상별로 기록하고 공유하는 일은 판정 뒤에
+따로 한다([영상별 기록](video-records.md)).
 
 **녹음 길이.** 확장 프로그램은 최대 30초를 녹음하고, 못 찾은 뒤 다시 찾을 때만 45초나 1분을 고를 수 있다
 ([확장 프로그램](extension.md) §3). 아래 기준은 모두 10–30초 오디오로 보정했고, 더 긴 오디오에도 그대로 쓴다.
