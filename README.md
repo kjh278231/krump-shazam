@@ -7,6 +7,8 @@ crowd noise (cheering, clapping, MC). Approach: audio fingerprinting with
 [Panako](https://github.com/JorenSix/Panako), validated first as an offline PoC on WAV clips
 before building the Chrome extension.
 
+Purpose, architecture and technical background in one place: [`docs/overview.md`](docs/overview.md).
+
 ## Layout
 
 | Path | What |
