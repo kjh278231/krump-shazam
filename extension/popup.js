@@ -23,6 +23,7 @@ let consent = false;  // chrome.storage.local 'consent'
 const openPage = (file) => chrome.tabs.create({ url: chrome.runtime.getURL(file) });
 let tick = null;
 let serverDot = '';  // '', 'on' or 'off' (checkServer)
+let answered = null;  // { id, correct } of the last result answered (ask)
 
 // h('div', { class: 'x', onclick: f }, child, 'text', ...): a DOM element. `html` sets a static
 // icon; everything else is text.
@@ -221,7 +222,7 @@ function result(r, state) {
           albumTitle && h('div', { class: 'album' }, albumTitle),
           album?.artist && h('div', { class: 'artist' }, album.artist)),
         h('span', { class: 'pos' }, `곡의 ${fmt(m.match_start)}부터`))),
-    preview(m, unsure),
+    preview(m),
   ];
   if (store) {
     const shop = STORE_NAME[store.store] || store.store;
@@ -237,11 +238,11 @@ function result(r, state) {
 }
 
 // The server cuts a 10 s excerpt from the matched spot; full files are never sent. Fetched rather
-// than set as <audio src> because the request needs the API key header. An unsure find gets one
-// big button (listening is the point); a confirmed one a compact player.
-function preview(m, big) {
+// than set as <audio src> because the request needs the API key header. Confirmed and unsure
+// finds get the same player.
+function preview(m) {
   const p = $('player');
-  const btn = big ? h('button', { class: 'light' }) : h('button', { class: 'play' });
+  const btn = h('button', { class: 'play' });
   const time = h('span', {}, '0:10');
   const fill = h('div');
   let loaded = false;
@@ -250,8 +251,7 @@ function preview(m, big) {
     const playing = state === 'playing';
     btn.setAttribute('aria-label', playing ? '미리듣기 멈춤' : '10초 미리듣기 재생');
     btn.textContent = '';
-    if (big) btn.append(icon(playing ? 'pause' : 'play'), state === 'loading' ? '불러오는 중…' : playing ? '멈춤' : '10초 미리듣기로 확인');
-    else btn.append(icon(playing ? 'pause' : 'play'));
+    btn.append(icon(playing ? 'pause' : 'play'));
   };
   p.ontimeupdate = () => {
     time.textContent = `${fmt(p.currentTime)} / ${fmt(p.duration || 10)}`;
@@ -263,6 +263,7 @@ function preview(m, big) {
     if (!p.paused) return p.pause();
     if (!loaded) {
       show('loading');
+      time.textContent = '불러오는 중…';
       try {
         const r = await fetch(
           `${SERVER.url}/preview?path=${encodeURIComponent(m.path)}&start=${Math.max(0, m.match_start).toFixed(1)}`,
@@ -281,34 +282,42 @@ function preview(m, big) {
     p.play();
   });
   show('paused');
-  if (big) {
-    return h('div', { style: 'display:flex;flex-direction:column;gap:8px' }, btn,
-      h('div', { class: 'bar light', 'aria-hidden': 'true' }, fill));
-  }
   return h('div', { class: 'player' }, btn,
     h('div', { class: 'player-info' },
       h('div', { class: 'player-row' }, h('span', {}, '10초 미리듣기'), time),
       h('div', { class: 'bar light', 'aria-hidden': 'true' }, fill)));
 }
 
+// One answer per result. It is kept in chrome.storage.session ('answered'), so reopening the
+// popup shows the answer instead of the buttons. Kept from the click on, so closing the popup
+// mid-request still counts; dropped again if the server did not take it.
 function ask(id, path) {
   const row = h('div', { class: 'ask' });
+  const thanks = (correct) => { row.textContent = `${correct ? '맞음' : '틀림'}으로 기록했어요. 고마워요!`; };
+  const remember = (a) => {
+    answered = a;
+    (a ? chrome.storage.session.set({ answered: a }) : chrome.storage.session.remove('answered')).catch(() => {});
+  };
   const send = async (correct) => {
+    for (const b of row.querySelectorAll('button')) b.disabled = true;
+    remember({ id, correct });
     try {
       const r = await fetch(`${SERVER.url}/feedback`, {
         method: 'POST', headers: { 'Content-Type': 'application/json', ...authHeaders() },
         body: JSON.stringify({ id, correct, path }),
       });
       if (!r.ok) throw new Error(r.status);
-      row.textContent = `${correct ? '맞음' : '틀림'}으로 기록했어요. 고마워요!`;
+      thanks(correct);
     } catch {
+      remember(null);
       row.textContent = '기록하지 못했어요. 잠시 후 다시 눌러 주세요.';
       setTimeout(() => { row.textContent = ''; row.append(...buttons()); }, 2500);
     }
   };
   const buttons = () => [h('span', {}, '결과가 맞나요?'),
     h('div', {}, h('button', { onclick: () => send(true) }, '맞음'), h('button', { onclick: () => send(false) }, '틀림'))];
-  row.append(...buttons());
+  if (answered?.id === id) thanks(answered.correct);
+  else row.append(...buttons());
   return row;
 }
 
@@ -318,7 +327,8 @@ function ask(id, path) {
     if (LENGTHS.includes(saved)) duration = saved;
     consent = agreed === true;
   } catch {}
-  const { state } = await chrome.storage.session.get('state');
+  const { state, answered: a } = await chrome.storage.session.get(['state', 'answered']);
+  answered = a || null;
   render(state);
   checkServer();
 })();

@@ -77,7 +77,7 @@ song is not in the library), then `python poc/evaluate.py --manifest your.csv`.
    검색), then 찾음, 찾음 · 확실하지 않음 or 못 찾음 (tips and 다시 찾기). Mid-recording hints and
    search details are not shown. A find that the server did not confirm (a rhythm candidate, low
    score or close rival) gets an amber badge, "확실하지 않아요. 미리듣기로 같은 곡인지 확인해
-   주세요." and a large preview button. The result shows the best song only, with its
+   주세요." above the same preview player a confirmed find gets. The result shows the best song only, with its
    album cover, album, artist and position in the library track, and a button to the album's
    store page (밴드캠프 / KNKRTWORLD / Gumroad에서 앨범 구매; 아티스트 보기 where only the artist's
    page was found). The links are in `db/album_links.json`, checked by hand
@@ -85,7 +85,9 @@ song is not in the library), then `python poc/evaluate.py --manifest your.csv`.
    folder, the album comes from a copy of the same audio (Panako id or `db/same_audio.csv`).
    **10초 미리듣기** plays a 10 s MP3 excerpt from that spot, cut by the server's `/preview`.
    Full library files are never served, because of copyright once this is distributed.
-   **맞음 / 틀림** (결과가 맞나요?) records ground truth. **다시 찾기** returns to 대기.
+   **맞음 / 틀림** (결과가 맞나요?) records ground truth, once per result: the answer is kept in
+   `chrome.storage.session`, so reopening the popup shows it instead of the buttons.
+   **다시 찾기** returns to 대기.
 5. **라이브러리** (popup header; its dot shows whether the server answers) opens a tab listing the
    library's albums as cover cards: title, artist, track count and a 구매 / 아티스트 link to the
    store. 곡 목록 opens an album's tracks; search by album, artist or track name; filter 전체 /

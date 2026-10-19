@@ -40,13 +40,12 @@ main { display: flex; flex-direction: column; gap: 16px; padding: 18px 16px 16px
 .lengths button { height: 44px; border-radius: 8px; border: 1px solid #2e2b29; background: var(--surface);
                   color: var(--fg); font-weight: 600; }
 .lengths button[aria-pressed=true] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
-.primary, .secondary, .outline, .light { height: 52px; border-radius: 10px; display: flex; align-items: center;
+.primary, .secondary, .outline { height: 52px; border-radius: 10px; display: flex; align-items: center;
   justify-content: center; gap: 8px; text-decoration: none; font-weight: 700; font-size: 15px; width: 100%; }
 .primary { background: var(--accent); color: var(--on-accent); border: none; }
-.primary:hover, .light:hover { filter: brightness(1.07); }
+.primary:hover { filter: brightness(1.07); }
 .secondary { background: var(--surface); color: var(--fg); border: 1px solid #4a4542; font-weight: 600; }
 .outline { height: 48px; border: 1.5px solid var(--accent); color: var(--accent); background: none; font-size: 14px; }
-.light { background: var(--fg); color: var(--bg); border: none; }
 .hint { font-size: 12px; color: var(--muted); text-align: center; margin-top: -8px; }
 .error { font-size: 13px; color: #ffd2c2; background: #2a1410; border-radius: 8px; padding: 10px 12px; }
 
