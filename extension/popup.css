@@ -52,21 +52,17 @@ main { display: flex; flex-direction: column; gap: 16px; padding: 18px 16px 16px
 /* Listening */
 .listen-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; }
 .eq { display: flex; align-items: flex-end; gap: 4px; height: 44px; }
-.eq span { display: block; width: 6px; height: 44px; border-radius: 3px; background: var(--accent);
-           transform-origin: 50% 100%; animation: eq 1s ease-in-out infinite; }
-.eq span:nth-child(2) { animation-delay: -.7s; } .eq span:nth-child(3) { animation-delay: -.3s; }
-.eq span:nth-child(4) { animation-delay: -.9s; } .eq span:nth-child(5) { animation-delay: -.5s; }
-.eq span:nth-child(6) { animation-delay: -.15s; } .eq span:nth-child(7) { animation-delay: -.6s; }
-@keyframes eq { 0%, 100% { transform: scaleY(.25); } 50% { transform: scaleY(1); } }
-@media (prefers-reduced-motion: reduce) { .eq span { animation: none; transform: scaleY(.6); } }
+/* Nothing on any screen moves (no animation, transition or ticking timer): with them the captured
+   tab stuttered during a search (docs/extension.md §3). The bars are a still picture. */
+.eq span { display: block; width: 6px; border-radius: 3px; background: var(--accent); }
+.eq span:nth-child(1) { height: 20px; } .eq span:nth-child(2) { height: 36px; } .eq span:nth-child(3) { height: 24px; }
+.eq span:nth-child(4) { height: 44px; } .eq span:nth-child(5) { height: 28px; } .eq span:nth-child(6) { height: 38px; }
+.eq span:nth-child(7) { height: 18px; }
 .panel { display: flex; flex-direction: column; gap: 8px; padding: 12px; border-radius: 10px;
          background: var(--surface); border: 1px solid var(--line); }
 .panel-row { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); }
 .num { font-family: var(--display); font-weight: 600; color: var(--fg); font-variant-numeric: tabular-nums; }
 .tab-title { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.bar { height: 4px; border-radius: 2px; background: #2e2b29; overflow: hidden; }
-.bar > div { height: 4px; width: 0; background: var(--accent); transition: width .4s linear; }
-.bar.light > div { background: var(--fg); }
 
 /* Result */
 .verdict { display: flex; align-items: center; gap: 10px; min-width: 0; }

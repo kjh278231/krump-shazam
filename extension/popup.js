@@ -35,7 +35,6 @@ const ICON = {
 let consent = false;  // chrome.storage.local 'consent' is POLICY
 let agreedBefore = false;  // consented to an earlier policy: the consent screen says what changed
 const openPage = (file) => chrome.tabs.create({ url: chrome.runtime.getURL(file) });
-let tick = null;
 let serverDot = '';  // '', 'on' or 'off' (checkServer)
 let answered = null;  // { id, correct } of the last result answered (ask)
 let current = {};  // the state last rendered
@@ -158,7 +157,6 @@ function headAction(state) {
 
 function render(state = {}) {
   current = state || {};
-  clearInterval(tick);
   headAction(current);
   const view = $('view');
   view.textContent = '';
@@ -241,16 +239,8 @@ function videoRecords() {
 
 function listening(state) {
   const searching = state.status === 'searching';
-  const time = h('span', { class: 'num' });
-  const fill = h('div');
-  const update = () => {
-    const total = state.duration || 30;
-    const t = searching ? total : Math.min(total, (Date.now() - (state.startedAt || Date.now())) / 1000);
-    time.textContent = searching ? '검색 중' : `${fmt(t)} / ${fmt(total)}`;
-    fill.style.width = `${(t / total) * 100}%`;
-  };
-  update();
-  if (!searching) tick = setInterval(update, 500);
+  // No elapsed time or progress bar: nothing on screen changes while the tab is captured.
+  const time = h('span', { class: 'num' }, searching ? '검색 중' : `최대 ${fmt(state.duration || 30)}`);
   const eq = h('div', { class: 'eq', 'aria-hidden': 'true' }, ...Array.from({ length: 7 }, () => h('span')));
   return [
     h('div', { class: 'listen-head' },
@@ -259,8 +249,7 @@ function listening(state) {
       eq),
     h('div', { class: 'panel' },
       h('div', { class: 'panel-row' }, h('span', {}, '듣는 탭'), time),
-      h('div', { class: 'tab-title', title: state.tabTitle || '' }, state.tabTitle || '현재 탭'),
-      h('div', { class: 'bar', 'aria-hidden': 'true' }, fill)),
+      h('div', { class: 'tab-title', title: state.tabTitle || '' }, state.tabTitle || '현재 탭')),
     searching
       ? h('button', { class: 'secondary', disabled: true }, '검색 중…')
       : h('button', { class: 'secondary', onclick: () => chrome.runtime.sendMessage({ target: 'background', type: 'stop' }) },
@@ -368,8 +357,7 @@ function preview(m) {
   const p = $('player');
   p.volume = 0.5;
   const btn = h('button', { class: 'play' });
-  const time = h('span', {}, '0:10');
-  const fill = h('div');
+  const time = h('span', {}, '0:10');  // stays still while playing, like every screen
   let loaded = false;
   const show = (state) => {
     btn.disabled = state === 'loading';
@@ -377,10 +365,6 @@ function preview(m) {
     btn.setAttribute('aria-label', playing ? '미리듣기 멈춤' : '10초 미리듣기 재생');
     btn.textContent = '';
     btn.append(icon(playing ? 'pause' : 'play'));
-  };
-  p.ontimeupdate = () => {
-    time.textContent = `${fmt(p.currentTime)} / ${fmt(p.duration || 10)}`;
-    fill.style.width = `${(p.currentTime / (p.duration || 10)) * 100}%`;
   };
   p.onended = p.onpause = () => show('paused');
   p.onplay = () => show('playing');
@@ -397,6 +381,7 @@ function preview(m) {
         if (p.src.startsWith('blob:')) URL.revokeObjectURL(p.src);
         p.src = URL.createObjectURL(await r.blob());
         loaded = true;
+        time.textContent = '0:10';
       } catch (e) {
         show('paused');
         time.textContent = `불러오지 못함 (${e.message})`;
@@ -409,8 +394,7 @@ function preview(m) {
   show('paused');
   return h('div', { class: 'player' }, btn,
     h('div', { class: 'player-info' },
-      h('div', { class: 'player-row' }, h('span', {}, '10초 미리듣기'), time),
-      h('div', { class: 'bar light', 'aria-hidden': 'true' }, fill)));
+      h('div', { class: 'player-row' }, h('span', {}, '10초 미리듣기'), time)));
 }
 
 // One answer per result. It is kept in chrome.storage.session ('answered'), so reopening the
