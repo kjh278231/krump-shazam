@@ -109,6 +109,7 @@ div.cover { border: 1px solid #3a322e; padding: 10px; display: flex; align-items
            font-size: 13px; text-decoration: underline; text-underline-offset: 3px; }
 .linkish:hover { color: var(--fg); }
 .foot { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: -4px; color: var(--muted); font-size: 12px; }
+.linkish.cancel { align-self: center; min-height: 40px; padding: 0 16px; margin-top: -8px; }
 .foot .linkish { font-size: 12px; color: var(--muted); align-self: center; }
 
 /* This video's records (idle screen) */

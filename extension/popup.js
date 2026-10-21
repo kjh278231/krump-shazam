@@ -265,7 +265,15 @@ function listening(state) {
       ? h('button', { class: 'secondary', disabled: true }, '검색 중…')
       : h('button', { class: 'secondary', onclick: () => chrome.runtime.sendMessage({ target: 'background', type: 'stop' }) },
         icon('stop'), '지금 멈추고 검색'),
+    h('button', { class: 'linkish cancel', onclick: cancel }, '취소'),
   ];
+}
+
+// Drops the search: the recording stops, nothing is searched or shown, and the start screen returns.
+function cancel() {
+  chrome.runtime.sendMessage({ target: 'background', type: 'cancel' });
+  render({ status: 'idle' });
+  loadVideo();
 }
 
 function verdictRow(kind, text, state) {

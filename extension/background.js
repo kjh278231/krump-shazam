@@ -45,9 +45,16 @@ function badge(text, color) {
   if (color) chrome.action.setBadgeTextColor?.({ color: ['#ff5a1f', '#f2b33d'].includes(color) ? '#111010' : '#f2eee8' });
 }
 
+// What the offscreen recorder reports; dropped once the search is over (e.g. cancelled).
+const REPORTS = ['partial', 'searching', 'result', 'error'];
+
 chrome.runtime.onMessage.addListener((msg) => {
   if (msg.target !== 'background') return;
   (async () => {
+    if (REPORTS.includes(msg.type)) {
+      const { state = {} } = await chrome.storage.session.get('state');
+      if (state.status !== 'recording' && state.status !== 'searching') return;
+    }
     switch (msg.type) {
       case 'start': {
         await ensureOffscreen();
@@ -66,6 +73,11 @@ chrome.runtime.onMessage.addListener((msg) => {
         if (!ack?.recording) await fail('진행 중인 녹음이 없습니다. 다시 시작해 주세요.');
         break;
       }
+      case 'cancel':
+        await chrome.runtime.sendMessage({ target: 'offscreen', type: 'cancel' }).catch(() => null);
+        await chrome.storage.session.set({ state: { status: 'idle' } });
+        badge('');
+        break;
       case 'partial':
         await setState({ partial: { ...msg.result, seconds: msg.seconds } });
         break;

@@ -8,6 +8,8 @@
 //
 // In a video tab shared requests also carry the video's key (vkey, docs/video-records.md), so the
 // server can record the songs found in that video.
+//
+// Cancel stops the recording, aborts the requests in flight and reports nothing more.
 
 // Server address and API key: SERVER from config.js (fixed at build time, aws_setup.py).
 const MIN_SECONDS = 5;
@@ -20,6 +22,7 @@ const RHYTHM_STEPS = [15, 20];
 
 let recorder = null;
 let stopTimer = null;
+let run = null;  // the search in progress: { cancelled, abort }
 
 function send(type, extra = {}) {
   // The background never replies; ignore the resulting "port closed" rejection.
@@ -29,7 +32,17 @@ function send(type, extra = {}) {
 chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   if (msg.target !== 'offscreen') return;
   if (msg.type === 'record') {
-    record(msg).catch((e) => send('error', { error: String(e.message || e) }));
+    const r = run = { cancelled: false, abort: new AbortController() };
+    record(msg, r).catch((e) => r.cancelled || send('error', { error: String(e.message || e) }));
+    sendResponse({ ok: true });
+  }
+  if (msg.type === 'cancel') {
+    if (run) {
+      run.cancelled = true;
+      run.abort.abort();
+    }
+    clearTimeout(stopTimer);
+    if (recorder?.state === 'recording') recorder.stop();
     sendResponse({ ok: true });
   }
   if (msg.type === 'stop') {
@@ -44,12 +57,12 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   }
 });
 
-async function identify(blob, params) {
+async function identify(blob, params, signal) {
   const qs = new URLSearchParams(params);
   let res;
   try {
     res = await fetch(`${SERVER.url}/identify?${qs}`, {
-      method: 'POST', body: blob, headers: { 'X-Api-Key': SERVER.apiKey },
+      method: 'POST', body: blob, headers: { 'X-Api-Key': SERVER.apiKey }, signal,
     });
   } catch {
     throw new Error('서버에 연결할 수 없습니다. 잠시 후 다시 시도하세요.');
@@ -63,11 +76,17 @@ async function identify(blob, params) {
   return res.json();
 }
 
-async function record({ streamId, duration, tabTitle, tabUrl, share, video }) {
+async function record({ streamId, duration, tabTitle, tabUrl, share, video }, run) {
   if (recorder?.state === 'recording') throw new Error('Already recording');
+  // Nothing is reported once the search is cancelled.
+  const report = (type, extra) => run.cancelled || send(type, extra);
   const stream = await navigator.mediaDevices.getUserMedia({
     audio: { mandatory: { chromeMediaSource: 'tab', chromeMediaSourceId: streamId } },
   });
+  if (run.cancelled) {
+    stream.getTracks().forEach((t) => t.stop());
+    return;
+  }
   // Capturing a tab mutes it for the user; route the audio back to the speakers.
   const ctx = new AudioContext();
   ctx.createMediaStreamSource(stream).connect(ctx.destination);
@@ -94,7 +113,7 @@ async function record({ streamId, duration, tabTitle, tabUrl, share, video }) {
   let nextCheck = FIRST_CHECK;
   const check = async (t) => {
     try {
-      const r = await identify(new Blob(chunks, { type: 'audio/webm' }), { ...page, partial: 1 });
+      const r = await identify(new Blob(chunks, { type: 'audio/webm' }), { ...page, partial: 1 }, run.abort.signal);
       // final: a fingerprint confirmation, or a clear rhythm candidate (server decides).
       // Kept even if the recording stopped meanwhile: it then replaces the final search.
       if (r.final) {
@@ -102,7 +121,7 @@ async function record({ streamId, duration, tabTitle, tabUrl, share, video }) {
         clearTimeout(stopTimer);
         if (recorder.state === 'recording') recorder.stop();
       } else if (recorder.state === 'recording') {
-        send('partial', { result: r, seconds: Math.round(t) });
+        report('partial', { result: r, seconds: Math.round(t) });
       }
     } catch {
       // Partial checks are best-effort (e.g. silence at the start); the final search reports errors.
@@ -129,14 +148,15 @@ async function record({ streamId, duration, tabTitle, tabUrl, share, video }) {
   // A check still running when the recording ends is waited for: sending the final search
   // alongside it would start a second (cold) Lambda instance, which is slower than waiting.
   if (inflight && !early) {
-    send('searching');
+    report('searching');
     await inflight;
   }
+  if (run.cancelled) return;
 
   if (early) {
-    send('result', { result: early });
+    report('result', { result: early });
     return;
   }
-  send('searching');
-  send('result', { result: await identify(new Blob(chunks, { type: 'audio/webm' }), page) });
+  report('searching');
+  report('result', { result: await identify(new Blob(chunks, { type: 'audio/webm' }), page, run.abort.signal) });
 }
