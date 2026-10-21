@@ -355,9 +355,10 @@ function songCard(m) {
 
 // The server cuts a 10 s excerpt from the matched spot; full files are never sent. Fetched rather
 // than set as <audio src> because the request needs the API key header. Confirmed and unsure
-// finds get the same player.
+// finds get the same player. Played at half volume: at full volume it was too loud next to the tab.
 function preview(m) {
   const p = $('player');
+  p.volume = 0.5;
   const btn = h('button', { class: 'play' });
   const time = h('span', {}, '0:10');
   const fill = h('div');
