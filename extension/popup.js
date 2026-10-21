@@ -8,7 +8,7 @@
 // `true`) are asked again. 1.1.0 was never published, so the lines are what changed since 1.0.0.
 // In a video tab the 대기 screen also shows the songs other users found in this video (GET /video,
 // docs/video-records.md) and this browser's own searches there.
-const POLICY = '2026-10-20';
+const POLICY = '2026-10-22';
 const POLICY_CHANGE = ['녹음이 최대 1분으로 늘었어요.', '찾은 곡을 같은 영상을 보는 다른 사용자에게 보여 줘요.'];
 const $ = (id) => document.getElementById(id);
 const authHeaders = () => ({ 'X-Api-Key': SERVER.apiKey });
