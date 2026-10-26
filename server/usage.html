@@ -1,6 +1,6 @@
 <!doctype html>
-<!-- Template of the usage dashboard: server/usage.py replaces __DATA__ and writes build/usage/index.html.
-     No external requests: the page holds users' tab titles and URLs and is opened from this PC only. -->
+<!-- Template of the usage dashboard: server/usage.py embeds data and writes build/usage/index.html.
+     Auto-refresh uses a loopback-only helper; AWS credentials stay in Python on this PC. -->
 <html lang="ko">
 <head>
 <meta charset="utf-8">
@@ -99,6 +99,8 @@
     <div>
       <h1>Krump Track Finder 사용량</h1>
       <div class="sub" id="generated"></div>
+      <div class="sub" id="refreshStatus" role="status" aria-live="polite"></div>
+      <button type="button" id="refresh" hidden>다시 갱신</button>
     </div>
     <div class="note">이 PC에서만 보세요. 사용자의 탭 제목과 주소가 들어 있습니다.</div>
   </header>
@@ -170,7 +172,8 @@
 <div class="tip" id="tip" hidden></div>
 
 <script>
-const DATA = __DATA__;
+let DATA = __DATA__;
+const LIVE_URL = __LIVE_URL__;
 
 const VERDICTS = [
   { key: 'confirmed', label: '찾음', color: 'var(--s1)' },
@@ -358,7 +361,7 @@ function verdictCell(v) {
 }
 
 // ---- render ----
-const firstDay = [DATA.searches[0]?.day, DATA.server[0]?.day].filter(Boolean).sort()[0] || DATA.today;
+let firstDay = [DATA.searches[0]?.day, DATA.server[0]?.day].filter(Boolean).sort()[0] || DATA.today;
 let period = '30';
 try { period = localStorage.getItem('period') || period; } catch {}
 if (!PERIODS.some(([p]) => p === period)) period = '30';
@@ -445,7 +448,7 @@ function render() {
     })));
 }
 
-$('generated').textContent = `${DATA.generated} 기준 · python server/usage.py로 새로 만듦`;
+$('generated').textContent = `${DATA.generated} 기준`;
 $('metricDays').textContent = DATA.metricDays;
 $('searchLegend').replaceChildren(...VERDICTS.map((v) => { const s = el('span', { text: v.label }); s.style.setProperty('--c', v.color); return s; }));
 $('period').replaceChildren(...PERIODS.map(([p, label]) => {
@@ -456,6 +459,43 @@ $('period').replaceChildren(...PERIODS.map(([p, label]) => {
 render();
 let resizeTimer;
 window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(render, 150); });
+
+let refreshing = false;
+async function refreshData() {
+  if (refreshing) return;
+  refreshing = true;
+  $('refresh').disabled = true;
+  $('refreshStatus').textContent = '최신 데이터를 가져오는 중… 기존 데이터를 먼저 표시합니다.';
+  try {
+    const response = await fetch(new URL('refresh', LIVE_URL), {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, cache: 'no-store',
+      signal: AbortSignal.timeout(180000),
+    });
+    if (!response.ok) throw new Error('refresh failed');
+    DATA = await response.json();
+    firstDay = [DATA.searches[0]?.day, DATA.server[0]?.day].filter(Boolean).sort()[0] || DATA.today;
+    $('generated').textContent = `${DATA.generated} 기준`;
+    $('metricDays').textContent = DATA.metricDays;
+    render();
+    $('refreshStatus').textContent = '최신 데이터로 갱신했습니다.';
+  } catch {
+    $('refreshStatus').textContent = `갱신하지 못했습니다. ${DATA.generated} 기준 데이터를 표시합니다. 인터넷 연결과 AWS 인증을 확인한 뒤 다시 갱신해 주세요.`;
+  } finally {
+    refreshing = false;
+    $('refresh').disabled = false;
+  }
+}
+if (LIVE_URL && location.protocol === 'file:') {
+  $('refreshStatus').textContent = '자동 갱신 대시보드를 여는 중…';
+  location.replace(LIVE_URL);
+} else if (LIVE_URL && location.href === LIVE_URL) {
+  $('refresh').hidden = false;
+  $('refresh').addEventListener('click', refreshData);
+  // Includes reopening a tab from the browser's back/forward cache.
+  window.addEventListener('pageshow', refreshData);
+} else {
+  $('refreshStatus').textContent = '저장된 데이터입니다. python server/usage.py를 실행하면 갱신됩니다.';
+}
 </script>
 </body>
 </html>

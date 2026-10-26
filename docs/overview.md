@@ -170,6 +170,8 @@ Chrome 확장 (extension/, Manifest V3, 프레임워크 없는 JS)
   웹스토어 대시보드에 올린다.
 - 비용: 하루 5회 사용 기준 월 $1 미만. `Project=krump-finder` 태그로 거른 월 $10 예산 경보가 있다.
 - 사용량: `python server/usage.py`가 S3 기록과 CloudWatch를 읽어 `build/usage/index.html`을 만든다(이 PC에서만 봄).
+  `server/usage-autostart.ps1`을 한 번 실행하면 로그인 때 로컬 보조 프로그램이 시작되고, HTML을 열 때마다
+  최신 데이터를 가져온다([설치와 동작](lambda-deployment.md#사용량-대시보드)).
 
 ## 7. 문서 지도
 

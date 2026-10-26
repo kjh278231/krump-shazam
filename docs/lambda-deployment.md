@@ -119,9 +119,28 @@ python server/usage.py            # build/usage/index.html을 만들고 브라�
 python server/usage.py --no-open
 ```
 
+HTML을 열 때 자동 갱신하려면 Windows에서 한 번 설치한다.
+
+```powershell
+powershell -ExecutionPolicy Bypass -File server/usage-autostart.ps1
+```
+
+- 현재 사용자 로그인 때 예약 작업 `KrumpFinderUsageDashboard`가 `pythonw server/usage.py --serve`를
+  창 없이 시작한다. 설치 직후에도 바로 실행되며, PC가 켜져 있다고 AWS를 주기적으로 조회하지는 않는다.
+- 기존 `build/usage/index.html`을 열면 `127.0.0.1:8766`의 전용 주소로 이동한다. 페이지를 열거나
+  새로고침할 때 AWS에서 최신 데이터를 가져와 차트·날짜·생성 시각을 바꾸고 로컬 파일도 저장한다.
+  갱신 중에는 기존 자료를 먼저 보여 주고, 실패하면 이전 자료의 기준 시각과 재시도 버튼을 표시한다.
+- 보조 프로그램은 루프백 주소에서만 듣는다. 임의 토큰 경로와 Host·Origin 검사로 다른 사이트의 접근을
+  막고 AWS 자격 증명은 브라우저에 전달하지 않는다. 설정은 `build/usage/service.json`, 마지막 데이터는
+  `data.json`, 오류 로그는 `service.log`다. 주소와 파일은 공유하지 않는다.
+- 보조 프로그램이 중지돼 페이지가 열리지 않으면 위 설치 명령을 다시 실행한다. 자동 시작을 해제하려면
+  `Stop-ScheduledTask -TaskName KrumpFinderUsageDashboard`와
+  `Unregister-ScheduledTask -TaskName KrumpFinderUsageDashboard -Confirm:$false`를 실행한다.
+
 - `aws_setup.py`와 같은 이 PC의 AWS 자격 증명으로 읽기만 한다. 처음에는 로그를 훑느라 약 1분 걸리고, 그다음은 2초 안팎이다.
   내려받은 JSON과 콜드 스타트 줄은 `build/usage/cache.json`에 두고, ETag가 바뀐 기록(피드백)만 다시 받는다.
-- 페이지는 파일 하나이고 외부 요청이 없다. 사용자의 탭 제목과 주소가 들어 있으므로 `build/` 밖으로 내보내거나 공개하지 않는다.
+- 사용자의 탭 제목과 주소가 들어 있으므로 `build/` 밖으로 내보내거나 공개하지 않는다.
+  자동 갱신을 설치하지 않으면 생성된 HTML은 저장된 데이터만 표시한다.
 - 템플릿은 `server/usage.html`이고, 스크립트가 데이터를 넣어 `build/usage/index.html`로 쓴다. 기간은 최근 7일·30일·90일·전체다.
 
 | 화면 | 가져오는 곳 |
