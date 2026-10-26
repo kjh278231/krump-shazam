@@ -100,6 +100,7 @@
   "artist": {"message": "아티스트"},
   "no_artist": {"message": "아티스트 정보 없음"},
   "track_count": {"message": " · $1곡"},
+  "track_count_one": {"message": " · $1곡"},
   "track_list": {"message": "곡 목록"},
   "collapse": {"message": "접기"},
   "no_results": {"message": "검색 결과가 없습니다."},

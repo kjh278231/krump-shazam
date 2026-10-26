@@ -1,7 +1,9 @@
 """Store screenshots and a layout check of every popup screen, from the real extension pages.
 
     python store/shots/make.py check            every popup scene and the library page in ko and en
-                                                -> build/shots/check/
+                                                -> build/shots/check/; fails when an English popup
+                                                scene is taller than Chrome's 600 px popup and than
+                                                its Korean one
     python store/shots/make.py store --lang en  the store screenshots -> store/assets/en/
 
 The pages run in headless Chrome against stub.js (a stand-in chrome.* API and server with canned
@@ -30,6 +32,7 @@ SCENES = ["consent", "consent_changed", "idle", "error", "error_unknown", "recor
 STORE = {"screenshot-1-found.png": "1", "screenshot-2-unsure.png": "2", "screenshot-3-listen.png": "3",
          "screenshot-4-library.png": "library", "screenshot-5-retry.png": "5", "screenshot-6-records.png": "6"}
 CHROME = Path("C:/Program Files/Google/Chrome/Application/chrome.exe")
+POPUP_MAX = 600  # Chrome's popup height limit; a taller popup scrolls
 
 
 def harness_pages() -> None:
@@ -68,6 +71,14 @@ def shoot(url: str, out: Path, size: str) -> None:
     print(out)
 
 
+def height(url: str) -> int:
+    """The rendered page height, as stub.js writes it into <html data-height>."""
+    dom = subprocess.run([str(CHROME), "--headless=new", "--window-size=380,900", "--virtual-time-budget=6000",
+                          "--dump-dom", url], check=True, capture_output=True, text=True, encoding="utf-8").stdout
+    m = re.search(r'data-height="(\d+)"', dom)
+    return int(m.group(1)) if m else 0
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("what", choices=["check", "store"])
@@ -81,10 +92,21 @@ def main() -> None:
     try:
         albums(a.server, a.key_file.read_text().strip() if a.key_file else "")
         if a.what == "check":
+            heights = {}
             for lang in ("ko", "en"):
                 for scene in SCENES:
-                    shoot(f"{base}/popup.html?lang={lang}&scene={scene}", CHECK / f"{lang}-{scene}.png", "380,900")
+                    url = f"{base}/popup.html?lang={lang}&scene={scene}"
+                    shoot(url, CHECK / f"{lang}-{scene}.png", "380,900")
+                    heights[lang, scene] = height(url)
                 shoot(f"{base}/library.html?lang={lang}", CHECK / f"{lang}-library.png", "1280,800")
+            # Korean screens taller than the limit predate English (they scroll in Chrome too); English
+            # must not add new ones.
+            tall = [f"{s}: en {heights['en', s]} px, ko {heights['ko', s]} px" for s in SCENES
+                    if heights["en", s] > POPUP_MAX and heights["en", s] > heights["ko", s]]
+            for s in SCENES:
+                print(f"{s:16} ko {heights['ko', s]:4} en {heights['en', s]:4}")
+            if tall:
+                raise SystemExit("taller than the popup in English:\n  " + "\n  ".join(tall))
         else:
             out = ROOT / "store" / "assets" / a.lang
             for name, shot in STORE.items():

@@ -105,7 +105,7 @@ function card(a, q, trackHit) {
   title.title = albumTitle(a.title);
   const sub = document.createElement('div');
   sub.className = 'sub';
-  sub.append(highlighted('span', a.artist || t('no_artist'), a.artist ? q : ''), t('track_count', a.tracks.length.toLocaleString(LANG)));
+  sub.append(highlighted('span', a.artist || t('no_artist'), a.artist ? q : ''), plural(a.tracks.length, 'track_count'));
   meta.append(title, sub);
 
   const actions = document.createElement('div');

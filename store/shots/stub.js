@@ -58,6 +58,10 @@
     action: { setBadgeText() {} },
     tabCapture: { getMediaStreamId: async () => { throw new Error('shot'); } },
   };
+  // For make.py check: the page height once it has rendered (Chrome cuts a popup at 600 px).
+  addEventListener('load', () => setTimeout(() => {
+    document.documentElement.dataset.height = String(document.body.scrollHeight);
+  }, 2000));
   window.SERVER = { url: 'https://server.invalid', apiKey: '' };
   const json = (body) => new Response(JSON.stringify(body), { headers: { 'Content-Type': 'application/json' } });
   window.fetch = async (u) => {

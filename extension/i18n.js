@@ -7,6 +7,9 @@
 const t = (name, ...subs) => chrome.i18n.getMessage(name, subs.map(String)) || name;
 const LANG = t('locale');  // 'ko' or 'en': the language shown, not Chrome's own (ja shows en)
 
+// plural(1, 'track_count'): message <name>_one for exactly one, else <name>; $1 is n written for LANG.
+const plural = (n, name) => t(n === 1 ? `${name}_one` : name, n.toLocaleString(LANG));
+
 // <span data-i18n="ext_name">; data-i18n-placeholder, -title and -aria-label set those attributes.
 function localize(root = document) {
   for (const el of root.querySelectorAll('[data-i18n]')) el.textContent = t(el.dataset.i18n);

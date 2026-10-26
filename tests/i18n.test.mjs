@@ -20,7 +20,7 @@ function load(lang) {
   vm.createContext(ctx);
   vm.runInContext(read('i18n.js'), ctx);
   // const/let at the top of a script are not properties of the context: read them through it.
-  return vm.runInContext('({ t, LANG, errorText, albumTitle })', ctx);
+  return vm.runInContext('({ t, LANG, errorText, albumTitle, plural })', ctx);
 }
 
 const sources = () => readdirSync(EXT).filter((f) => /\.(js|html)$/.test(f) && f !== 'config.js');
@@ -109,4 +109,11 @@ test('LANG and t', () => {
   assert.equal(en.LANG, 'en');
   assert.equal(load('ko').LANG, 'ko');
   assert.equal(en.t('no_such_message'), 'no_such_message');
+});
+
+test('plural: one track is singular in English', () => {
+  const en = load('en');
+  assert.equal(en.plural(1, 'track_count'), ' · 1 track');
+  assert.equal(en.plural(4286, 'track_count'), ' · 4,286 tracks');
+  assert.equal(load('ko').t('track_count', 1), ' · 1곡');
 });
