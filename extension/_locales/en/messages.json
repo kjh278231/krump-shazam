@@ -1,0 +1,17 @@
+{
+  "locale": { "message": "en" },
+  "ext_name": { "message": "Krump Track Finder" },
+  "ext_description": { "message": "Captures the current tab's audio and finds the track in the krump library." },
+  "single_track": { "message": "Single track" },
+  "err_bad_key": { "message": "The API key is wrong." },
+  "err_empty": { "message": "Nothing was recorded. Check that the tab is playing sound." },
+  "err_undecodable": { "message": "Couldn't read the recording. Please try again." },
+  "err_silent": { "message": "Almost no sound was recorded. Check that the tab or video isn't muted or paused." },
+  "err_no_albums": { "message": "The server has no album list." },
+  "err_no_connection": { "message": "Can't reach the server. Try again in a moment." },
+  "err_record_start": { "message": "Couldn't start recording. Please try again." },
+  "err_not_recording": { "message": "No recording in progress. Please start again." },
+  "err_capture": { "message": "Can't capture the tab's audio: $1" },
+  "err_record": { "message": "Couldn't record: $1" },
+  "err_server": { "message": "Server error $1" }
+}

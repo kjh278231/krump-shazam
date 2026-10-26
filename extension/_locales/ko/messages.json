@@ -1,0 +1,17 @@
+{
+  "locale": { "message": "ko" },
+  "ext_name": { "message": "Krump Track Finder" },
+  "ext_description": { "message": "지금 보고 있는 탭의 소리를 듣고 크럼프 라이브러리에서 트랙을 찾아요." },
+  "single_track": { "message": "단일 곡" },
+  "err_bad_key": { "message": "API 키가 맞지 않습니다." },
+  "err_empty": { "message": "녹음된 소리가 없습니다. 탭에서 소리가 나고 있는지 확인하세요." },
+  "err_undecodable": { "message": "녹음을 읽지 못했습니다. 다시 시도해 주세요." },
+  "err_silent": { "message": "소리가 거의 녹음되지 않았습니다. 탭/영상이 음소거 상태이거나 멈춰 있지 않은지 확인하세요." },
+  "err_no_albums": { "message": "서버에 앨범 목록이 없습니다." },
+  "err_no_connection": { "message": "서버에 연결할 수 없습니다. 잠시 후 다시 시도하세요." },
+  "err_record_start": { "message": "녹음을 시작하지 못했습니다. 다시 시도해 주세요." },
+  "err_not_recording": { "message": "진행 중인 녹음이 없습니다. 다시 시작해 주세요." },
+  "err_capture": { "message": "탭 오디오를 캡처할 수 없습니다: $1" },
+  "err_record": { "message": "녹음하지 못했습니다: $1" },
+  "err_server": { "message": "서버 오류 $1" }
+}
