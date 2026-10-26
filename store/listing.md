@@ -26,10 +26,12 @@
 
 ## 3. 스토어 등록정보 (Store listing)
 
-- 언어: 한국어 (영어 설명은 아래 English를 추가 언어로)
+- 언어: 1.3.0부터 **영어가 기본 언어**입니다(`manifest.json`의 `default_locale: "en"`). 한국어(`ko`)를 추가 언어로 두고
+  아래 한국어 요약·설명을 씁니다. 영어 등록정보에는 아래 English를 씁니다.
+  - 익스텐션 이름과 설명은 `extension/_locales/<언어>/messages.json`의 `ext_name`·`ext_description`에서 옵니다.
 - 카테고리: 엔터테인먼트 (Entertainment)
 - 아이콘: zip 안의 `icons/icon128.png`가 자동으로 쓰입니다.
-- 스크린샷(1280×800, `store/assets/`):
+- 스크린샷(1280×800). 한국어 등록정보는 `store/assets/`, 영어 등록정보는 `store/assets/en/`(1.3.0부터, 같은 파일 이름):
   1. `screenshot-1-found.png`
   2. `screenshot-2-unsure.png`
   3. `screenshot-3-listen.png`
@@ -38,6 +40,9 @@
   6. `screenshot-6-records.png` (1.2.0부터, 영상에서 다른 사용자가 찾은 곡)
 - 작은 프로모션 타일(440×280): `store/assets/promo-small-440x280.png`
 - 스크린샷의 앨범 커버는 일부러 제목 타일로 바꿨습니다. 다른 아티스트의 앨범 아트를 홍보 이미지에 쓰지 않기 위해서입니다.
+- 영어 스크린샷은 `python store/shots/make.py store --lang en --key-file <키 파일>`로 만듭니다. 실제 팝업·라이브러리 화면을
+  흉내 낸 데이터로 찍고(`store/shots/stub.js`), 왼쪽 문구는 `store/shots/compose.html`에 있습니다. 라이브러리 목록은 실행 중인
+  로컬 서버에서 가져옵니다.
 
 ### 요약 (132자 이내)
 
@@ -88,6 +93,7 @@ Krump Track Finder listens to the current tab and finds the same track in a krum
   lets you check with a 10-second preview.
 - When others have already found tracks in the same video, the popup shows them as soon as you open it.
 - Browse and search the whole library.
+- In English, or in Korean when Chrome is set to Korean.
 
 Only tracks in the library can be found. Using the extension requires agreeing to the privacy
 policy (again when it changes): when you search, the tab's audio (up to 1 min) and its title and URL are
@@ -147,7 +153,7 @@ recording, the tab title or who searched). No name, account or other personal de
 
 1. `extension/manifest.json`의 `version`을 올립니다(이전보다 커야 업로드됩니다).
 2. `python store/package.py` → 대시보드의 패키지 탭에서 새 zip을 올리고 검토를 제출합니다.
-   화면이 바뀌었으면 스토어 등록정보의 스크린샷과 설명도 맞춥니다.
+   화면이 바뀌었으면 두 언어의 스크린샷과 설명도 맞춥니다(`python store/shots/make.py check`로 화면부터 확인).
 3. 권한이나 수집 데이터가 바뀌면 4번과 개인정보처리방침도 고칩니다.
 
 ## 비용과 보안 메모
