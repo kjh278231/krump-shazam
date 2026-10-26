@@ -20,6 +20,7 @@ const RETRY_LENGTHS = [30, 45, 60];
 // before, and the request has still woken the server for the search.
 const VIDEO_TIMEOUT = 3000;
 const OWN_ROWS = 5;  // this browser's own searches listed per video
+const DOTS_STEP = 500;  // ms between steps of the dots after 찾는 중
 const STORE_NAME = { bandcamp: '밴드캠프', knkrtworld: 'KNKRTWORLD', gumroad: 'Gumroad' };
 const ICON = {
   listen: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M6.3 6.3a8 8 0 0 0 0 11.4M17.7 6.3a8 8 0 0 1 0 11.4"/></svg>',
@@ -35,6 +36,7 @@ const ICON = {
 let consent = false;  // chrome.storage.local 'consent' is POLICY
 let agreedBefore = false;  // consented to an earlier policy: the consent screen says what changed
 const openPage = (file) => chrome.tabs.create({ url: chrome.runtime.getURL(file) });
+let tick = null;  // steps the dots of the 찾는 중 screen (listening)
 let serverDot = '';  // '', 'on' or 'off' (checkServer)
 let answered = null;  // { id, correct } of the last result answered (ask)
 let current = {};  // the state last rendered
@@ -157,6 +159,7 @@ function headAction(state) {
 
 function render(state = {}) {
   current = state || {};
+  clearInterval(tick);
   headAction(current);
   const view = $('view');
   view.textContent = '';
@@ -197,10 +200,10 @@ function consentScreen() {
 
 function idle(error) {
   return [
-    h('div', {}, h('h1', { class: 'headline' }, '지금 나오는 트랙'),
+    h('div', {}, h('h1', { class: 'headline' }, '현재 탭에서 찾기'),
       h('div', { class: 'sub' }, '이 탭의 소리를 듣고 크럼프 라이브러리에서 찾아요.')),
     error && h('div', { class: 'error', role: 'alert' }, error),
-    h('button', { class: 'primary', onclick: () => start() }, icon('listen'), '현재 탭에서 찾기'),
+    h('button', { class: 'primary', onclick: () => start() }, icon('listen'), '지금 나오는 트랙 찾기'),
     h('div', { class: 'hint' }, `최대 ${lengthLabel(FIRST_LENGTH)} 듣고, 곡이 확실해지면 바로 멈춰요`, h('br'),
       '팝업을 닫아도 계속 들어요'),
     videoRecords(),
@@ -239,12 +242,15 @@ function videoRecords() {
 
 function listening(state) {
   const searching = state.status === 'searching';
-  // No elapsed time or progress bar: nothing on screen changes while the tab is captured.
+  // No elapsed time or progress bar: they kept the screen redrawing while the tab is captured.
+  // Only the dots after 찾는 중 step (1, 2, 3, 1, ...), so the search visibly goes on.
   const time = h('span', { class: 'num' }, searching ? '검색 중' : `최대 ${fmt(state.duration || 30)}`);
   const eq = h('div', { class: 'eq', 'aria-hidden': 'true' }, ...Array.from({ length: 7 }, () => h('span')));
+  const dots = h('span', { class: 'dots', 'data-n': '1', 'aria-hidden': 'true' }, ...Array.from({ length: 3 }, () => h('span', {}, '.')));
+  tick = setInterval(() => { dots.dataset.n = String((Number(dots.dataset.n) % 3) + 1); }, DOTS_STEP);
   return [
     h('div', { class: 'listen-head' },
-      h('div', {}, h('h1', { class: 'headline' }, '찾는 중…'),
+      h('div', {}, h('h1', { class: 'headline' }, '찾는 중', dots),
         h('div', { class: 'sub' }, searching ? '들은 소리 전체로 마지막 검색을 하고 있어요.' : '곡이 확실해지면 바로 멈춰요.')),
       eq),
     h('div', { class: 'panel' },

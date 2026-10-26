@@ -2,8 +2,9 @@
   --bg: #111010; --surface: #1b1918; --line: #2a2725; --line-strong: #3a3532;
   --fg: #f2eee8; --muted: #a39c94; --soft: #cfc8bf;
   --accent: #ff5a1f; --on-accent: #111010; --warn: #f2b33d; --warn-bg: #241e14; --ok-dot: #5bd68a; --bad: #ff8a63;
-  --display: Archivo, 'IBM Plex Sans KR', 'Malgun Gothic', sans-serif;
-  --body: 'IBM Plex Sans KR', 'Malgun Gothic', system-ui, sans-serif;
+  /* Pretendard for Korean: IBM Plex Sans KR looked broken on Windows screens (user feedback). */
+  --display: Archivo, 'Pretendard Variable', 'Malgun Gothic', sans-serif;
+  --body: 'Pretendard Variable', 'Malgun Gothic', system-ui, sans-serif;
 }
 * { box-sizing: border-box; }
 body { width: 380px; margin: 0; background: var(--bg); color: var(--fg); font: 14px/1.45 var(--body); }
@@ -32,8 +33,8 @@ svg { flex: none; }
 
 /* Screens */
 main { display: flex; flex-direction: column; gap: 16px; padding: 18px 16px 16px; }
-.headline { font: 800 34px/1 var(--display); font-stretch: 70%; text-transform: uppercase; letter-spacing: .01em; margin: 0; }
-.headline.sm { font-size: 30px; line-height: 1.05; }
+.headline { font: 800 28px/1.1 var(--display); font-stretch: 70%; text-transform: uppercase; letter-spacing: .01em; margin: 0; }
+.headline.sm { font-size: 26px; line-height: 1.1; }
 .sub { font-size: 13px; color: var(--muted); margin-top: 4px; }
 .label { font-size: 12px; font-weight: 600; color: var(--muted); letter-spacing: .04em; margin-bottom: 8px; }
 .lengths { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 6px; }
@@ -41,19 +42,21 @@ main { display: flex; flex-direction: column; gap: 16px; padding: 18px 16px 16px
                   color: var(--fg); font-weight: 600; }
 .lengths button[aria-pressed=true] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
 .primary, .secondary, .outline { height: 52px; border-radius: 10px; display: flex; align-items: center;
-  justify-content: center; gap: 8px; text-decoration: none; font-weight: 700; font-size: 15px; width: 100%; }
+  justify-content: center; gap: 8px; text-decoration: none; font-weight: 700; font-size: 17px; width: 100%; }
 .primary { background: var(--accent); color: var(--on-accent); border: none; }
 .primary:hover { filter: brightness(1.07); }
 .secondary { background: var(--surface); color: var(--fg); border: 1px solid #4a4542; font-weight: 600; }
-.outline { height: 48px; border: 1.5px solid var(--accent); color: var(--accent); background: none; font-size: 14px; }
+.outline { height: 48px; border: 1.5px solid var(--accent); color: var(--accent); background: none; font-size: 15px; }
 .hint { font-size: 12px; color: var(--muted); text-align: center; margin-top: -8px; }
 .error { font-size: 13px; color: #ffd2c2; background: #2a1410; border-radius: 8px; padding: 10px 12px; }
 
 /* Listening */
 .listen-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; }
 .eq { display: flex; align-items: flex-end; gap: 4px; height: 44px; }
-/* Nothing on any screen moves (no animation, transition or ticking timer): with them the captured
-   tab stuttered during a search (docs/extension.md §3). The bars are a still picture. */
+/* No animation or transition: with them the captured tab stuttered during a search (docs/extension.md §3).
+   The bars are a still picture. The one thing that moves is the dots after 찾는 중, stepped by a timer
+   (popup.js listening): a few still frames a second, not a running animation. */
+.dots[data-n="1"] span:nth-child(n+2), .dots[data-n="2"] span:nth-child(3) { visibility: hidden; }
 .eq span { display: block; width: 6px; border-radius: 3px; background: var(--accent); }
 .eq span:nth-child(1) { height: 20px; } .eq span:nth-child(2) { height: 36px; } .eq span:nth-child(3) { height: 24px; }
 .eq span:nth-child(4) { height: 44px; } .eq span:nth-child(5) { height: 28px; } .eq span:nth-child(6) { height: 38px; }

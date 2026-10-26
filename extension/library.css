@@ -1,8 +1,9 @@
 :root {
   --bg: #111010; --surface: #1b1918; --line: #2a2725; --line-strong: #3a3532;
   --fg: #f2eee8; --muted: #a39c94; --accent: #ff5a1f; --on-accent: #111010; --bad: #ff8a63; --mark: #5c3a10;
-  --display: Archivo, 'IBM Plex Sans KR', 'Malgun Gothic', sans-serif;
-  --body: 'IBM Plex Sans KR', 'Malgun Gothic', system-ui, sans-serif;
+  /* Pretendard for Korean: IBM Plex Sans KR looked broken on Windows screens (user feedback). */
+  --display: Archivo, 'Pretendard Variable', 'Malgun Gothic', sans-serif;
+  --body: 'Pretendard Variable', 'Malgun Gothic', system-ui, sans-serif;
 }
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--bg); color: var(--fg); font: 14px/1.45 var(--body); }
