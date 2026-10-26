@@ -1,6 +1,6 @@
 # Krump Track Finder 개인정보처리방침
 
-시행일 2026년 10월 22일(익스텐션 1.2.0부터) · 이전 방침과 달라진 점은 9번 · 익스텐션 안의 같은 문서: `extension/privacy.html`
+시행일 2026년 10월 22일(익스텐션 1.2.0부터) · 이전 방침과 달라진 점은 9번 · 익스텐션 안의 같은 문서: `extension/privacy.html` · [English](privacy-policy.en.md)
 
 Krump Track Finder(이하 “익스텐션”)는 브라우저 탭에서 재생 중인 음악을 듣고 크럼프 음악 라이브러리에서
 같은 곡을 찾아 주는 Chrome 익스텐션입니다. 이 문서는 익스텐션이 어떤 정보를 서버로 보내고, 어떻게 쓰고

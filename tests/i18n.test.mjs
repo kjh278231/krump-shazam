@@ -59,10 +59,10 @@ test('locales: every key used exists', () => {
   assert.deepEqual(missing, []);
 });
 
-test('no Korean left in code', { todo: true }, () => {
+test('no Korean left in code', () => {
   const left = [];
   for (const f of sources()) {
-    if (f === 'privacy.html') continue;
+    if (f === 'privacy.html') continue;  // the Korean policy; privacy.en.html is checked
     const src = read(f);
     if (f.endsWith('.js')) {
       // String literals only; comments may stay Korean. A comment starts at a // after a space

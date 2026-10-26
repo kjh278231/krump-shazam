@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy policy</title>
+<link rel="icon" href="icons/icon32.png">
+<style>
+:root {
+  --bg: #f7f5f1; --fg: #1a1817; --muted: #5c5650; --line: #ddd7cf; --accent: #c2410c;
+  --font: 'IBM Plex Sans KR', 'Malgun Gothic', 'Apple SD Gothic Neo', system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --bg: #111010; --fg: #f2eee8; --muted: #a39c94; --line: #2a2725; --accent: #ff7a45; }
+}
+:root[data-theme="dark"] { --bg: #111010; --fg: #f2eee8; --muted: #a39c94; --line: #2a2725; --accent: #ff7a45; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.7 var(--font); }
+main { max-width: 760px; margin: 0 auto; padding: 40px 16px 64px; }
+h1 { font-size: 30px; line-height: 1.2; margin: 0 0 6px; }
+h2 { font-size: 18px; margin: 32px 0 8px; padding-top: 20px; border-top: 1px solid var(--line); }
+p, li { margin: 6px 0; }
+ul { padding-left: 20px; }
+.meta { color: var(--muted); font-size: 13px; }
+a { color: var(--accent); }
+table { width: 100%; border-collapse: collapse; font-size: 14px; margin: 8px 0; }
+th, td { text-align: left; vertical-align: top; padding: 8px; border-bottom: 1px solid var(--line); }
+th { color: var(--muted); font-weight: 600; white-space: nowrap; }
+.scroll { overflow-x: auto; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Krump Track Finder Privacy Policy</h1>
+  <p class="meta">Effective October 22, 2026 (from extension 1.2.0) · What changed from the previous policy: <a href="#history">section 9</a> · <a href="privacy.html" lang="ko">Korean</a></p>
+  <p class="meta">This is a translation of the Korean policy, with the same content and the same effective date.</p>
+
+  <p>Krump Track Finder (the “extension”) is a Chrome extension that listens to music playing in a browser tab and finds
+    the same track in a krump music library. This document explains what information the extension sends to the server,
+    and how that information is used and kept. The extension can be used only after agreeing to this policy.</p>
+
+  <h2>1. Information sent to and stored on the server</h2>
+  <p>The extension sends information to the server only in the two cases below. Otherwise it does not read a tab’s audio or your browsing history.</p>
+  <ul>
+    <li><b>When you open the popup on a YouTube or Instagram video tab</b>: it sends the video’s id (for example the <code>v=</code> value of a YouTube address) to look up the tracks other users found in this video. This lookup is not stored on the server.</li>
+    <li><b>When you press “Find the playing track”</b>: it sends and stores the information below.</li>
+  </ul>
+  <div class="scroll">
+  <table>
+    <tr><th>Information</th><th>Details</th></tr>
+    <tr><td>Tab audio recording</td><td>The audio of the tab you searched in, up to 1 minute (up to 30 seconds on the first search; 45 seconds or 1 minute if you choose it when searching again after nothing was found)</td></tr>
+    <tr><td>Tab title and address (URL)</td><td>The title and address of the tab you searched in</td></tr>
+    <tr><td>Search result</td><td>The track found, scores, search method, time</td></tr>
+    <tr><td>Result rating</td><td>Your answer, if you press Right or Wrong at “Is this right?”</td></tr>
+  </table>
+  </div>
+  <p>No name, email, account, cookies, location or similar information is collected. Stored recordings are not linked to any person.</p>
+
+  <h2>2. Purposes</h2>
+  <ul>
+    <li>To find the track in the recording and show the result</li>
+    <li>To improve the accuracy of finding tracks (tuning the search criteria, test data)</li>
+    <li>To show other users watching the same video which tracks were found in that video (<a href="#shown">section 3-1</a>)</li>
+  </ul>
+  <p>The information is not used for any other purpose, such as advertising, sale or credit scoring. User data is not sold, and apart from the information listed in section 3-1 it is not passed to any other company or person.</p>
+
+  <h2>3. Where it is stored and for how long</h2>
+  <ul>
+    <li>It is stored encrypted in private storage in the Amazon Web Services (AWS) Seoul region.</li>
+    <li>Recordings are kept as long as they are needed to improve accuracy and deleted when no longer needed. Per-video track records (section 3-1) are kept as long as this feature is offered.</li>
+    <li>To have a recording deleted, send the date and time of the recording and the video’s address to the contact below. The recording and the per-video track records made from it are deleted together.</li>
+  </ul>
+
+  <h2 id="shown">3-1. Information shown to other users</h2>
+  <p>Of the results found, the information below is shown to other users who open the popup on the same video.</p>
+  <ul>
+    <li>Shown: the video id, the track found, the position in the track (where the preview starts), and a “found” or “confirmed by another user” mark</li>
+    <li>Results that were not certain and that nobody confirmed as right, and searches that found nothing, are not shown. Results rated wrong are not shown either.</li>
+    <li>Not shown: the recording, the tab title, the full video address, the date, time and number of searches, or who searched. The extension does not collect names, accounts or IP addresses, so the server does not know who searched either.</li>
+    <li>This information can be looked up only by someone who knows the video id, and it is not published as a list.</li>
+  </ul>
+
+  <h2>4. Information stored only in the browser</h2>
+  <p>Whether you agreed (the effective date of the policy you agreed to), the state of a search in progress, the library’s album list, and the record of your own results (video id, track, result, the latest 100) are stored only in your browser (Chrome storage) and are not sent to the server.</p>
+
+  <h2>5. Outside services</h2>
+  <ul>
+    <li>Fonts are loaded from Google Fonts, and album covers on the library page from the image servers of the stores (Bandcamp and others). Like any web request, these services may receive your IP address and similar information.</li>
+    <li>Pressing “Buy the album” or “See the artist” opens the store’s site. That site’s own policy applies there.</li>
+  </ul>
+
+  <h2>6. Permissions</h2>
+  <ul>
+    <li><b>tabCapture</b>, <b>activeTab</b>, <b>offscreen</b>: record the audio of the tab you searched in (you keep hearing it while it records).</li>
+    <li><b>storage</b>: store the information of section 4 in the browser.</li>
+    <li>Access to the server address: send the recording to the search server and receive the result.</li>
+  </ul>
+
+  <h2>7. Withdrawing consent</h2>
+  <p>Pressing “Withdraw consent” at the bottom of the popup withdraws it, and searching is not available until you agree again. The record of your own results stored in the browser (section 4) is deleted at the same time. To have recordings and per-video track records already stored deleted, ask as described in section 3.</p>
+
+  <h2>8. Contact and changes</h2>
+  <p>Questions and deletion requests: <a href="mailto:kjh960912@gmail.com">kjh960912@gmail.com</a></p>
+  <p>When this policy changes, this page gives the new effective date and what changed (section 9), and the extension asks for your consent again. Searching is not available until you agree again.</p>
+
+  <h2 id="history">9. Revision history</h2>
+  <ul>
+    <li><b>Effective October 22, 2026 (extension 1.2.0)</b>
+      <ul>
+        <li>The longest tab audio recording went from 45 seconds to 1 minute. The first search listens for up to 30 seconds; only when searching again after nothing was found can you choose 45 seconds or 1 minute.</li>
+        <li>The chosen recording length is no longer stored in the browser.</li>
+        <li>Opening the popup on a video tab sends the video id to look up tracks other users found (not stored).</li>
+        <li>Tracks found are shown to other users watching the same video (section 3-1).</li>
+        <li>The record of your own results is stored in the browser and deleted when you withdraw consent.</li>
+        <li>Consent is asked again when the policy changes. Users who agreed to the previous policy must agree to this one again to search.</li>
+      </ul>
+    </li>
+    <li><b>Effective October 17, 2026 (extension 1.0.0)</b>: first version.</li>
+  </ul>
+</main>
+</body>
+</html>
