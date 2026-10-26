@@ -14,11 +14,14 @@
 | `background.js` | service worker. 팝업과 녹음기 사이를 잇고 상태를 `chrome.storage.session`에 둔다. 툴바 배지. 영상에서 끝난 찾기를 내 기록(`history`)에 남긴다 |
 | `offscreen.html`, `offscreen.js` | 탭 오디오 녹음, 녹음 중 확인, 최종 검색. 영상 탭이면 요청에 영상 키(`vkey`)를 붙인다 |
 | `video.js` | 탭 주소에서 영상 키(`videoKey`). 팝업이 쓴다 |
+| `i18n.js`, `_locales/ko`, `_locales/en` | 화면 문장(1.3.0). 한국어 Chrome이면 한국어, 그 밖은 영어(§7) |
 | `library.html`, `library.js`, `library.css` | 라이브러리 앨범 목록 탭 |
 | `privacy.html` | 개인정보처리방침([같은 내용](privacy-policy.md)) |
 | `icons/` | 툴바·스토어 아이콘 |
 
 빌드 단계는 없다. 순수 JS·CSS를 그대로 불러온다.
+
+화면이 바뀌면 `python store/shots/make.py check`로 모든 팝업 화면을 한국어·영어로 찍어 본다(§7).
 
 **서버 연결.** 기본 서버는 배포된 AWS Lambda다([Lambda 배포](lambda-deployment.md)). 엔드포인트와 API 키는
 `config.js`에 고정돼 있고, 확장 프로그램에는 이를 보거나 바꾸는 설정 화면이 없다. 로컬 서버(`server\start.bat`,
@@ -162,3 +165,22 @@ IBM Plex Sans KR은 Windows 화면에서 버튼 글자가 살짝 깨져 보인�
   올린다.
 - `store/listing.md`에 등록 문구, 권한 사유, 데이터 공개 항목, 절차가 있고, `store/assets/`에 스크린샷과 프로모
   타일이 있다.
+
+## 7. 언어 (1.3.0)
+
+작성 2026-10-26. 설계는 `docs/superpowers/specs/2026-10-26-english-support-design.md`.
+
+- Chrome UI 언어가 한국어면 한국어, 그 밖의 모든 언어는 영어다. `_locales/ko`와 `_locales/en`만 두고 `default_locale`은
+  `en`이다. 고르는 설정은 없다. Chrome UI는 영어인데 웹사이트 선호 언어만 한국어인 사람은 영어로 본다.
+- 문장은 모두 `_locales/<언어>/messages.json`에 있다. 숫자가 끼면 메시지 안에 `$1`을 쓴다. 이름과 설명(`manifest.json`의
+  `__MSG_ext_name__` 등)도 여기서 온다.
+- `i18n.js`(각 페이지 스크립트보다 먼저 불러옴): `t(이름, ...값)`, 보이는 언어 `LANG`, HTML의 `data-i18n` 채우기
+  (`localize`), 오류 문장(`errorText`), 앨범 이름 `'단일 곡'`의 영어 표기(`albumTitle`, 서버 데이터는 그대로).
+- 오류는 문장이 아니라 `{ code, status?, detail? }`로 오간다. offscreen 문서에는 `chrome.i18n`이 없어서, 팝업이
+  `errorText`로 문장을 고른다. 서버 오류는 응답의 `code`([검색 파이프라인](search-pipeline.md) §6)를 쓰고, 모르는 `code`나
+  `code`가 없는 응답은 "서버 오류 N"이다. 서버의 한국어 `detail`은 보이지 않는다. 1.2.0이 남긴 문자열 오류는 그대로 보인다.
+- 시험: `node --test "tests/*.test.mjs"`가 두 언어의 키와 `$n`이 같은지, 코드에서 쓰는 키가 모두 있는지, 코드 문자열에
+  한국어가 남지 않았는지 본다.
+- 화면 확인과 스토어 스크린샷: `store/shots/`. `stub.js`가 `chrome.*`와 서버를 흉내 내고, 실제 `popup.js`·`library.js`를
+  headless Chrome으로 찍는다. `python store/shots/make.py check`는 모든 팝업 화면을 두 언어로 `build/shots/check/`에 찍는다.
+  영어 문장이 길어 넘치면 먼저 문장을 줄인다.

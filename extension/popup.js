@@ -3,13 +3,15 @@
 // chrome.storage.session (background.js), because the popup closes whenever it loses focus.
 // Searching needs the user's consent to the privacy policy (privacy.html): recordings are kept
 // on the server to improve accuracy. Without it only the consent screen is shown.
-// Consent is to one version of the policy, its 시행일. When privacy.html changes, set POLICY to the
-// new 시행일 and POLICY_CHANGE to what changed (one or two lines): earlier consents (1.0.0 stored
-// `true`) are asked again. 1.1.0 was never published, so the lines are what changed since 1.0.0.
+// Consent is to one version of the policy, its 시행일. When the policy changes, set POLICY to the
+// new 시행일 and policy_change_1/2 (both _locales) to what changed (one or two lines): earlier
+// consents (1.0.0 stored `true`) are asked again. 1.1.0 was never published, so the lines are what
+// changed since 1.0.0. The policy is in five places that change together: privacy.html,
+// privacy.en.html, docs/privacy-policy.md, docs/privacy-policy.en.md and those two messages.
 // In a video tab the 대기 screen also shows the songs other users found in this video (GET /video,
 // docs/video-records.md) and this browser's own searches there.
 const POLICY = '2026-10-22';
-const POLICY_CHANGE = ['녹음이 최대 1분으로 늘었어요.', '찾은 곡을 같은 영상을 보는 다른 사용자에게 보여 줘요.'];
+const POLICY_CHANGE = [t('policy_change_1'), t('policy_change_2')];
 const $ = (id) => document.getElementById(id);
 const authHeaders = () => ({ 'X-Api-Key': SERVER.apiKey });
 // Every search records up to 30 s (the length the server's thresholds are calibrated on). Only
@@ -21,7 +23,7 @@ const RETRY_LENGTHS = [30, 45, 60];
 const VIDEO_TIMEOUT = 3000;
 const OWN_ROWS = 5;  // this browser's own searches listed per video
 const DOTS_STEP = 500;  // ms between steps of the dots after 찾는 중
-const STORE_NAME = { bandcamp: '밴드캠프', knkrtworld: 'KNKRTWORLD', gumroad: 'Gumroad' };
+const STORE_NAME = { bandcamp: t('store_bandcamp'), knkrtworld: 'KNKRTWORLD', gumroad: 'Gumroad' };
 const ICON = {
   listen: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M6.3 6.3a8 8 0 0 0 0 11.4M17.7 6.3a8 8 0 0 1 0 11.4"/></svg>',
   stop: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12" rx="1.5"/></svg>',
@@ -65,14 +67,14 @@ function fmt(sec) {
   const s = Math.max(0, Math.round(sec));
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 }
-const lengthLabel = (s) => (s % 60 ? `${s}초` : `${s / 60}분`);  // 45 -> 45초, 60 -> 1분
+const lengthLabel = (s) => (s % 60 ? t('length_seconds', s) : t('length_minutes', s / 60));  // 45 -> 45초, 60 -> 1분
 
 function setDot(state) {
   serverDot = state;
   const dot = document.querySelector('.dot');
   if (dot) {
     dot.className = `dot ${serverDot}`;
-    dot.parentElement.title = serverDot === 'on' ? '서버 연결됨' : serverDot === 'off' ? '서버에 연결할 수 없음' : '';
+    dot.parentElement.title = serverDot === 'on' ? t('server_on') : serverDot === 'off' ? t('server_off') : '';
   }
 }
 
@@ -125,7 +127,7 @@ async function start(duration = FIRST_LENGTH) {
   try {
     streamId = await chrome.tabCapture.getMediaStreamId({ targetTabId: tab.id });
   } catch (e) {
-    render({ status: 'error', error: `탭 오디오를 캡처할 수 없습니다: ${e.message}` });
+    render({ status: 'error', error: { code: 'capture', detail: e.message } });
     return;
   }
   chrome.runtime.sendMessage({
@@ -148,12 +150,12 @@ function headAction(state) {
   } else if (state.status === 'done' && state.result?.verdict !== 'fail') {
     // The video's records are looked up again: the song just found now shows as a record.
     const again = () => { toIdle(); render({ status: 'idle' }); loadVideo(); };
-    box.append(h('button', { class: 'chip-btn', onclick: again }, icon('again'), '다시 찾기'));
+    box.append(h('button', { class: 'chip-btn', onclick: again }, icon('again'), t('search_again')));
   } else {
     box.append(h('button', {
-      class: 'chip-btn', title: '라이브러리에 있는 앨범 보기',
+      class: 'chip-btn', title: t('library_hint'),
       onclick: () => openPage('library.html'),
-    }, h('span', { class: `dot ${serverDot}`, 'aria-hidden': 'true' }), '라이브러리'));
+    }, h('span', { class: `dot ${serverDot}`, 'aria-hidden': 'true' }), t('library')));
   }
 }
 
@@ -184,33 +186,33 @@ async function setConsent(value) {
 
 function consentScreen() {
   return [
-    h('div', {}, h('h1', { class: 'headline' }, '시작하기 전에'),
-      h('div', { class: 'sub' }, '곡을 찾으려면 아래 내용에 동의해 주세요.')),
-    agreedBefore && h('div', { class: 'note' }, '개인정보처리방침이 바뀌었어요.', POLICY_CHANGE.flatMap((l) => [h('br'), l])),
+    h('div', {}, h('h1', { class: 'headline' }, t('consent_title')),
+      h('div', { class: 'sub' }, t('consent_sub'))),
+    agreedBefore && h('div', { class: 'note' }, t('policy_changed'), POLICY_CHANGE.flatMap((l) => [h('br'), l])),
     h('ul', { class: 'tips' },
-      h('li', {}, '찾기를 누르면 이 탭의 소리(최대 1분)와 탭 제목·주소를 서버로 보내요.'),
-      h('li', {}, '영상 탭에서 팝업을 열면 영상 id를 보내 다른 사용자가 찾은 곡을 조회해요. 이 조회는 저장하지 않아요.'),
-      h('li', {}, '찾은 곡은 같은 영상을 보는 다른 사용자에게 보여요. 녹음·탭 제목·누가 찾았는지는 보이지 않아요.'),
-      h('li', {}, '보낸 녹음은 서버에 저장해 정확도를 높이는 데 써요. 팔지 않아요. 이름·이메일·계정은 받지 않아요.')),
-    h('button', { class: 'linkish', onclick: () => openPage('privacy.html') }, '개인정보처리방침 전체 보기'),
-    h('button', { class: 'primary', onclick: () => setConsent(true) }, icon('check'), '동의하고 시작'),
-    h('div', { class: 'hint' }, '동의하지 않으면 찾기를 쓸 수 없어요.'),
+      h('li', {}, t('consent_1')),
+      h('li', {}, t('consent_2')),
+      h('li', {}, t('consent_3')),
+      h('li', {}, t('consent_4'))),
+    h('button', { class: 'linkish', onclick: () => openPage(t('privacy_page')) }, t('privacy_full')),
+    h('button', { class: 'primary', onclick: () => setConsent(true) }, icon('check'), t('agree')),
+    h('div', { class: 'hint' }, t('consent_hint')),
   ];
 }
 
 function idle(error) {
   return [
-    h('div', {}, h('h1', { class: 'headline' }, '현재 탭에서 찾기'),
-      h('div', { class: 'sub' }, '이 탭의 소리를 듣고 크럼프 라이브러리에서 찾아요.')),
-    error && h('div', { class: 'error', role: 'alert' }, error),
-    h('button', { class: 'primary', onclick: () => start() }, icon('listen'), '지금 나오는 트랙 찾기'),
-    h('div', { class: 'hint' }, `최대 ${lengthLabel(FIRST_LENGTH)} 듣고, 곡이 확실해지면 바로 멈춰요`, h('br'),
-      '팝업을 닫아도 계속 들어요'),
+    h('div', {}, h('h1', { class: 'headline' }, t('idle_title')),
+      h('div', { class: 'sub' }, t('idle_sub'))),
+    error && h('div', { class: 'error', role: 'alert' }, errorText(error)),
+    h('button', { class: 'primary', onclick: () => start() }, icon('listen'), t('find_now')),
+    h('div', { class: 'hint' }, t('idle_hint', lengthLabel(FIRST_LENGTH)), h('br'),
+      t('idle_hint_close')),
     videoRecords(),
     h('div', { class: 'foot' },
-      h('button', { class: 'linkish', onclick: () => openPage('privacy.html') }, '개인정보처리방침'),
+      h('button', { class: 'linkish', onclick: () => openPage(t('privacy_page')) }, t('privacy')),
       h('span', { 'aria-hidden': 'true' }, '·'),
-      h('button', { class: 'linkish', onclick: () => setConsent(false) }, '동의 철회')),
+      h('button', { class: 'linkish', onclick: () => setConsent(false) }, t('withdraw'))),
   ];
 }
 
@@ -226,16 +228,16 @@ function videoRecords() {
   if (!songs.length && !own.length) return null;
   const row = (name, sub) => h('li', {},
     h('span', { class: 'what' }, h('span', { class: 'name', title: name }, name), sub && h('span', { class: 'tag' }, sub)));
-  const albumLine = (m) => [m.album?.title, m.album?.artist].filter(Boolean).join(' · ') || m.folder || null;
+  const albumLine = (m) => [m.album?.title && albumTitle(m.album.title), m.album?.artist].filter(Boolean).join(' · ') || m.folder || null;
   const rows = songs.length === 1 ? [] : songs.map((s) => row(trackName(s.song), albumLine(s.song)));
   for (const e of own) {
-    rows.push(e.song ? row(trackName(e.song), e.verdict === 'check' ? '내 기록 · 확실하지 않음' : '내 기록') : row('못 찾음', '내 기록'));
+    rows.push(e.song ? row(trackName(e.song), e.verdict === 'check' ? t('mine_unsure') : t('mine')) : row(t('not_found'), t('mine')));
   }
   const one = songs.length === 1 ? songs[0] : null;
-  return h('section', { class: 'vlist', 'aria-label': '이 영상에서 찾은 곡' },
-    h('div', { class: 'label' }, '이 영상에서 찾은 곡'),
+  return h('section', { class: 'vlist', 'aria-label': t('video_songs') },
+    h('div', { class: 'label' }, t('video_songs')),
     one && h('div', { class: 'note info' }, one.status === 'verified'
-      ? '다른 사용자가 이 영상에서 찾고 맞다고 확인한 곡이에요.' : '다른 사용자가 이 영상에서 찾은 곡이에요.'),
+      ? t('video_verified') : t('video_found')),
     one && h('div', { class: 'card' }, ...songCard(one.song)),
     rows.length > 0 && h('ul', {}, rows));
 }
@@ -244,23 +246,23 @@ function listening(state) {
   const searching = state.status === 'searching';
   // No elapsed time or progress bar: they kept the screen redrawing while the tab is captured.
   // Only the dots after 찾는 중 step (1, 2, 3, 1, ...), so the search visibly goes on.
-  const time = h('span', { class: 'num' }, searching ? '검색 중' : `최대 ${fmt(state.duration || 30)}`);
+  const time = h('span', { class: 'num' }, searching ? t('searching') : t('max_length', fmt(state.duration || 30)));
   const eq = h('div', { class: 'eq', 'aria-hidden': 'true' }, ...Array.from({ length: 7 }, () => h('span')));
   const dots = h('span', { class: 'dots', 'data-n': '1', 'aria-hidden': 'true' }, ...Array.from({ length: 3 }, () => h('span', {}, '.')));
   tick = setInterval(() => { dots.dataset.n = String((Number(dots.dataset.n) % 3) + 1); }, DOTS_STEP);
   return [
     h('div', { class: 'listen-head' },
-      h('div', {}, h('h1', { class: 'headline' }, '찾는 중', dots),
-        h('div', { class: 'sub' }, searching ? '들은 소리 전체로 마지막 검색을 하고 있어요.' : '곡이 확실해지면 바로 멈춰요.')),
+      h('div', {}, h('h1', { class: 'headline' }, t('listening_title'), dots),
+        h('div', { class: 'sub' }, searching ? t('searching_sub') : t('listening_sub'))),
       eq),
     h('div', { class: 'panel' },
-      h('div', { class: 'panel-row' }, h('span', {}, '듣는 탭'), time),
-      h('div', { class: 'tab-title', title: state.tabTitle || '' }, state.tabTitle || '현재 탭')),
+      h('div', { class: 'panel-row' }, h('span', {}, t('listening_tab')), time),
+      h('div', { class: 'tab-title', title: state.tabTitle || '' }, state.tabTitle || t('current_tab'))),
     searching
-      ? h('button', { class: 'secondary', disabled: true }, '검색 중…')
+      ? h('button', { class: 'secondary', disabled: true }, t('searching_button'))
       : h('button', { class: 'secondary', onclick: () => chrome.runtime.sendMessage({ target: 'background', type: 'stop' }) },
-        icon('stop'), '지금 멈추고 검색'),
-    h('button', { class: 'linkish cancel', onclick: cancel }, '취소'),
+        icon('stop'), t('stop_and_search')),
+    h('button', { class: 'linkish cancel', onclick: cancel }, t('cancel')),
   ];
 }
 
@@ -300,23 +302,23 @@ function result(r, state) {
       lengths.append(h('button', { 'data-s': s, 'aria-pressed': String(s === retry), onclick: () => pick(s) }, lengthLabel(s)));
     }
     return [
-      verdictRow('none', '못 찾음', state),
-      h('h1', { class: 'headline sm' }, '이 구간에선', h('br'), '못 찾았어요'),
+      verdictRow('none', t('not_found'), state),
+      h('h1', { class: 'headline sm' }, t('not_found_title_1'), h('br'), t('not_found_title_2')),
       h('ul', { class: 'tips' },
-        h('li', {}, '음악이 크게 들리는 구간에서 다시 시도해 보세요.'),
-        h('li', {}, 'MC·함성이 크면 45초나 1분으로 더 길게 들어 보세요.'),
-        h('li', {}, '라이브러리에 없는 곡일 수도 있어요.')),
-      h('div', { role: 'group', 'aria-label': '다시 찾을 때 최대 녹음 길이' },
-        h('div', { class: 'label' }, '최대 녹음 길이'), lengths),
-      h('button', { class: 'primary', onclick: () => start(retry) }, icon('again'), '다시 찾기'),
+        h('li', {}, t('tip_loud')),
+        h('li', {}, t('tip_longer')),
+        h('li', {}, t('tip_missing'))),
+      h('div', { role: 'group', 'aria-label': t('retry_length_group') },
+        h('div', { class: 'label' }, t('retry_length')), lengths),
+      h('button', { class: 'primary', onclick: () => start(retry) }, icon('again'), t('search_again')),
     ];
   }
   // check = a rhythm or low-score fingerprint candidate: right most of the time, but not always.
   const unsure = r.verdict === 'check';
   const m = r.songs[0];  // only the best song is shown
   const out = [
-    verdictRow(unsure ? 'unsure' : 'found', unsure ? '찾음 · 확실하지 않음' : '찾음', state),
-    unsure && h('div', { class: 'note' }, '확실하지 않아요. 미리듣기로 같은 곡인지 확인해 주세요.'),
+    verdictRow(unsure ? 'unsure' : 'found', unsure ? t('found_unsure') : t('found'), state),
+    unsure && h('div', { class: 'note' }, t('unsure_note')),
     ...songCard(m),
   ];
   if (r.id) out.push(ask(r.id, m.path, r.video?.key));  // only stored queries take feedback
@@ -329,19 +331,19 @@ function songCard(m) {
   const album = m.album;
   const store = album?.store?.url?.startsWith('https://') ? album.store : null;
   const name = trackName(m);
-  const albumTitle = album?.title || m.folder || '';
+  const albumName = (album?.title && albumTitle(album.title)) || m.folder || '';
 
   const cover = album?.cover
-    ? h('img', { class: 'cover', src: album.cover, alt: `앨범 커버: ${albumTitle}` })
-    : h('div', { class: 'cover', role: 'img', 'aria-label': '앨범 커버 없음' }, albumTitle || '♪');
+    ? h('img', { class: 'cover', src: album.cover, alt: t('cover_alt', albumName) })
+    : h('div', { class: 'cover', role: 'img', 'aria-label': t('no_cover') }, albumName || '♪');
 
   const out = [
     h('div', { class: 'song' }, cover,
       h('div', { class: 'song-text' },
         h('div', {}, h('div', { class: 'track' }, name),
-          albumTitle && h('div', { class: 'album' }, albumTitle),
+          albumName && h('div', { class: 'album' }, albumName),
           album?.artist && h('div', { class: 'artist' }, album.artist)),
-        h('span', { class: 'pos' }, `곡의 ${fmt(m.match_start)}부터`))),
+        h('span', { class: 'pos' }, t('position', fmt(m.match_start))))),
     preview(m),
   ];
   if (store) {
@@ -350,8 +352,8 @@ function songCard(m) {
     out.push(h('a', {
       class: isAlbum ? 'primary' : 'outline', href: store.url, target: '_blank', rel: 'noopener',
       onclick: (e) => { e.preventDefault(); chrome.tabs.create({ url: store.url }); },
-    }, isAlbum ? `${shop}에서 앨범 구매` : `${shop}에서 아티스트 보기`, icon('out')));
-    if (!isAlbum) out.push(h('div', { class: 'hint' }, '이 앨범의 판매 페이지는 없어서 아티스트 페이지로 연결해요.'));
+    }, isAlbum ? t('buy_album', shop) : t('see_artist', shop), icon('out')));
+    if (!isAlbum) out.push(h('div', { class: 'hint' }, t('artist_only')));
   }
   return out;
 }
@@ -368,7 +370,7 @@ function preview(m) {
   const show = (state) => {
     btn.disabled = state === 'loading';
     const playing = state === 'playing';
-    btn.setAttribute('aria-label', playing ? '미리듣기 멈춤' : '10초 미리듣기 재생');
+    btn.setAttribute('aria-label', playing ? t('preview_pause') : t('preview_play'));
     btn.textContent = '';
     btn.append(icon(playing ? 'pause' : 'play'));
   };
@@ -378,7 +380,7 @@ function preview(m) {
     if (!p.paused) return p.pause();
     if (!loaded) {
       show('loading');
-      time.textContent = '불러오는 중…';
+      time.textContent = t('loading');
       try {
         const r = await fetch(
           `${SERVER.url}/preview?path=${encodeURIComponent(m.path)}&start=${Math.max(0, m.match_start).toFixed(1)}`,
@@ -390,7 +392,7 @@ function preview(m) {
         time.textContent = '0:10';
       } catch (e) {
         show('paused');
-        time.textContent = `불러오지 못함 (${e.message})`;
+        time.textContent = t('load_failed', e.message);
         return;
       }
     }
@@ -400,7 +402,7 @@ function preview(m) {
   show('paused');
   return h('div', { class: 'player' }, btn,
     h('div', { class: 'player-info' },
-      h('div', { class: 'player-row' }, h('span', {}, '10초 미리듣기'), time)));
+      h('div', { class: 'player-row' }, h('span', {}, t('preview_label')), time)));
 }
 
 // One answer per result. It is kept in chrome.storage.session ('answered'), so reopening the
@@ -409,7 +411,7 @@ function preview(m) {
 // video key) lets the server mark the video's record too.
 function ask(id, path, video = '') {
   const row = h('div', { class: 'ask' });
-  const thanks = (correct) => { row.textContent = `${correct ? '맞음' : '틀림'}으로 기록했어요. 고마워요!`; };
+  const thanks = (correct) => { row.textContent = correct ? t('answered_right') : t('answered_wrong'); };
   const remember = (a) => {
     answered = a;
     (a ? chrome.storage.session.set({ answered: a }) : chrome.storage.session.remove('answered')).catch(() => {});
@@ -426,12 +428,12 @@ function ask(id, path, video = '') {
       thanks(correct);
     } catch {
       remember(null);
-      row.textContent = '기록하지 못했어요. 잠시 후 다시 눌러 주세요.';
+      row.textContent = t('answer_failed');
       setTimeout(() => { row.textContent = ''; row.append(...buttons()); }, 2500);
     }
   };
-  const buttons = () => [h('span', {}, '결과가 맞나요?'),
-    h('div', {}, h('button', { onclick: () => send(true) }, '맞음'), h('button', { onclick: () => send(false) }, '틀림'))];
+  const buttons = () => [h('span', {}, t('ask')),
+    h('div', {}, h('button', { onclick: () => send(true) }, t('right')), h('button', { onclick: () => send(false) }, t('wrong')))];
   if (answered?.id === id) thanks(answered.correct);
   else row.append(...buttons());
   return row;

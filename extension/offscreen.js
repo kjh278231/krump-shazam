@@ -33,7 +33,8 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   if (msg.target !== 'offscreen') return;
   if (msg.type === 'record') {
     const r = run = { cancelled: false, abort: new AbortController() };
-    record(msg, r).catch((e) => r.cancelled || send('error', { error: String(e.message || e) }));
+    // The popup words the error (i18n.js errorText): this document has no chrome.i18n.
+    record(msg, r).catch((e) => r.cancelled || send('error', { error: e.info || { code: 'record', detail: String(e.message || e) } }));
     sendResponse({ ok: true });
   }
   if (msg.type === 'cancel') {
@@ -65,13 +66,13 @@ async function identify(blob, params, signal) {
       method: 'POST', body: blob, headers: { 'X-Api-Key': SERVER.apiKey }, signal,
     });
   } catch {
-    throw new Error('서버에 연결할 수 없습니다. 잠시 후 다시 시도하세요.');
+    throw Object.assign(new Error('no connection'), { info: { code: 'no_connection' } });
   }
   if (!res.ok) {
-    const text = await res.text();
-    let detail = text;
-    try { detail = JSON.parse(text).detail || text; } catch {}
-    throw new Error(res.status === 400 ? detail : `서버 오류 ${res.status}: ${detail}`);
+    // The server's code (ApiError in server/app.py), not its Korean detail.
+    let code = 'server';
+    try { code = (await res.json()).code || code; } catch {}
+    throw Object.assign(new Error(`server ${res.status}`), { info: { code, status: res.status } });
   }
   return res.json();
 }

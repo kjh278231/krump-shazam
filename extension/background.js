@@ -65,12 +65,12 @@ chrome.runtime.onMessage.addListener((msg) => {
         badge('REC', '#ff5a1f');
         // msg's own target/type must not override these, so spread it first.
         const ack = await chrome.runtime.sendMessage({ ...msg, target: 'offscreen', type: 'record' }).catch(() => null);
-        if (!ack?.ok) await fail('녹음을 시작하지 못했습니다. 다시 시도해 주세요.');
+        if (!ack?.ok) await fail({ code: 'record_start' });
         break;
       }
       case 'stop': {
         const ack = await chrome.runtime.sendMessage({ target: 'offscreen', type: 'stop' }).catch(() => null);
-        if (!ack?.recording) await fail('진행 중인 녹음이 없습니다. 다시 시작해 주세요.');
+        if (!ack?.recording) await fail({ code: 'not_recording' });
         break;
       }
       case 'cancel':
