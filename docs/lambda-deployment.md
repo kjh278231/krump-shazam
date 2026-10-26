@@ -110,6 +110,34 @@ python server/deploy/aws_setup.py bucket data image function warm
 - 주소는 공개돼도 된다. 키 없는 요청은 401로 거절되지만 Lambda 실행은 과금되므로, 최악의 경우(동시 실행 3개를
   한 달 내내) 약 $780/월이다. 이상하면 API 키를 바꾸거나(`KF_API_KEY`) 동시 실행 상한을 0으로 내린다.
 
+## 사용량 대시보드
+
+작성 2026-10-23. 배포된 서버가 얼마나 쓰이는지 이 PC에서만 보는 HTML이다.
+
+```bash
+python server/usage.py            # build/usage/index.html을 만들고 브라우저로 연다
+python server/usage.py --no-open
+```
+
+- `aws_setup.py`와 같은 이 PC의 AWS 자격 증명으로 읽기만 한다. 처음에는 로그를 훑느라 약 1분 걸리고, 그다음은 2초 안팎이다.
+  내려받은 JSON과 콜드 스타트 줄은 `build/usage/cache.json`에 두고, ETag가 바뀐 기록(피드백)만 다시 받는다.
+- 페이지는 파일 하나이고 외부 요청이 없다. 사용자의 탭 제목과 주소가 들어 있으므로 `build/` 밖으로 내보내거나 공개하지 않는다.
+- 템플릿은 `server/usage.html`이고, 스크립트가 데이터를 넣어 `build/usage/index.html`로 쓴다. 기간은 최근 7일·30일·90일·전체다.
+
+| 화면 | 가져오는 곳 |
+|---|---|
+| 찾기 수, 결과(찾음 / 확실하지 않음 / 못 찾음), 피드백, 사이트, 녹음 길이, 찾은 단계, 많이 찾은 곡, 최근 찾기 | S3 `recordings/`의 JSON, 길이는 WAV 크기(16 kHz mono 16-bit) |
+| 영상 기록 수 | S3 `videos/` |
+| 서버 요청(웜 유지 제외), 오류, 스로틀 | CloudWatch `AWS/Lambda` 시간별 합계에서 `AWS/Scheduler` `InvocationAttemptCount`(그룹 `krump-finder`)를 뺌 |
+| 콜드 스타트, 예상 비용 | 로그의 `Init Duration`이 있는 REPORT 줄. 비용은 (실행 + 초기화 시간) × 메모리 × x86 단가 + 요청 단가, 무료 한도 적용 전 |
+
+- 녹음 기록에는 판정이 없어서 스크립트가 다시 계산한다. `pair`·`rhythm+pair`는 찾음, `rhythm`은 확실하지 않음, `fingerprint`는
+  `grouping.verdict`와 같은 기준(점수 5 미만 못 찾음, 10 미만이나 둘째 곡이 60% 이상이면 확실하지 않음)이다. 영상 기록 4개의
+  판정과 모두 같았다(2026-10-23).
+- 사용자 수는 알 수 없다. 서버에 사용자 id가 없다. 설치 수와 주간 사용자는 웹스토어 개발자 대시보드에서 본다.
+- 동의해야 쓸 수 있으므로 끝까지 마친 찾기는 모두 `recordings/`에 남는다. 취소한 찾기와 개발 중 시험한 찾기는 구분하지 않는다.
+- 서버 지표는 최근 90일(`METRIC_DAYS`)만 가져온다. 시각은 모두 한국 시간이다(Lambda의 녹음 id는 UTC).
+
 ## 서버 코드에서 바뀐 것
 
 1. **fingerprint DB 읽기 전용 열기**: Panako 패치 8 (`-Dpanako.lmdb.readonly=true`, `MDB_RDONLY | MDB_NOLOCK`).

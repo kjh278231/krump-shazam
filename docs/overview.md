@@ -16,7 +16,7 @@
 **같은 녹음**을 찾는다. 비슷하게 들리는 곡을 추천하는 기능은 아니다.
 
 - 라이브러리: `music/`(`N:\개인\Krump Track & Albums` 사본). 고유 트랙 4,132개, 약 244시간, 앨범 319개.
-- 사용자 흐름: **현재 탭에서 찾기** → 최대 30초 녹음(확실해지면 일찍 멈춤) → 곡 이름, 앨범 커버,
+- 사용자 흐름: **지금 나오는 트랙 찾기** → 최대 30초 녹음(확실해지면 일찍 멈춤) → 곡 이름, 앨범 커버,
   곡 안의 위치, 10초 미리듣기, 판매 페이지 링크 → **맞음 / 틀림** 피드백. 못 찾으면 그 한 번만 45초나 1분으로
   늘려 다시 찾을 수 있다.
 - 영상 탭(1.2.0부터): 같은 영상에서 다른 사용자가 이미 찾은 곡이 있으면, 팝업을 열자마자 그 곡들을 보여 준다
@@ -73,6 +73,7 @@ Chrome 확장 (extension/, Manifest V3, 프레임워크 없는 JS)
 | 인덱스 빌드 | `poc/build_index.py`, `poc/pairfp.py build`, `poc/build_rhythm_index.py`, `poc/rhythm_cohort.py`, `poc/find_duplicates.py` | fingerprint DB, pair index, rhythm index, cohort, `db/same_audio.csv` |
 | 앨범 데이터 | `server/build_albums.py`, `server/fetch_store_covers.py`, `db/album_links.json` | 앨범 목록, 커버, 판매 링크([앨범 링크](album-links.md)) |
 | 배포 | `server/deploy/` | 이미지·데이터 준비(`stage.py`), AWS 리소스(`aws_setup.py`), 배포 조건 확인(`release.py`) |
+| 사용량 대시보드 | `server/usage.py`, `server/usage.html` | 배포된 서버의 찾기·결과·피드백·Lambda 호출과 비용을 이 PC에서 보는 HTML([Lambda 배포](lambda-deployment.md)) |
 | 스토어 | `store/` | 웹스토어 업로드 zip(`package.py`), 등록 문구, 스크린샷 |
 | 평가 | `poc/evaluate.py`, `poc/make_testset.py`, `poc/real_video_test.py`, `poc/battle_*.py`, `poc/eval_*.py`, `realtest/` | 합성 잡음 세트, 실제 영상, 배틀 100편 측정 |
 
@@ -168,6 +169,7 @@ Chrome 확장 (extension/, Manifest V3, 프레임워크 없는 JS)
 - 확장 프로그램 업데이트는 `manifest.json`의 `version`을 올리고 `python store/package.py`로 만든 zip을
   웹스토어 대시보드에 올린다.
 - 비용: 하루 5회 사용 기준 월 $1 미만. `Project=krump-finder` 태그로 거른 월 $10 예산 경보가 있다.
+- 사용량: `python server/usage.py`가 S3 기록과 CloudWatch를 읽어 `build/usage/index.html`을 만든다(이 PC에서만 봄).
 
 ## 7. 문서 지도
 
@@ -177,7 +179,7 @@ Chrome 확장 (extension/, Manifest V3, 프레임워크 없는 JS)
 | [검색 파이프라인](search-pipeline.md) | 단계 순서, 후보 묶기와 판정, Panako와 패치, pair stage, rhythm search, 기준과 보정, 서버 실행 구조와 속도 |
 | [확장 프로그램](extension.md) | 파일 구성, 녹음 흐름, 팝업 화면, 라이브러리 페이지, 동의와 녹음 저장, 웹스토어 배포 |
 | [평가](evaluation.md) | 평가 세트와 도구, PoC 결과, 실제 영상 테스트, 미확인 후보 |
-| [Lambda 배포](lambda-deployment.md) | 왜 Lambda인가, 비용, 배포된 리소스, 배포 절차, 콜드 스타트 측정 |
+| [Lambda 배포](lambda-deployment.md) | 왜 Lambda인가, 비용, 배포된 리소스, 배포 절차, 사용량 대시보드, 콜드 스타트 측정 |
 | [영상별 기록](video-records.md) | 영상 키, 이벤트 형식, 공유 기준, `GET /video`, 시험, 구간을 기록하지 않는 이유 |
 | [앨범 링크](album-links.md) | `db/album_links.json` 형식과 링크를 찾은 방법 |
 | [개인정보처리방침](privacy-policy.md) | 보내는 정보, 보관, 철회 |

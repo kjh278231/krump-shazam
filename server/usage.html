@@ -1,0 +1,461 @@
+<!doctype html>
+<!-- Template of the usage dashboard: server/usage.py replaces __DATA__ and writes build/usage/index.html.
+     No external requests: the page holds users' tab titles and URLs and is opened from this PC only. -->
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Krump 사용량</title>
+<style>
+  :root {
+    color-scheme: light;
+    --page: #f9f9f7; --surface: #fcfcfb; --ink: #0b0b0b; --ink-2: #52514e; --muted: #898781;
+    --grid: #e1e0d9; --axis: #c3c2b7; --ring: rgba(11,11,11,0.10); --wash: rgba(11,11,11,0.04);
+    --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      color-scheme: dark;
+      --page: #0d0d0d; --surface: #1a1a19; --ink: #f0efec; --ink-2: #c3c2b7; --muted: #898781;
+      --grid: #2c2c2a; --axis: #383835; --ring: rgba(255,255,255,0.10); --wash: rgba(255,255,255,0.05);
+      --s1: #3987e5; --s2: #d95926; --s3: #199e70;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink);
+         font: 14px/1.5 system-ui, -apple-system, "Segoe UI", "Malgun Gothic", sans-serif; }
+  main { max-width: 1120px; margin: 0 auto; padding: 24px 16px 48px; }
+  h1 { font-size: 20px; margin: 0; font-weight: 650; }
+  h2 { font-size: 15px; margin: 0; font-weight: 600; }
+  .sub, .note { color: var(--ink-2); font-size: 13px; }
+  .note { color: var(--muted); }
+  header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px; }
+  .filters { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 20px 0 16px; }
+  .seg { display: inline-flex; border: 1px solid var(--ring); border-radius: 8px; overflow: hidden; background: var(--surface); }
+  .seg button { font: inherit; border: 0; background: none; color: var(--ink-2); padding: 6px 12px; cursor: pointer; }
+  .seg button + button { border-left: 1px solid var(--ring); }
+  .seg button:hover { background: var(--wash); }
+  .seg button[aria-pressed="true"] { color: var(--ink); font-weight: 650; background: var(--wash); }
+  .card { background: var(--surface); border: 1px solid var(--ring); border-radius: 12px; padding: 16px; min-width: 0; }
+  .card > h2 + .sub { margin-top: 2px; }
+  .stats { display: grid; grid-template-columns: minmax(200px, 1fr) 3fr; gap: 12px; }
+  .tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; min-width: 0; }
+  .stat .label { color: var(--ink-2); font-size: 13px; }
+  .stat .value { font-size: 26px; font-weight: 600; margin-top: 2px; }
+  .stat.hero .value { font-size: 52px; line-height: 1.1; }
+  .stat .detail { color: var(--muted); font-size: 12px; margin-top: 2px; }
+  .stack { display: grid; gap: 12px; margin-top: 12px; }
+  .stack > * { min-width: 0; }
+  .grid3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 8px; color: var(--ink-2); font-size: 12px; }
+  .legend span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 2px;
+                         background: var(--c); margin-right: 6px; vertical-align: -1px; }
+  .chart { margin-top: 8px; }
+  .chart svg { display: block; width: 100%; overflow: visible; }
+  .chart text { fill: var(--muted); font-size: 11px; font-variant-numeric: tabular-nums; }
+  .chart .cap { fill: var(--ink-2); }
+  .hit { fill: transparent; outline: none; cursor: default; }
+  .col { pointer-events: none; }
+  .hit:hover + .col, .hit:focus-visible + .col { opacity: .75; }
+  .hit:focus-visible { stroke: var(--ink-2); stroke-width: 1; }
+  details { margin-top: 10px; }
+  summary { color: var(--ink-2); font-size: 12px; cursor: pointer; width: max-content; }
+  .scroll { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { text-align: left; padding: 6px 10px 6px 0; border-bottom: 1px solid var(--grid); vertical-align: top; }
+  th { color: var(--muted); font-weight: 500; font-size: 12px; white-space: nowrap; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  td.nowrap { white-space: nowrap; }
+  td a { color: inherit; }
+  .dim { color: var(--muted); }
+  .key::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+                 background: var(--c); margin-right: 6px; }
+  .bars { display: grid; gap: 8px; margin-top: 12px; }
+  .bar { display: grid; grid-template-columns: 96px 1fr; align-items: center; gap: 10px; font-size: 13px; }
+  .bar .name { color: var(--ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .bar .track { display: flex; align-items: center; gap: 8px; min-width: 0; }
+  .bar .fill { height: 14px; background: var(--s1); border-radius: 0 4px 4px 0; min-width: 2px; flex: none; }
+  .bar .val { color: var(--ink); white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .bar .val small { color: var(--muted); font-size: 12px; }
+  .empty { color: var(--muted); font-size: 13px; padding: 24px 0; text-align: center; }
+  .tip { position: fixed; pointer-events: none; z-index: 10; background: var(--surface); color: var(--ink);
+         border: 1px solid var(--ring); border-radius: 8px; padding: 8px 10px; font-size: 12px;
+         box-shadow: 0 4px 16px rgba(0,0,0,.12); min-width: 140px; }
+  .tip .head { color: var(--ink-2); margin-bottom: 4px; }
+  .tip .row { display: flex; align-items: center; gap: 6px; }
+  .tip .row::before { content: ""; width: 10px; height: 2px; background: var(--c, transparent); flex: none; }
+  .tip b { font-weight: 650; font-variant-numeric: tabular-nums; }
+  .tip .row span { color: var(--ink-2); }
+  footer { margin-top: 20px; }
+  footer li { margin: 2px 0; }
+  @media (max-width: 560px) { .stat.hero .value { font-size: 44px; } .bar { grid-template-columns: 76px 1fr; } }
+  @media (max-width: 860px) { .stats { grid-template-columns: 1fr; } }
+  @media (max-width: 640px) { .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div>
+      <h1>Krump Track Finder 사용량</h1>
+      <div class="sub" id="generated"></div>
+    </div>
+    <div class="note">이 PC에서만 보세요. 사용자의 탭 제목과 주소가 들어 있습니다.</div>
+  </header>
+
+  <div class="filters">
+    <div class="seg" role="group" aria-label="기간" id="period"></div>
+    <span class="note" id="range"></span>
+  </div>
+
+  <section class="stats" id="stats"></section>
+
+  <div class="stack">
+    <section class="card">
+      <h2>날짜별 찾기</h2>
+      <div class="sub">끝까지 마친 찾기(취소한 찾기는 남지 않음). 결과는 팝업이 보여 준 판정이다.</div>
+      <div class="legend" id="searchLegend"></div>
+      <div class="chart" id="searchChart"></div>
+      <details><summary>표로 보기</summary><div class="scroll" id="searchTable"></div></details>
+    </section>
+
+    <section class="card">
+      <h2>날짜별 서버 요청</h2>
+      <div class="sub">Lambda 호출에서 5분마다 오는 웜 유지 호출을 뺀 수. 중간 확인, 미리듣기, 팝업 열기, 피드백이 모두 들어 있다.</div>
+      <div class="chart" id="serverChart"></div>
+      <details><summary>표로 보기</summary><div class="scroll" id="serverTable"></div></details>
+    </section>
+
+    <div class="grid3">
+      <section class="card">
+        <h2>사이트</h2>
+        <div class="sub">찾기를 한 탭</div>
+        <div class="bars" id="siteBars"></div>
+      </section>
+      <section class="card">
+        <h2>녹음 길이</h2>
+        <div class="sub">30초 전이면 일찍 확정된 것, 45초·1분은 다시 찾기</div>
+        <div class="bars" id="lengthBars"></div>
+      </section>
+      <section class="card">
+        <h2>찾은 단계</h2>
+        <div class="sub">찾음·확실하지 않음만</div>
+        <div class="bars" id="methodBars"></div>
+      </section>
+    </div>
+
+    <section class="card">
+      <h2>많이 찾은 곡</h2>
+      <div class="sub">찾음과 확실하지 않음, 상위 10곡</div>
+      <div class="scroll" id="topTracks"></div>
+    </section>
+
+    <section class="card">
+      <h2>최근 찾기</h2>
+      <div class="sub" id="recentSub"></div>
+      <div class="scroll" id="recent"></div>
+    </section>
+  </div>
+
+  <footer class="note">
+    <ul>
+      <li>사용자 수는 알 수 없다. 서버에 사용자 id가 없다(설치·주간 사용자 수는 웹스토어 개발자 대시보드).</li>
+      <li>찾기는 S3 <code>recordings/</code>의 기록이다. 동의해야 쓸 수 있으므로 끝까지 마친 찾기는 모두 남는다. 개발 중 시험한 찾기도 섞여 있다.</li>
+      <li>기록에는 판정이 없어 단계와 점수로 다시 계산했다(<code>server/usage.py</code> <code>verdict</code>, 서버와 같은 기준).</li>
+      <li>서버 지표는 최근 <span id="metricDays"></span>일만 가져온다. 예상 비용은 Lambda 실행비(콜드 스타트 포함)와 요청 비용이고, 무료 한도와 S3 비용은 넣지 않았다.</li>
+      <li>시각은 모두 한국 시간이다.</li>
+    </ul>
+  </footer>
+</main>
+<div class="tip" id="tip" hidden></div>
+
+<script>
+const DATA = __DATA__;
+
+const VERDICTS = [
+  { key: 'confirmed', label: '찾음', color: 'var(--s1)' },
+  { key: 'check', label: '확실하지 않음', color: 'var(--s2)' },
+  { key: 'fail', label: '못 찾음', color: 'var(--s3)' },
+];
+const VERDICT = Object.fromEntries(VERDICTS.map((v) => [v.key, v]));
+const METHODS = { fingerprint: 'fingerprint', pair: 'pair stage', 'rhythm+pair': 'rhythm+pair', rhythm: 'rhythm' };
+const LENGTHS = [
+  ['~12초', (s) => s <= 12], ['13~17초', (s) => s <= 17], ['18~22초', (s) => s <= 22], ['23~29초', (s) => s < 29.5],
+  ['30초', (s) => s < 31], ['31~45초', (s) => s < 46], ['46초~1분', () => true],
+];
+const PERIODS = [['7', '최근 7일'], ['30', '최근 30일'], ['90', '최근 90일'], ['all', '전체']];
+
+const $ = (id) => document.getElementById(id);
+function el(tag, props = {}, ...kids) {
+  const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(props)) {
+    if (k === 'class') e.className = v;
+    else if (k === 'style') e.style.cssText = v;
+    else if (k === 'text') e.textContent = v;
+    else e.setAttribute(k, v);
+  }
+  for (const kid of kids) if (kid != null) e.append(kid);
+  return e;
+}
+const SVG = 'http://www.w3.org/2000/svg';
+function svg(tag, attrs = {}) {
+  const e = document.createElementNS(SVG, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+const fmt = (n) => n.toLocaleString('ko-KR');
+const pct = (a, b) => (b ? `${Math.round((a / b) * 100)}%` : '–');
+const trackName = (p) => p.split('/').pop().replace(/\.[^.]+$/, '');
+const trackFolder = (p) => (p.includes('/') ? p.slice(0, p.lastIndexOf('/')) : '');
+const shortDay = (d) => `${+d.slice(5, 7)}/${+d.slice(8, 10)}`;
+
+function addDays(day, n) {
+  const t = new Date(`${day}T00:00:00Z`);
+  t.setUTCDate(t.getUTCDate() + n);
+  return t.toISOString().slice(0, 10);
+}
+function daysBetween(a, b) {
+  const out = [];
+  for (let d = a; d <= b; d = addDays(d, 1)) out.push(d);
+  return out;
+}
+
+// ---- tooltip (values lead, labels follow; every value is also in a table) ----
+const tip = $('tip');
+function showTip(evt, head, rows) {
+  tip.replaceChildren(el('div', { class: 'head', text: head }),
+    ...rows.map(([value, label, color]) => {
+      const r = el('div', { class: 'row' }, el('b', { text: value }), el('span', { text: label }));
+      if (color) r.style.setProperty('--c', color);
+      return r;
+    }));
+  tip.hidden = false;
+  const box = evt.currentTarget.getBoundingClientRect();
+  const x = evt.clientX ?? box.left + box.width / 2;
+  const y = evt.clientY ?? box.top;
+  const w = tip.offsetWidth, h = tip.offsetHeight;
+  tip.style.left = `${Math.min(window.innerWidth - w - 8, Math.max(8, x + 12))}px`;
+  tip.style.top = `${Math.max(8, y - h - 12)}px`;
+}
+const hideTip = () => { tip.hidden = true; };
+
+function niceStep(max, ticks = 4) {
+  const raw = Math.max(1, max) / ticks;
+  const mag = 10 ** Math.floor(Math.log10(raw));
+  return Math.max(1, [1, 2, 5, 10].map((m) => m * mag).find((s) => s >= raw));  // counts: whole steps
+}
+
+// Rounded data end (top), square at the baseline.
+function topRounded(x, y, w, h, r) {
+  r = Math.min(r, w / 2, h);
+  return `M${x},${y + h}V${y + r}Q${x},${y} ${x + r},${y}H${x + w - r}Q${x + w},${y} ${x + w},${y + r}V${y + h}Z`;
+}
+
+// Stacked columns by day. series: [{key, label, color}], value(row, key).
+function columns(host, rows, series, value, tipRows) {
+  host.replaceChildren();
+  if (!rows.length) { host.append(el('div', { class: 'empty', text: '이 기간에 데이터가 없습니다.' })); return; }
+  const W = Math.max(280, host.clientWidth), H = 200, top = 16, axisH = 24, left = 36, right = 4;
+  const plotW = W - left - right, plotH = H - top;
+  const totals = rows.map((r) => series.reduce((s, x) => s + value(r, x.key), 0));
+  const step = niceStep(Math.max(...totals));
+  const ymax = Math.max(step, Math.ceil(Math.max(...totals) / step) * step);
+  const y = (v) => top + plotH - (v / ymax) * plotH;
+  const band = plotW / rows.length;
+  const bw = Math.max(1, Math.min(24, band - 2, band * 0.72));
+  const s = svg('svg', { viewBox: `0 0 ${W} ${H + axisH}`, height: H + axisH, role: 'img' });
+
+  for (let v = 0; v <= ymax; v += step) {
+    s.append(svg('line', { x1: left, x2: W - right, y1: y(v), y2: y(v), stroke: v ? 'var(--grid)' : 'var(--axis)', 'stroke-width': 1 }));
+    const t = svg('text', { x: left - 6, y: y(v) + 4, 'text-anchor': 'end' });
+    t.textContent = fmt(v);
+    s.append(t);
+  }
+  const every = Math.max(1, Math.ceil(44 / band));
+  const peak = totals.indexOf(Math.max(...totals));
+  rows.forEach((r, i) => {
+    const x = left + i * band + (band - bw) / 2;
+    const g = svg('g', { class: 'col' });
+    let base = y(0);
+    const parts = series.map((x) => ({ ...x, v: value(r, x.key) })).filter((p) => p.v > 0);
+    parts.forEach((p, j) => {
+      const h = (p.v / ymax) * plotH;
+      const last = j === parts.length - 1;
+      const gap = j > 0 && h > 3 ? 2 : 0;  // surface gap between stacked segments
+      const segH = Math.max(1, h - gap);
+      const segY = base - h;
+      g.append(last ? svg('path', { d: topRounded(x, segY, bw, segH, 4), fill: p.color })
+                    : svg('rect', { x, y: segY, width: bw, height: segH, fill: p.color }));
+      base -= h;
+    });
+    if (i === peak && totals[i] > 0) {  // label the peak only
+      const t = svg('text', { x: x + bw / 2, y: base - 5, 'text-anchor': 'middle', class: 'cap' });
+      t.textContent = fmt(totals[i]);
+      g.append(t);
+    }
+    if ((rows.length - 1 - i) % every === 0) {  // counted from the end, so today is always labeled
+      const t = svg('text', { x: left + i * band + band / 2, y: H + 16, 'text-anchor': 'middle' });
+      t.textContent = shortDay(r.day);
+      s.append(t);
+    }
+    const hit = svg('rect', { class: 'hit', x: left + i * band, y: top, width: band, height: plotH, tabindex: 0,
+                              'aria-label': `${r.day} ${fmt(totals[i])}` });
+    const show = (e) => showTip(e, r.day, tipRows(r, totals[i]));
+    hit.addEventListener('pointermove', show);
+    hit.addEventListener('focus', show);
+    hit.addEventListener('pointerleave', hideTip);
+    hit.addEventListener('blur', hideTip);
+    s.append(hit, g);
+  });
+  host.append(s);
+}
+
+function table(headers, rows) {
+  if (!rows.length) return el('div', { class: 'empty', text: '없음' });
+  const t = el('table');
+  t.append(el('thead', {}, el('tr', {}, ...headers.map(([h, cls]) => el('th', { class: cls || '', text: h })))));
+  const body = el('tbody');
+  for (const r of rows) {
+    body.append(el('tr', {}, ...r.map((c, i) => {
+      const td = el('td', { class: headers[i][1] || '' });
+      if (c instanceof Node) td.append(c); else td.textContent = c ?? '';
+      return td;
+    })));
+  }
+  t.append(body);
+  return t;
+}
+
+function bars(host, entries) {
+  host.replaceChildren();
+  const total = entries.reduce((s, [, n]) => s + n, 0);
+  if (!total) { host.append(el('div', { class: 'empty', text: '없음' })); return; }
+  const max = Math.max(...entries.map(([, n]) => n));
+  for (const [name, n] of entries) {
+    const fill = el('div', { class: 'fill', style: `width: calc((100% - 72px) * ${n / max})` });
+    host.append(el('div', { class: 'bar' },
+      el('div', { class: 'name', title: name, text: name }),
+      el('div', { class: 'track' }, fill, el('span', { class: 'val' }, fmt(n), ' ', el('small', { text: pct(n, total) })))));
+  }
+}
+
+function count(items, keyOf) {
+  const m = new Map();
+  for (const it of items) { const k = keyOf(it); if (k != null) m.set(k, (m.get(k) || 0) + 1); }
+  return m;
+}
+
+function stat(label, value, detail, hero) {
+  return el('div', { class: `card stat${hero ? ' hero' : ''}` },
+    el('div', { class: 'label', text: label }), el('div', { class: 'value', text: value }),
+    detail ? el('div', { class: 'detail', text: detail }) : null);
+}
+
+function verdictCell(v) {
+  const s = el('span', { class: 'key', text: VERDICT[v].label });
+  s.style.setProperty('--c', VERDICT[v].color);
+  return s;
+}
+
+// ---- render ----
+const firstDay = [DATA.searches[0]?.day, DATA.server[0]?.day].filter(Boolean).sort()[0] || DATA.today;
+let period = '30';
+try { period = localStorage.getItem('period') || period; } catch {}
+if (!PERIODS.some(([p]) => p === period)) period = '30';
+
+function render() {
+  const from = period === 'all' ? firstDay : addDays(DATA.today, -(+period - 1));
+  const days = daysBetween(from, DATA.today);
+  $('range').textContent = `${days[0]} ~ ${DATA.today}`;
+  $('period').querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.p === period)));
+
+  const S = DATA.searches.filter((s) => s.day >= days[0]);
+  const found = S.filter((s) => s.verdict !== 'fail');
+  const by = count(S, (s) => s.verdict);
+  const right = found.filter((s) => s.feedback === 'correct').length;
+  const wrong = found.filter((s) => s.feedback === 'wrong').length;
+  const srv = DATA.server.filter((d) => d.day >= days[0]);
+  const sum = (k) => srv.reduce((a, d) => a + d[k], 0);
+  const cold = sum('cold');
+  const V = DATA.videoEvents.filter((e) => e.day >= days[0]);
+  const videos = new Set(V.map((e) => e.video)).size;
+
+  $('stats').replaceChildren(
+    stat('찾기', fmt(S.length), `하루 평균 ${(S.length / days.length).toFixed(1)}회`, true),
+    el('div', { class: 'tiles' },
+    stat('찾은 비율', pct(found.length, S.length),
+      `찾음 ${fmt(by.get('confirmed') || 0)} · 확실하지 않음 ${fmt(by.get('check') || 0)} · 못 찾음 ${fmt(by.get('fail') || 0)}`),
+    stat('피드백', `${fmt(right + wrong)}건`, `맞음 ${fmt(right)} · 틀림 ${fmt(wrong)} · 찾은 결과의 ${pct(right + wrong, found.length)}`),
+    stat('서버 요청', fmt(sum('requests')), `웜 유지 제외 · 오류 ${fmt(sum('errors'))} · 스로틀 ${fmt(sum('throttles'))}`),
+    stat('콜드 스타트', `${fmt(cold)}회`, cold ? `평균 초기화 ${(sum('init_ms') / cold / 1000).toFixed(1)}초` : '초기화 없음'),
+    stat('Lambda 예상 비용', `$${sum('cost').toFixed(2)}`, '무료 한도 적용 전, 웜 유지 포함'),
+    stat('영상 기록', `${fmt(V.length)}개`, `영상 ${fmt(videos)}개`)),
+  );
+
+  // Searches by day
+  const perDay = new Map(days.map((d) => [d, { day: d, confirmed: 0, check: 0, fail: 0 }]));
+  for (const s of S) perDay.get(s.day)[s.verdict]++;
+  const searchRows = [...perDay.values()];
+  columns($('searchChart'), searchRows, VERDICTS, (r, k) => r[k],
+    (r, total) => [[fmt(total), '합계'], ...VERDICTS.map((v) => [fmt(r[v.key]), v.label, v.color])]);
+  $('searchTable').replaceChildren(table([['날짜'], ['찾음', 'num'], ['확실하지 않음', 'num'], ['못 찾음', 'num'], ['합계', 'num']],
+    searchRows.filter((r) => r.confirmed + r.check + r.fail).reverse()
+      .map((r) => [r.day, fmt(r.confirmed), fmt(r.check), fmt(r.fail), fmt(r.confirmed + r.check + r.fail)])));
+
+  // Server requests by day (one series; cold starts, errors and cost ride along in the tooltip and table)
+  const srvBy = new Map(srv.map((d) => [d.day, d]));
+  const zero = { requests: 0, warm: 0, invocations: 0, errors: 0, throttles: 0, cold: 0, init_ms: 0, cost: 0 };
+  const srvRows = days.filter((d) => d >= addDays(DATA.today, -(DATA.metricDays - 1)))
+    .map((d) => ({ ...zero, ...srvBy.get(d), day: d }));
+  columns($('serverChart'), srvRows, [{ key: 'requests', label: '요청', color: 'var(--s1)' }], (r) => r.requests,
+    (r) => [[fmt(r.requests), '요청'], [fmt(r.cold), '콜드 스타트'], [fmt(r.errors), '오류'],
+            [fmt(r.warm), '웜 유지 호출'], [`$${r.cost.toFixed(3)}`, '예상 비용']]);
+  $('serverTable').replaceChildren(table(
+    [['날짜'], ['요청', 'num'], ['웜 유지', 'num'], ['전체 호출', 'num'], ['오류', 'num'], ['스로틀', 'num'], ['콜드 스타트', 'num'], ['예상 비용', 'num']],
+    srvRows.filter((r) => r.invocations).reverse().map((r) => [r.day, fmt(r.requests), fmt(r.warm), fmt(r.invocations),
+      fmt(r.errors), fmt(r.throttles), fmt(r.cold), `$${r.cost.toFixed(3)}`])));
+
+  bars($('siteBars'), [...count(S, (s) => s.site)].sort((a, b) => b[1] - a[1]));
+  const lens = count(S.filter((s) => s.seconds != null), (s) => LENGTHS.find(([, f]) => f(s.seconds))[0]);
+  bars($('lengthBars'), LENGTHS.map(([name]) => [name, lens.get(name) || 0]).filter(([, n]) => n));
+  bars($('methodBars'), [...count(found, (s) => METHODS[s.method] || s.method)].sort((a, b) => b[1] - a[1]));
+
+  const tracks = new Map();
+  for (const s of found) {
+    const t = tracks.get(s.track) || { path: s.track, n: 0, check: 0, right: 0, wrong: 0 };
+    t.n++; if (s.verdict === 'check') t.check++;
+    if (s.feedback === 'correct') t.right++; if (s.feedback === 'wrong') t.wrong++;
+    tracks.set(s.track, t);
+  }
+  $('topTracks').replaceChildren(table([['곡'], ['폴더'], ['찾은 횟수', 'num'], ['확실하지 않음', 'num'], ['맞음', 'num'], ['틀림', 'num']],
+    [...tracks.values()].sort((a, b) => b.n - a.n || a.path.localeCompare(b.path)).slice(0, 10)
+      .map((t) => [trackName(t.path), el('span', { class: 'dim', text: trackFolder(t.path) }),
+                   fmt(t.n), fmt(t.check), fmt(t.right), fmt(t.wrong)])));
+
+  const recent = S.slice().reverse().slice(0, 100);
+  $('recentSub').textContent = S.length > recent.length ? `기간 안 ${fmt(S.length)}건 중 최근 100건` : `기간 안 ${fmt(S.length)}건`;
+  $('recent').replaceChildren(table([['시각', 'nowrap'], ['사이트', 'nowrap'], ['탭 제목'], ['결과', 'nowrap'], ['곡'], ['피드백', 'nowrap'], ['길이', 'num']],
+    recent.map((s) => {
+      const title = /^https?:\/\//.test(s.url)
+        ? el('a', { href: s.url, target: '_blank', rel: 'noreferrer noopener', text: s.title || s.url })
+        : el('span', { text: s.title || '(제목 없음)' });
+      return [s.at, s.site, title, verdictCell(s.verdict), s.track ? trackName(s.track) : el('span', { class: 'dim', text: '–' }),
+              { correct: '맞음', wrong: '틀림' }[s.feedback] || el('span', { class: 'dim', text: '–' }),
+              s.seconds != null ? `${s.seconds}초` : '–'];
+    })));
+}
+
+$('generated').textContent = `${DATA.generated} 기준 · python server/usage.py로 새로 만듦`;
+$('metricDays').textContent = DATA.metricDays;
+$('searchLegend').replaceChildren(...VERDICTS.map((v) => { const s = el('span', { text: v.label }); s.style.setProperty('--c', v.color); return s; }));
+$('period').replaceChildren(...PERIODS.map(([p, label]) => {
+  const b = el('button', { type: 'button', 'data-p': p, text: label });
+  b.addEventListener('click', () => { period = p; try { localStorage.setItem('period', p); } catch {} render(); });
+  return b;
+}));
+render();
+let resizeTimer;
+window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(render, 150); });
+</script>
+</body>
+</html>
