@@ -439,6 +439,7 @@ function ask(id, path, video = '') {
   return row;
 }
 
+localize();  // the page's lang; the popup's text is all built by script
 (async () => {
   try {
     // Earlier builds also kept a chosen length ('duration'); it is no longer read.

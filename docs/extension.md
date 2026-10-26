@@ -182,5 +182,6 @@ IBM Plex Sans KR은 Windows 화면에서 버튼 글자가 살짝 깨져 보인�
 - 시험: `node --test "tests/*.test.mjs"`가 두 언어의 키와 `$n`이 같은지, 코드에서 쓰는 키가 모두 있는지, 코드 문자열에
   한국어가 남지 않았는지 본다.
 - 화면 확인과 스토어 스크린샷: `store/shots/`. `stub.js`가 `chrome.*`와 서버를 흉내 내고, 실제 `popup.js`·`library.js`를
-  headless Chrome으로 찍는다. `python store/shots/make.py check`는 모든 팝업 화면을 두 언어로 `build/shots/check/`에 찍는다.
+  headless Chrome으로 찍는다. `python store/shots/make.py check --key-file <키 파일>`은 모든 팝업 화면과 라이브러리 페이지를
+  두 언어로 `build/shots/check/`에 찍는다. 라이브러리 앨범 목록은 실행 중인 로컬 서버의 `GET /albums`에서 커버를 빼고 가져온다.
   영어 문장이 길어 넘치면 먼저 문장을 줄인다.

@@ -1,6 +1,7 @@
 """Store screenshots and a layout check of every popup screen, from the real extension pages.
 
-    python store/shots/make.py check            every popup scene in ko and en -> build/shots/check/
+    python store/shots/make.py check            every popup scene and the library page in ko and en
+                                                -> build/shots/check/
     python store/shots/make.py store --lang en  the store screenshots -> store/assets/en/
 
 The pages run in headless Chrome against stub.js (a stand-in chrome.* API and server with canned
@@ -15,7 +16,6 @@ import functools
 import http.server
 import json
 import re
-import shutil
 import subprocess
 import threading
 import urllib.request
@@ -49,10 +49,13 @@ def albums(server: str, key: str) -> None:
     (HERE / "albums.json").write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
 
 
+class Quiet(http.server.SimpleHTTPRequestHandler):
+    def log_message(self, *args) -> None:
+        pass
+
+
 def serve() -> tuple[http.server.ThreadingHTTPServer, int]:
-    handler = functools.partial(http.server.SimpleHTTPRequestHandler, directory=str(ROOT))
-    handler.log_message = lambda *a: None
-    srv = http.server.ThreadingHTTPServer(("127.0.0.1", 0), handler)
+    srv = http.server.ThreadingHTTPServer(("127.0.0.1", 0), functools.partial(Quiet, directory=str(ROOT)))
     threading.Thread(target=srv.serve_forever, daemon=True).start()
     return srv, srv.server_address[1]
 
@@ -76,15 +79,16 @@ def main() -> None:
     srv, port = serve()
     base = f"http://127.0.0.1:{port}/store/shots"
     try:
+        albums(a.server, a.key_file.read_text().strip() if a.key_file else "")
         if a.what == "check":
             for lang in ("ko", "en"):
                 for scene in SCENES:
                     shoot(f"{base}/popup.html?lang={lang}&scene={scene}", CHECK / f"{lang}-{scene}.png", "380,900")
+                shoot(f"{base}/library.html?lang={lang}", CHECK / f"{lang}-library.png", "1280,800")
         else:
-            albums(a.server, a.key_file.read_text().strip() if a.key_file else "")
             out = ROOT / "store" / "assets" / a.lang
             for name, shot in STORE.items():
-                url = (f"{base}/library.html?lang={a.lang}&scene=library" if shot == "library"
+                url = (f"{base}/library.html?lang={a.lang}" if shot == "library"
                        else f"{base}/compose.html?lang={a.lang}&shot={shot}")
                 shoot(url, out / name, "1280,800")
     finally:

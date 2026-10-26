@@ -65,8 +65,10 @@ test('no Korean left in code', { todo: true }, () => {
     if (f === 'privacy.html') continue;
     const src = read(f);
     if (f.endsWith('.js')) {
-      // String literals only; comments may stay Korean.
-      for (const m of src.matchAll(/'(?:[^'\\\n]|\\.)*'|"(?:[^"\\\n]|\\.)*"|`(?:[^`\\]|\\.)*`/g)) {
+      // String literals only; comments may stay Korean. A comment starts at a // after a space
+      // (a URL's // follows a colon).
+      const code = src.replace(/(^|\s)\/\/.*$/gm, '$1');
+      for (const m of code.matchAll(/'(?:[^'\\\n]|\\.)*'|"(?:[^"\\\n]|\\.)*"|`(?:[^`\\]|\\.)*`/g)) {
         if (HANGUL.test(m[0]) && !(f === 'i18n.js' && m[0] === "'단일 곡'")) left.push(`${f}: ${m[0]}`);
       }
     } else {
