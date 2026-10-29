@@ -92,7 +92,7 @@ No packages beyond the server's requirements; Node is optional (development only
 
 ```bash
 python -m unittest discover -s tests       # server/videos.py: video keys, sharing rules, stores
-node --test "tests/*.test.mjs"             # extension/video.js (Node 22; quote the glob, a bare folder does not work)
+node --test "tests/*.test.mjs"             # extension/video.js, i18n.js and _locales (Node 22; quote the glob, a bare folder does not work)
 ```
 
 `tests/check_api.py` checks a running server: the requests of earlier extension versions get the same answers

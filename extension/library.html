@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Krump 라이브러리</title>
+<title data-i18n="library_page_title">Krump Track Finder</title>
 <link rel="icon" href="icons/icon32.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -22,22 +22,22 @@
           </span>
           <span class="wordmark">Krump Track Finder</span>
         </div>
-        <h1>라이브러리</h1>
+        <h1 data-i18n="library_heading"></h1>
         <div id="summary" class="stats"></div>
       </div>
       <div class="search">
-        <label for="search">검색</label>
+        <label for="search" data-i18n="search_label"></label>
         <div class="field">
           <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
-          <input id="search" type="search" placeholder="앨범, 아티스트, 곡 이름" autocomplete="off">
+          <input id="search" type="search" data-i18n-placeholder="search_placeholder" autocomplete="off">
         </div>
       </div>
     </header>
     <div class="bar">
-      <div id="filters" class="filters" role="group" aria-label="보기">
-        <button type="button" data-f="all" aria-pressed="true">전체</button>
-        <button type="button" data-f="buy" aria-pressed="false">구매 가능</button>
-        <button type="button" data-f="none" aria-pressed="false">판매처 없음</button>
+      <div id="filters" class="filters" role="group" data-i18n-aria-label="filters_label">
+        <button type="button" data-f="all" aria-pressed="true" data-i18n="filter_all"></button>
+        <button type="button" data-f="buy" aria-pressed="false" data-i18n="filter_buy"></button>
+        <button type="button" data-f="none" aria-pressed="false" data-i18n="no_store"></button>
       </div>
       <span id="shown" class="shown"></span>
     </div>
@@ -45,6 +45,7 @@
     <main id="albums"></main>
   </div>
   <script src="config.js"></script>
+  <script src="i18n.js"></script>
   <script src="library.js"></script>
 </body>
 </html>

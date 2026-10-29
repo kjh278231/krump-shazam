@@ -1,0 +1,69 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+  /* A 1280x800 store screenshot: the pitch on the left, the real popup (popup.html in this folder,
+     rendered by stub.js) on the right. Covers are title tiles: other artists' album art is not used. */
+  html, body { margin: 0; width: 1280px; height: 800px; overflow: hidden; }
+  body { background: linear-gradient(105deg, #0f0e0e 0 72%, #191716 72%); color: #f2eee8;
+         font-family: 'Pretendard Variable', 'Malgun Gothic', sans-serif; position: relative; }
+  .pitch { position: absolute; left: 126px; top: 50%; transform: translateY(-50%); width: 560px; }
+  .pitch.narrow { left: 72px; width: 360px; }
+  .brand { display: flex; align-items: center; gap: 12px; font: 800 21px/1 Archivo, sans-serif;
+           font-stretch: 75%; text-transform: uppercase; }
+  .logo { width: 36px; height: 36px; border-radius: 8px; background: #ff5a1f; color: #111010;
+          display: grid; place-items: center; }
+  h1 { font-size: 56px; line-height: 1.12; font-weight: 800; margin: 22px 0 26px; letter-spacing: -.01em; }
+  h1 em { font-style: normal; color: #ff5a1f; }
+  p { font-size: 21px; line-height: 1.65; color: #d9d2c9; margin: 0; }
+  .popup { position: absolute; width: 380px; border: 1px solid #3a3532; border-radius: 16px; overflow: hidden;
+           background: #111010; box-shadow: 0 30px 80px rgba(0, 0, 0, .55); }
+  iframe { display: block; width: 380px; height: 600px; border: 0; }
+</style>
+</head>
+<body>
+<div id="pitch" class="pitch">
+  <div class="brand"><span class="logo"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M4 10v4M8 6v12M12 3v18M16 7v10M20 10v4"/></svg></span>Krump Track Finder</div>
+  <h1 id="title"></h1>
+  <p id="text"></p>
+</div>
+<script>
+// ?lang=en&shot=1. Each shot: title (with <em> for the accent), text, popups [scene, x, top or null
+// to centre, click selector], narrow pitch.
+const SHOTS = {
+  en: {
+    1: ['The krump track<br>playing now, <em>found</em>', 'Watching a battle or session? One click. It listens to the tab and finds the same track in a krump library.', [['found', 774]]],
+    2: ['Not sure?<br>Check with a<br><em>10 s preview</em>', 'Finds tracks by their rhythm even in live videos full of reverb and crowd noise. When unsure, listen to check.', [['unsure', 774]]],
+    3: ['Stops<br><em>as soon as</em><br>it\'s sure', 'Listens for up to 30 seconds, sometimes only 10, and keeps listening if you close the popup.', [['idle', 484, 200], ['recording', 858, 292]], true],
+    5: ['Not found?<br>Listen <em>longer</em>', 'Drowned out by the MC or the crowd? Search again for 45 seconds or a minute. The first search is always up to 30 seconds.', [['fail', 774, null, '[data-s="60"]']]],
+    6: ['Tracks in this video,<br>shown <em>as soon as</em><br>you open it', 'If others already found tracks in the same video, the popup shows them right away. Several show as a list.', [['records', 774]]],
+  },
+};
+const q = new URLSearchParams(location.search);
+const lang = q.get('lang') || 'en';
+const [title, text, popups, narrow] = SHOTS[lang][q.get('shot')];
+document.getElementById('title').innerHTML = title;
+document.getElementById('text').textContent = text;
+if (narrow) document.getElementById('pitch').classList.add('narrow');
+for (const [scene, x, top, click] of popups) {
+  const box = document.createElement('div');
+  box.className = 'popup';
+  box.style.left = `${x}px`;
+  const frame = document.createElement('iframe');
+  frame.src = `popup.html?lang=${lang}&scene=${scene}`;
+  box.append(frame);
+  document.body.append(box);
+  frame.onload = () => setTimeout(() => {
+    const doc = frame.contentDocument;
+    if (click) doc.querySelector(click)?.click();
+    const h = doc.body.scrollHeight;
+    frame.style.height = `${h}px`;
+    box.style.top = `${top ?? (800 - h) / 2}px`;
+  }, 1500);
+}
+</script>
+</body>
+</html>

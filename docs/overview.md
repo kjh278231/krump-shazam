@@ -22,8 +22,9 @@
 - 영상 탭(1.2.0부터): 같은 영상에서 다른 사용자가 이미 찾은 곡이 있으면, 팝업을 열자마자 그 곡들을 보여 준다
   ([영상별 기록](video-records.md)). 영상의 몇 초에 나오는 곡인지는 기록하지 않는다.
 - 결과는 세 가지다. **찾음**(확정), **찾음 · 확실하지 않음**(미리듣기로 확인해 달라는 후보), **못 찾음**.
-- 공개 상태: Chrome Web Store 1.0.0 Unlisted(2026-10-18). 다음 공개는 1.2.0이다(1.1.0은 내지 않고 합침,
-  [확장 프로그램](extension.md) §6). 서버는 AWS Lambda(서울)에서 돈다.
+- 공개 상태: Chrome Web Store 1.0.0 Unlisted(2026-10-18), 1.2.0 제출(1.1.0은 내지 않고 합침,
+  [확장 프로그램](extension.md) §6). 1.3.0부터 화면이 영어로도 나온다(한국어 Chrome이면 한국어, 그 밖은 영어,
+  [확장 프로그램](extension.md) §7). 서버는 AWS Lambda(서울) 하나를 두 언어가 같이 쓴다.
 - 쓰려면 개인정보처리방침에 동의해야 한다. 동의하면 녹음과 탭 제목·주소가 서버에 남고, 그 녹음과 피드백이 정확도 평가
   데이터가 된다. 찾은 곡은 같은 영상을 여는 다른 사용자에게 보인다([개인정보처리방침](privacy-policy.md)).
 
@@ -46,6 +47,7 @@ Chrome 확장 (extension/, Manifest V3, 프레임워크 없는 JS)
   offscreen.js   탭 오디오 녹음(MediaRecorder, Opus, 1초 조각), 중간 확인, 최종 검색
   video.js       탭 주소에서 영상 키
   library.js     라이브러리 앨범 목록 페이지
+  i18n.js        화면 문장(_locales/ko, _locales/en), 오류 코드를 문장으로
         │  HTTPS (Lambda Function URL), X-Api-Key 헤더
         ▼
 서버 (server/app.py, FastAPI) — 로컬 127.0.0.1:8765 또는 Lambda 컨테이너(Lambda Web Adapter)
@@ -74,7 +76,7 @@ Chrome 확장 (extension/, Manifest V3, 프레임워크 없는 JS)
 | 앨범 데이터 | `server/build_albums.py`, `server/fetch_store_covers.py`, `db/album_links.json` | 앨범 목록, 커버, 판매 링크([앨범 링크](album-links.md)) |
 | 배포 | `server/deploy/` | 이미지·데이터 준비(`stage.py`), AWS 리소스(`aws_setup.py`), 배포 조건 확인(`release.py`) |
 | 사용량 대시보드 | `server/usage.py`, `server/usage.html` | 배포된 서버의 찾기·결과·피드백·Lambda 호출과 비용을 이 PC에서 보는 HTML([Lambda 배포](lambda-deployment.md)) |
-| 스토어 | `store/` | 웹스토어 업로드 zip(`package.py`), 등록 문구, 스크린샷 |
+| 스토어 | `store/` | 웹스토어 업로드 zip(`package.py`), 등록 문구, 스크린샷(한국어 `assets/`, 영어 `assets/en/`), 화면 확인·스크린샷 도구(`shots/`) |
 | 평가 | `poc/evaluate.py`, `poc/make_testset.py`, `poc/real_video_test.py`, `poc/battle_*.py`, `poc/eval_*.py`, `realtest/` | 합성 잡음 세트, 실제 영상, 배틀 100편 측정 |
 
 ## 3. 한 번의 찾기
@@ -179,12 +181,12 @@ Chrome 확장 (extension/, Manifest V3, 프레임워크 없는 JS)
 |---|---|
 | [README](../README.md) | 설치, 인덱스 빌드, 로컬 실행, 확장 프로그램 불러오기 |
 | [검색 파이프라인](search-pipeline.md) | 단계 순서, 후보 묶기와 판정, Panako와 패치, pair stage, rhythm search, 기준과 보정, 서버 실행 구조와 속도 |
-| [확장 프로그램](extension.md) | 파일 구성, 녹음 흐름, 팝업 화면, 라이브러리 페이지, 동의와 녹음 저장, 웹스토어 배포 |
+| [확장 프로그램](extension.md) | 파일 구성, 녹음 흐름, 팝업 화면, 라이브러리 페이지, 동의와 녹음 저장, 웹스토어 배포, 언어 |
 | [평가](evaluation.md) | 평가 세트와 도구, PoC 결과, 실제 영상 테스트, 미확인 후보 |
 | [Lambda 배포](lambda-deployment.md) | 왜 Lambda인가, 비용, 배포된 리소스, 배포 절차, 사용량 대시보드, 콜드 스타트 측정 |
 | [영상별 기록](video-records.md) | 영상 키, 이벤트 형식, 공유 기준, `GET /video`, 시험, 구간을 기록하지 않는 이유 |
 | [앨범 링크](album-links.md) | `db/album_links.json` 형식과 링크를 찾은 방법 |
-| [개인정보처리방침](privacy-policy.md) | 보내는 정보, 보관, 철회 |
+| [개인정보처리방침](privacy-policy.md), [영어판](privacy-policy.en.md) | 보내는 정보, 보관, 철회 |
 | [Shazam 잡음 강건성 검토](review-shazam-noise-robustness.md) | fingerprint 개선 실험(E1–E6)의 근거 |
 | [설계안 A — NMFP](design-a-nmfp.md), [설계안 B — MuQ](design-b-muq.md) | 신경망 fingerprint 제안(구현 안 함) |
 | `docs/fp-experiments-e1-e6.md` (브랜치 `fp-experiments`) | E1–E9 실험 결과 |

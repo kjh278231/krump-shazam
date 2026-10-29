@@ -12,6 +12,11 @@ per-video records follow their contract (docs/video-records.md §7).
   python tests/check_api.py --server URL --key-file FILE --no-store
                                                       deployed smoke test: never sends share=1, so
                                                       nothing is stored
+  python tests/check_api.py --errors [--key-file FILE]
+                                                      user-facing errors carry a `code` and keep the
+                                                      old `detail` (1.3.0 extension); no clips needed,
+                                                      nothing is stored. With a key file the server's
+                                                      key is required and a wrong one is tried too
 
 Default server http://127.0.0.1:8765 (no API key). Run the local server with KF_TMP and KF_VIDEO_DIR
 pointing at a scratch folder so recordings/ is not touched:
@@ -250,6 +255,43 @@ def smoke(srv: Server, clips: dict[str, bytes]) -> int:
     return c.failed
 
 
+def silence(tmp: Path, seconds: int = 5) -> bytes:
+    """A recording of a muted tab: Opus in WebM, like the extension's MediaRecorder."""
+    out = tmp / "silence.webm"
+    subprocess.run([FFMPEG, "-v", "error", "-y", "-f", "lavfi", "-i", "anullsrc=r=48000:cl=mono",
+                    "-t", str(seconds), "-c:a", "libopus", str(out)], check=True)
+    return out.read_bytes()
+
+
+def errors(srv: Server) -> int:
+    """The errors the extension shows: the 1.3.0 extension words them from `code`, 1.0.0/1.2.0 show
+    `detail` as it is, so `detail` must not change."""
+    c = Checker()
+
+    def check(st, data, status, code, detail, what, prefix=False):
+        body = data if isinstance(data, dict) else {}
+        got_detail = body.get("detail", "")
+        same = got_detail.startswith(detail) if prefix else got_detail == detail
+        c.ok(st == status and body.get("code") == code and same,
+             f"{what}: {status} {code} ({st} {body.get('code')} {got_detail[:60]!r})")
+
+    st, data, _ = srv.call("POST", "/identify", {}, b"")
+    check(st, data, 400, "empty", "recording is empty (is the tab playing audio?)", "empty recording")
+    st, data, _ = srv.call("POST", "/identify", {}, b"x" * 5000)
+    check(st, data, 400, "undecodable", "ffmpeg could not decode the recording", "undecodable recording",
+          prefix=True)  # ffmpeg's own message follows
+    with tempfile.TemporaryDirectory() as d:
+        quiet = silence(Path(d))
+    st, data, _ = srv.call("POST", "/identify", {}, quiet)
+    check(st, data, 400, "silent", "소리가 거의 녹음되지 않았습니다. 탭/영상이 음소거 상태이거나 멈춰 있지 않은지 확인하세요.",
+          "silent recording")
+    if srv.key:
+        st, data, _ = Server(srv.url, srv.key + "-wrong").call("GET", "/albums")
+        check(st, data, 401, "bad_key", "API 키가 맞지 않습니다.", "wrong API key")
+    print("failed" if c.failed else "all passed", f"({c.failed} failed)")
+    return c.failed
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--server", default="http://127.0.0.1:8765")
@@ -258,11 +300,14 @@ def main() -> None:
     ap.add_argument("--compare", type=Path, help="compare the old requests' answers with this baseline")
     ap.add_argument("--contract", action="store_true", help="check the per-video records contract")
     ap.add_argument("--no-store", action="store_true", help="deployed smoke test, never share=1")
+    ap.add_argument("--errors", action="store_true", help="error codes and unchanged details")
     ap.add_argument("--video-dir", type=Path, help="the server's KF_VIDEO_DIR")
     a = ap.parse_args()
     srv = Server(a.server, a.key_file.read_text().strip() if a.key_file else "")
-    with tempfile.TemporaryDirectory() as d:
-        clips = cut_clips(Path(d))
+    clips = {}
+    if a.baseline or a.compare or a.contract or a.no_store:
+        with tempfile.TemporaryDirectory() as d:
+            clips = cut_clips(Path(d))
     failed = 0
     if a.baseline or a.compare:
         before = events_under(a.video_dir)
@@ -286,6 +331,8 @@ def main() -> None:
         failed += contract(srv, clips, a.video_dir)
     if a.no_store:
         failed += smoke(srv, clips)
+    if a.errors:
+        failed += errors(srv)
     sys.exit(1 if failed else 0)
 
 

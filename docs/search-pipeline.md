@@ -258,3 +258,19 @@ fingerprint와 pair stage는 길이에 비례하고 rhythm search는 길이와 �
 
 Linux에서는 프로세스 시작이 밀리초 단위라 ffmpeg 몫은 대부분 사라질 것이다. Lambda의 단계별 시간은
 [Lambda 배포](lambda-deployment.md)에 있다. 응답의 `timings`에 단계별 초가 들어 있다.
+
+## 6. 사용자에게 보이는 오류 (2026-10-26)
+
+확장 프로그램이 화면에 띄우는 오류는 응답 JSON에 `code`가 붙는다. 1.3.0부터 확장 프로그램이 `code`를 보고 사용자 언어의
+문장을 고른다. `detail`은 예전 문장 그대로다. 1.0.0·1.2.0은 `detail`을 그대로 띄우기 때문이다(`server/app.py` `ApiError`).
+
+| 상태 | `code` | 언제 | `detail` |
+|---|---|---|---|
+| 401 | `bad_key` | API 키가 다름 | API 키가 맞지 않습니다. |
+| 400 | `empty` | 녹음이 1,000바이트 미만 | recording is empty (is the tab playing audio?) |
+| 400 | `undecodable` | ffmpeg가 녹음을 못 읽음 | ffmpeg could not decode the recording: … |
+| 400 | `silent` | 거의 무음(RMS < 0.003, 음소거된 탭) | 소리가 거의 녹음되지 않았습니다. … |
+| 404 | `no_albums` | `GET /albums`인데 앨범 목록 파일이 없음 | 앨범 목록이 없습니다 … |
+
+그 밖의 오류(`GET /video`의 잘못된 키, 미리듣기·피드백 실패)는 `code`가 없다. 확장 프로그램이 그 문장을 보이지 않기 때문이다.
+확인: `python tests/check_api.py --errors --key-file <키 파일>`(`detail`이 그대로인지도 본다).

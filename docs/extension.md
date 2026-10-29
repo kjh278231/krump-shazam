@@ -14,11 +14,14 @@
 | `background.js` | service worker. 팝업과 녹음기 사이를 잇고 상태를 `chrome.storage.session`에 둔다. 툴바 배지. 영상에서 끝난 찾기를 내 기록(`history`)에 남긴다 |
 | `offscreen.html`, `offscreen.js` | 탭 오디오 녹음, 녹음 중 확인, 최종 검색. 영상 탭이면 요청에 영상 키(`vkey`)를 붙인다 |
 | `video.js` | 탭 주소에서 영상 키(`videoKey`). 팝업이 쓴다 |
+| `i18n.js`, `_locales/ko`, `_locales/en` | 화면 문장(1.3.0). 한국어 Chrome이면 한국어, 그 밖은 영어(§7) |
 | `library.html`, `library.js`, `library.css` | 라이브러리 앨범 목록 탭 |
-| `privacy.html` | 개인정보처리방침([같은 내용](privacy-policy.md)) |
+| `privacy.html`, `privacy.en.html` | 개인정보처리방침([같은 내용](privacy-policy.md), [영어판](privacy-policy.en.md)) |
 | `icons/` | 툴바·스토어 아이콘 |
 
 빌드 단계는 없다. 순수 JS·CSS를 그대로 불러온다.
+
+화면이 바뀌면 `python store/shots/make.py check`로 모든 팝업 화면을 한국어·영어로 찍어 본다(§7).
 
 **서버 연결.** 기본 서버는 배포된 AWS Lambda다([Lambda 배포](lambda-deployment.md)). 엔드포인트와 API 키는
 `config.js`에 고정돼 있고, 확장 프로그램에는 이를 보거나 바꾸는 설정 화면이 없다. 로컬 서버(`server\start.bat`,
@@ -139,10 +142,13 @@ IBM Plex Sans KR은 Windows 화면에서 버튼 글자가 살짝 깨져 보인�
   1.0.0은 `true`를 저장했으므로 1.2.0으로 올라가는 사용자는 모두 한 번 다시 동의한다. 1.1.0(시행일 2026-10-19 방침)은
   웹스토어에 내지 않고 1.2.0에 합쳤다(§6).
 - 예전 방침에 동의했던 사용자(`true`나 다른 시행일)에게는 동의 화면에 "개인정보처리방침이 바뀌었어요." 아래
-  `POLICY_CHANGE`(한두 줄)가 보인다. 지금은 1.0.0 사용자 기준으로 "녹음이 최대 1분으로 늘었어요." / "찾은 곡을 같은 영상을
+  `POLICY_CHANGE`(한두 줄, 메시지 `policy_change_1`·`policy_change_2`)가 보인다. 지금은 1.0.0 사용자 기준으로 "녹음이 최대 1분으로 늘었어요." / "찾은 곡을 같은 영상을
   보는 다른 사용자에게 보여 줘요."다. 처음 쓰는 사용자와 철회한 사용자에게는 보이지 않는다.
-- 방침을 고칠 때: `extension/privacy.html`과 [개인정보처리방침](privacy-policy.md)의 시행일과 9번(개정 이력)을 고치고,
-  `POLICY`를 새 시행일로, `POLICY_CHANGE`를 바뀐 점 한두 줄로 바꾼다. 제출일이 바뀌면 패키징 직전에 이 셋의 날짜를 함께 고친다.
+- 방침은 다섯 곳에 있고 함께 고친다(1.3.0부터): `extension/privacy.html`, `extension/privacy.en.html`,
+  [개인정보처리방침](privacy-policy.md), [영어판](privacy-policy.en.md), 두 언어의 `policy_change_1`·`policy_change_2`.
+  영어판은 한국어판을 그대로 옮긴 번역이고 시행일이 같다. 영어판이 생긴 것만으로는 `POLICY`를 바꾸지 않았다(다시 동의 받지 않음).
+- 방침을 고칠 때: 위 네 문서의 시행일과 9번(개정 이력)을 고치고, `POLICY`를 새 시행일로, 바뀐 점 한두 줄을 두 언어 메시지에
+  쓴다. 제출일이 바뀌면 패키징 직전에 날짜를 함께 고친다. 팝업의 방침 링크는 보이는 언어 쪽(`privacy_page`)을 연다.
 - 동의하면 확장 프로그램이 `share=1`과 함께 탭 제목·주소(영상 탭이면 영상 키도)를 보내고, 서버가 최종 녹음을 저장한다.
   `share`가 없으면(이전 빌드) 서버는 검색 뒤 오디오를 지우고 id를 돌려주지 않으며, 팝업은 맞음 / 틀림을 숨긴다.
 - 1.2.0부터 동의 화면에 영상별 기록의 공유가 들어 있다. 영상 탭에서 팝업을 열면 영상 id를 보내 조회하고, 찾은 곡은 같은
@@ -162,3 +168,24 @@ IBM Plex Sans KR은 Windows 화면에서 버튼 글자가 살짝 깨져 보인�
   올린다.
 - `store/listing.md`에 등록 문구, 권한 사유, 데이터 공개 항목, 절차가 있고, `store/assets/`에 스크린샷과 프로모
   타일이 있다.
+
+## 7. 언어 (1.3.0)
+
+작성 2026-10-26. 설계는 `docs/superpowers/specs/2026-10-26-english-support-design.md`.
+
+- Chrome UI 언어가 한국어면 한국어, 그 밖의 모든 언어는 영어다. `_locales/ko`와 `_locales/en`만 두고 `default_locale`은
+  `en`이다. 고르는 설정은 없다. Chrome UI는 영어인데 웹사이트 선호 언어만 한국어인 사람은 영어로 본다.
+- 문장은 모두 `_locales/<언어>/messages.json`에 있다. 숫자가 끼면 메시지 안에 `$1`을 쓴다. 이름과 설명(`manifest.json`의
+  `__MSG_ext_name__` 등)도 여기서 온다.
+- `i18n.js`(각 페이지 스크립트보다 먼저 불러옴): `t(이름, ...값)`, 보이는 언어 `LANG`, HTML의 `data-i18n` 채우기
+  (`localize`), 오류 문장(`errorText`), 앨범 이름 `'단일 곡'`의 영어 표기(`albumTitle`, 서버 데이터는 그대로).
+- 오류는 문장이 아니라 `{ code, status?, detail? }`로 오간다. offscreen 문서에는 `chrome.i18n`이 없어서, 팝업이
+  `errorText`로 문장을 고른다. 서버 오류는 응답의 `code`([검색 파이프라인](search-pipeline.md) §6)를 쓰고, 모르는 `code`나
+  `code`가 없는 응답은 "서버 오류 N"이다. 서버의 한국어 `detail`은 보이지 않는다. 1.2.0이 남긴 문자열 오류는 그대로 보인다.
+- 시험: `node --test "tests/*.test.mjs"`가 두 언어의 키와 `$n`이 같은지, 코드에서 쓰는 키가 모두 있는지, 코드 문자열에
+  한국어가 남지 않았는지 본다.
+- 화면 확인과 스토어 스크린샷: `store/shots/`. `stub.js`가 `chrome.*`와 서버를 흉내 내고, 실제 `popup.js`·`library.js`를
+  headless Chrome으로 찍는다. `python store/shots/make.py check --key-file <키 파일>`은 모든 팝업 화면과 라이브러리 페이지를
+  두 언어로 `build/shots/check/`에 찍는다. 라이브러리 앨범 목록은 실행 중인 로컬 서버의 `GET /albums`에서 커버를 빼고 가져온다.
+  영어 화면이 Chrome 팝업 높이 한계(600px)를 넘고 한국어보다 길면 실패한다(한국어도 넘는 화면은 1.2.0부터 그랬다:
+  영상 기록 카드가 하나일 때 682px). 영어 문장이 길어 넘치면 먼저 문장을 줄인다.

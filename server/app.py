@@ -49,7 +49,7 @@ import numpy as np  # noqa: E402
 import uvicorn  # noqa: E402
 from fastapi import Depends, FastAPI, HTTPException, Request  # noqa: E402
 from fastapi.middleware.cors import CORSMiddleware  # noqa: E402
-from fastapi.responses import Response  # noqa: E402
+from fastapi.responses import JSONResponse, Response  # noqa: E402
 from starlette.concurrency import run_in_threadpool  # noqa: E402
 from pydantic import BaseModel  # noqa: E402
 
@@ -255,12 +255,27 @@ def same_audio(a: int, b: int) -> bool:
     return a == b or frozenset((a, b)) in LINKS
 
 
+class ApiError(HTTPException):
+    """An error the extension shows. `code` lets the 1.3.0 extension word it in the user's language;
+    `detail` stays as it was because 1.0.0 and 1.2.0 show it as it is."""
+
+    def __init__(self, status: int, code: str, detail: str):
+        super().__init__(status, detail)
+        self.code = code
+
+
 def check_key(request: Request) -> None:
     if API_KEY and request.headers.get("x-api-key") != API_KEY:
-        raise HTTPException(401, "API 키가 맞지 않습니다.")
+        raise ApiError(401, "bad_key", "API 키가 맞지 않습니다.")
 
 
 app = FastAPI()
+
+
+@app.exception_handler(ApiError)
+async def api_error(request: Request, exc: ApiError) -> JSONResponse:
+    return JSONResponse({"detail": exc.detail, "code": exc.code}, status_code=exc.status_code)
+
 app.add_middleware(CORSMiddleware, allow_origin_regex=r"chrome-extension://.*",
                    allow_methods=["*"], allow_headers=["*"])
 log_lock = threading.Lock()
@@ -333,7 +348,7 @@ async def identify(request: Request, title: str = "", url: str = "", partial: bo
 def identify_audio(body: bytes, title: str, url: str, partial: bool, share: bool = False,
                    video: dict | None = None) -> dict:
     if len(body) < 1000:
-        raise HTTPException(400, "recording is empty (is the tab playing audio?)")
+        raise ApiError(400, "empty", "recording is empty (is the tab playing audio?)")
     TMP_DIR.mkdir(parents=True, exist_ok=True)
     # Unique even for requests arriving in the same millisecond.
     stamp = datetime.now().strftime("%Y%m%d-%H%M%S-%f")[:-3] + "-" + uuid.uuid4().hex[:4]
@@ -346,13 +361,13 @@ def identify_audio(body: bytes, title: str, url: str, partial: bool, share: bool
                           capture_output=True, text=True)
     raw.unlink(missing_ok=True)
     if conv.returncode != 0 or not wav.exists():
-        raise HTTPException(400, f"ffmpeg could not decode the recording: {conv.stderr[-300:]}")
+        raise ApiError(400, "undecodable", f"ffmpeg could not decode the recording: {conv.stderr[-300:]}")
     # Instagram and others start videos muted; a muted tab records digital silence.
     with wave.open(str(wav), "rb") as w:
         pcm = np.frombuffer(w.readframes(w.getnframes()), dtype="<i2").astype(np.float32) / 32768
     if pcm.size == 0 or np.sqrt(np.mean(pcm ** 2)) < 0.003:
         wav.unlink()
-        raise HTTPException(400, "소리가 거의 녹음되지 않았습니다. 탭/영상이 음소거 상태이거나 멈춰 있지 않은지 확인하세요.")
+        raise ApiError(400, "silent", "소리가 거의 녹음되지 않았습니다. 탭/영상이 음소거 상태이거나 멈춰 있지 않은지 확인하세요.")
 
     t0 = time.time()
     try:
@@ -621,7 +636,7 @@ def albums() -> Response:
     global albums_body
     if albums_body is None:
         if not ALBUMS_FILE.exists():
-            raise HTTPException(404, "앨범 목록이 없습니다 (server/build_albums.py를 실행하세요).")
+            raise ApiError(404, "no_albums", "앨범 목록이 없습니다 (server/build_albums.py를 실행하세요).")
         out = []
         for a in ALBUMS:
             tracks = [t for t in a["tracks"] if LIBRARY.keys.get(t.lower()) == t and t not in EXCLUDED]
